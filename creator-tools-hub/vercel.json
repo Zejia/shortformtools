@@ -1,0 +1,27 @@
+{
+  "cleanUrls": true,
+  "trailingSlash": false,
+  "headers": [
+    {
+      "source": "/(.*)",
+      "headers": [
+        { "key": "X-Content-Type-Options", "value": "nosniff" },
+        { "key": "Referrer-Policy", "value": "strict-origin-when-cross-origin" },
+        { "key": "X-Frame-Options", "value": "DENY" },
+        { "key": "Permissions-Policy", "value": "camera=(), microphone=(), geolocation=()" }
+      ]
+    },
+    {
+      "source": "/assets/(.*)",
+      "headers": [
+        { "key": "Cache-Control", "value": "public, max-age=31536000, immutable" }
+      ]
+    }
+  ],
+  "redirects": [
+    { "source": "/tiktok-engagement-calculator", "destination": "/tiktok-engagement-rate-calculator", "permanent": true },
+    { "source": "/free-tiktok-engagement-rate-calculator", "destination": "/tiktok-engagement-rate-calculator", "permanent": true },
+    { "source": "/youtube-title-length-checker", "destination": "/youtube-title-checker", "permanent": true },
+    { "source": "/instagram-caption-line-break-generator", "destination": "/instagram-line-break-generator", "permanent": true }
+  ]
+}

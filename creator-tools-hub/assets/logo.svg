@@ -1,0 +1,14 @@
+<svg width="180" height="36" viewBox="0 0 180 36" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title">
+  <title id="title">Creator Tools Hub</title>
+  <rect x="0.75" y="0.75" width="34.5" height="34.5" rx="8.25" fill="url(#paint0_linear)" stroke="#D0C8B8" stroke-width="1.5"/>
+  <path d="M12 22.4L23.6 10.8M15.5 10.8H23.6V18.9" stroke="#F8F6EF" stroke-width="2.7" stroke-linecap="round" stroke-linejoin="round"/>
+  <text x="46" y="23.5" fill="#182326" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, system-ui, sans-serif" font-size="16" font-weight="760">Creator</text>
+  <text x="108" y="23.5" fill="#49615E" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, system-ui, sans-serif" font-size="16" font-weight="720">Tools Hub</text>
+  <defs>
+    <linearGradient id="paint0_linear" x1="3" y1="2" x2="34" y2="35" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#2E8C8A"/>
+      <stop offset="0.62" stop-color="#708A77"/>
+      <stop offset="1" stop-color="#D47A58"/>
+    </linearGradient>
+  </defs>
+</svg>

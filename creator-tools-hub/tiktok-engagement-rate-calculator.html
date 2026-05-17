@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>TikTok Engagement Rate Calculator by Followers or Views</title>
+    <meta name="description" content="Calculate TikTok engagement rate from likes, comments, shares, saves, followers, or views. Free TikTok engagement calculator for creators and brands.">
+    <link rel="canonical" href="https://shortformtools.com/tiktok-engagement-rate-calculator">
+    <meta property="og:title" content="TikTok Engagement Rate Calculator">
+    <meta property="og:description" content="Calculate TikTok engagement by followers or views, then see the interaction gap to your target rate.">
+    <meta property="og:type" content="website">
+    <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+    <link rel="manifest" href="site.webmanifest">
+    <link rel="stylesheet" href="styles.css">
+    <script type="application/ld+json">[{"@context":"https://schema.org","@type":"SoftwareApplication","name":"TikTok Engagement Rate Calculator","applicationCategory":"BusinessApplication","operatingSystem":"Web","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"}},{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Creator Tools Hub","item":"https://shortformtools.com/"},{"@type":"ListItem","position":2,"name":"TikTok Engagement Rate Calculator","item":"https://shortformtools.com/tiktok-engagement-rate-calculator"}]},{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[{"@type":"Question","name":"How do you calculate TikTok engagement rate?","acceptedAnswer":{"@type":"Answer","text":"Add likes, comments, shares, and saves, then divide by followers or views and multiply by 100."}},{"@type":"Question","name":"Should TikTok engagement use followers or views?","acceptedAnswer":{"@type":"Answer","text":"Use followers for account-level comparisons and views for video-level performance."}}]}]</script>
+  </head>
+  <body>
+    <header class="site-header">
+      <nav class="nav" aria-label="Primary">
+        <a class="brand" href="index.html"><img class="brand-logo" src="assets/logo.svg" alt="Creator Tools Hub"></a>
+        <div class="nav-links">
+          <a aria-current="page" href="tiktok-engagement-rate-calculator.html">TikTok Calculator</a>
+          <a href="instagram-line-break-generator.html">Instagram Formatter</a>
+          <a href="youtube-title-checker.html">YouTube Checker</a>
+        </div>
+      </nav>
+    </header>
+    <main>
+      <section class="intro">
+        <p class="eyebrow">TikTok calculator</p>
+        <h1>TikTok Engagement Rate Calculator</h1>
+        <p class="lede">Enter public post metrics and calculate engagement by followers or by views.</p>
+      </section>
+      <section class="tool-shell" data-tool="tiktok">
+        <div class="tool-head">
+          <div><h2>Calculator</h2><p>Likes + comments + shares + saves.</p></div>
+          <div class="segmented" aria-label="Calculation mode">
+            <button type="button" data-mode="followers" aria-pressed="true">Followers</button>
+            <button type="button" data-mode="views" aria-pressed="false">Views</button>
+          </div>
+        </div>
+        <div class="tool-grid">
+          <div class="form-panel">
+            <div class="field-grid">
+              <div class="field"><label for="followers">Followers</label><input id="followers" type="number" value="10000" min="0"></div>
+              <div class="field"><label for="views">Views</label><input id="views" type="number" value="50000" min="0"></div>
+              <div class="field"><label for="likes">Likes</label><input id="likes" type="number" value="1600" min="0"></div>
+              <div class="field"><label for="comments">Comments</label><input id="comments" type="number" value="120" min="0"></div>
+              <div class="field"><label for="shares">Shares</label><input id="shares" type="number" value="80" min="0"></div>
+              <div class="field"><label for="saves">Saves</label><input id="saves" type="number" value="40" min="0"></div>
+              <div class="field"><label for="posts">Posts</label><input id="posts" type="number" value="1" min="1"></div>
+              <div class="field"><label for="targetRate">Target rate (%)</label><input id="targetRate" type="number" value="5" min="0" step="0.1"></div>
+            </div>
+            <div class="inline-note">Use target rate to see how many more interactions the post needs.</div>
+            <div class="actions"><button id="copyTiktokReport" type="button">Copy report</button></div>
+          </div>
+          <aside class="result-panel">
+            <div class="metric"><span class="label">Engagement rate</span><strong id="engagementRate">0%</strong><div class="meter"><span id="engagementMeter"></span></div></div>
+            <div class="metric"><span class="label">Total interactions</span><strong id="totalInteractions">0</strong></div>
+            <div class="metric"><span class="label">Per post</span><strong id="perPost">0</strong></div>
+            <div class="metric"><span class="label" id="targetRateLabel">5% target</span><strong id="targetGap">0</strong></div>
+            <div class="metric"><span class="label">Benchmark</span><span id="benchmark" class="badge">Average</span></div>
+          </aside>
+        </div>
+      </section>
+      <section class="section">
+        <h2>Formula</h2>
+        <p>Engagement rate = (likes + comments + shares + saves) ÷ followers or views × 100. Use the same denominator when comparing multiple accounts.</p>
+        <h3>Follower rate vs view rate</h3>
+        <p>Follower-based engagement is useful for account audits and influencer comparisons. View-based engagement is better for individual videos because TikTok distribution can reach far beyond existing followers.</p>
+        <div class="faq">
+          <details><summary>What is a good TikTok engagement rate?</summary><p>For many accounts, 2-4% is workable, 4-8% is healthy, and 8%+ is strong. Benchmarks vary by niche, audience size, and whether you divide by followers or views.</p></details>
+          <details><summary>Why include saves?</summary><p>Saves signal intent and future value. If you do not have save data, leave it at zero and compare results consistently.</p></details>
+        </div>
+      </section>
+      <section class="section tool-list">
+        <a class="tool-card" href="instagram-line-break-generator.html"><h3>Instagram line break generator</h3><p>Format captions with clean spacing.</p></a>
+        <a class="tool-card" href="youtube-title-checker.html"><h3>YouTube title checker</h3><p>Check title length and keyword placement.</p></a>
+      </section>
+    </main>
+    <footer class="site-footer"><div><a href="about.html">About</a> · <a href="contact.html">Contact</a> · <a href="privacy.html">Privacy</a> · <a href="terms.html">Terms</a></div></footer>
+    <script src="app.js"></script>
+  </body>
+</html>

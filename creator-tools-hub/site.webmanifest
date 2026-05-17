@@ -1,0 +1,14 @@
+{
+  "name": "Creator Tools Hub",
+  "short_name": "Creator Tools",
+  "icons": [
+    {
+      "src": "assets/favicon.svg",
+      "sizes": "64x64",
+      "type": "image/svg+xml"
+    }
+  ],
+  "theme_color": "#2e8c8a",
+  "background_color": "#f8f6ef",
+  "display": "standalone"
+}
