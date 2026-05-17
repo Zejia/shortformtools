@@ -1,5 +1,67 @@
 {
   "trailingSlash": false,
+  "redirects": [
+    {
+      "source": "/index.html",
+      "destination": "/",
+      "permanent": true
+    },
+    {
+      "source": "/etsy-fee-calculator.html",
+      "destination": "/etsy-fee-calculator",
+      "permanent": true
+    },
+    {
+      "source": "/etsy-profit-calculator.html",
+      "destination": "/etsy-profit-calculator",
+      "permanent": true
+    },
+    {
+      "source": "/etsy-offsite-ads-calculator.html",
+      "destination": "/etsy-offsite-ads-calculator",
+      "permanent": true
+    },
+    {
+      "source": "/etsy-fee-calculator-2026.html",
+      "destination": "/etsy-fee-calculator-2026",
+      "permanent": true
+    },
+    {
+      "source": "/etsy-digital-product-fee-calculator.html",
+      "destination": "/etsy-digital-product-fee-calculator",
+      "permanent": true
+    },
+    {
+      "source": "/etsy-shipping-profit-calculator.html",
+      "destination": "/etsy-shipping-profit-calculator",
+      "permanent": true
+    },
+    {
+      "source": "/etsy-discount-profit-calculator.html",
+      "destination": "/etsy-discount-profit-calculator",
+      "permanent": true
+    },
+    {
+      "source": "/free-etsy-pricing-spreadsheet.html",
+      "destination": "/free-etsy-pricing-spreadsheet",
+      "permanent": true
+    },
+    {
+      "source": "/about.html",
+      "destination": "/about",
+      "permanent": true
+    },
+    {
+      "source": "/privacy.html",
+      "destination": "/privacy",
+      "permanent": true
+    },
+    {
+      "source": "/terms.html",
+      "destination": "/terms",
+      "permanent": true
+    }
+  ],
   "rewrites": [
     {
       "source": "/etsy-fee-calculator",
