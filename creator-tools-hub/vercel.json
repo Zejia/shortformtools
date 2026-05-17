@@ -19,6 +19,12 @@
     }
   ],
   "redirects": [
+    {
+      "source": "/:path*",
+      "has": [{ "type": "host", "value": "www.shortformtools.com" }],
+      "destination": "https://shortformtools.com/:path*",
+      "permanent": true
+    },
     { "source": "/tiktok-engagement-calculator", "destination": "/tiktok-engagement-rate-calculator", "permanent": true },
     { "source": "/free-tiktok-engagement-rate-calculator", "destination": "/tiktok-engagement-rate-calculator", "permanent": true },
     { "source": "/youtube-title-length-checker", "destination": "/youtube-title-checker", "permanent": true },
