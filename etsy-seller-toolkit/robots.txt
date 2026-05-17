@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://etsysellertoolkit.com/sitemap.xml
+Sitemap: https://etsy-seller-toolkit.vercel.app/sitemap.xml
