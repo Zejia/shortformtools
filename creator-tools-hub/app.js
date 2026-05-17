@@ -306,6 +306,97 @@ function initShortsTitleGenerator() {
   build();
 }
 
+function initBioGenerator() {
+  const shell = document.querySelector("[data-tool='bio-generator']");
+  if (!shell) return;
+
+  const platform = shell.dataset.platform || "creator";
+  const niche = document.getElementById("bioNiche");
+  const value = document.getElementById("bioValue");
+  const tone = document.getElementById("bioTone");
+  const proof = document.getElementById("bioProof");
+  const output = document.getElementById("bioOutput");
+  const copy = document.getElementById("copyBios");
+  const generate = document.getElementById("generateBios");
+
+  function build() {
+    const subject = niche.value.trim() || "content creators";
+    const promise = value.value.trim() || "make better short-form videos";
+    const signal = proof.value.trim();
+    const toneWord = tone.value;
+    const platformLabel = platform === "instagram" ? "IG" : "TikTok";
+    const proofLine = signal ? ` | ${signal}` : "";
+    const bios = [
+      `Tips for ${subject} who want to ${promise}.${proofLine}`,
+      `${platformLabel} notes for ${subject}. Helping you ${promise}.`,
+      `${toneWord} ideas for ${subject}. Follow for ways to ${promise}.`,
+      `${subject}: systems, hooks, and posting ideas. ${signal || "New tools weekly."}`
+    ];
+    output.replaceChildren(...bios.map((bio) => {
+      const item = document.createElement("li");
+      item.textContent = bio;
+      return item;
+    }));
+    setText("bioCount", numberFormat.format(bios.length));
+  }
+
+  shell.querySelectorAll("input, select").forEach((input) => input.addEventListener("input", build));
+  shell.querySelectorAll("select").forEach((input) => input.addEventListener("change", build));
+  generate.addEventListener("click", build);
+  copy.addEventListener("click", async () => {
+    await navigator.clipboard.writeText([...output.querySelectorAll("li")].map((li) => li.textContent).join("\n"));
+    copy.textContent = "Copied";
+    setTimeout(() => (copy.textContent = "Copy"), 1200);
+  });
+  build();
+}
+
+function initChannelNameGenerator() {
+  const shell = document.querySelector("[data-tool='channel-name']");
+  if (!shell) return;
+
+  const topic = document.getElementById("channelTopic");
+  const audience = document.getElementById("channelAudience");
+  const style = document.getElementById("channelStyle");
+  const output = document.getElementById("channelOutput");
+  const copy = document.getElementById("copyChannelNames");
+  const generate = document.getElementById("generateChannelNames");
+
+  function titleCase(text) {
+    return text.replace(/\w\S*/g, (word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase());
+  }
+
+  function build() {
+    const subject = titleCase(topic.value.trim() || "Creator Strategy");
+    const viewer = titleCase(audience.value.trim() || "Beginners");
+    const styleWord = style.value;
+    const names = [
+      `${subject} Lab`,
+      `${viewer} Guide to ${subject}`,
+      `${subject} Notes`,
+      `${styleWord} ${subject}`,
+      `${subject} Playbook`,
+      `${viewer} ${subject} Studio`
+    ];
+    output.replaceChildren(...names.map((name) => {
+      const item = document.createElement("li");
+      item.textContent = name;
+      return item;
+    }));
+    setText("channelNameCount", numberFormat.format(names.length));
+  }
+
+  shell.querySelectorAll("input, select").forEach((input) => input.addEventListener("input", build));
+  shell.querySelectorAll("select").forEach((input) => input.addEventListener("change", build));
+  generate.addEventListener("click", build);
+  copy.addEventListener("click", async () => {
+    await navigator.clipboard.writeText([...output.querySelectorAll("li")].map((li) => li.textContent).join("\n"));
+    copy.textContent = "Copied";
+    setTimeout(() => (copy.textContent = "Copy"), 1200);
+  });
+  build();
+}
+
 initTikTok();
 initLineBreaks();
 initTitleChecker();
@@ -314,3 +405,5 @@ initHashtagGenerator();
 initCaptionCounter();
 initDescriptionGenerator();
 initShortsTitleGenerator();
+initBioGenerator();
+initChannelNameGenerator();

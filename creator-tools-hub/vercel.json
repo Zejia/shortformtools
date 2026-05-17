@@ -32,7 +32,11 @@
     { "source": "/youtube-title-length-checker", "destination": "/youtube-title-checker", "permanent": true },
     { "source": "/youtube-description-template-generator", "destination": "/youtube-description-generator", "permanent": true },
     { "source": "/shorts-title-generator", "destination": "/youtube-shorts-title-generator", "permanent": true },
+    { "source": "/youtube-name-generator", "destination": "/youtube-channel-name-generator", "permanent": true },
+    { "source": "/youtube-channel-name-ideas", "destination": "/youtube-channel-name-generator", "permanent": true },
     { "source": "/instagram-character-counter", "destination": "/instagram-caption-character-counter", "permanent": true },
-    { "source": "/instagram-caption-line-break-generator", "destination": "/instagram-line-break-generator", "permanent": true }
+    { "source": "/instagram-caption-line-break-generator", "destination": "/instagram-line-break-generator", "permanent": true },
+    { "source": "/instagram-profile-bio-generator", "destination": "/instagram-bio-generator", "permanent": true },
+    { "source": "/tiktok-profile-bio-generator", "destination": "/tiktok-bio-generator", "permanent": true }
   ]
 }
