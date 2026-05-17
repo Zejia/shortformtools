@@ -27,7 +27,12 @@
     },
     { "source": "/tiktok-engagement-calculator", "destination": "/tiktok-engagement-rate-calculator", "permanent": true },
     { "source": "/free-tiktok-engagement-rate-calculator", "destination": "/tiktok-engagement-rate-calculator", "permanent": true },
+    { "source": "/tiktok-earnings-calculator", "destination": "/tiktok-money-calculator", "permanent": true },
+    { "source": "/free-tiktok-hashtag-generator", "destination": "/tiktok-hashtag-generator", "permanent": true },
     { "source": "/youtube-title-length-checker", "destination": "/youtube-title-checker", "permanent": true },
+    { "source": "/youtube-description-template-generator", "destination": "/youtube-description-generator", "permanent": true },
+    { "source": "/shorts-title-generator", "destination": "/youtube-shorts-title-generator", "permanent": true },
+    { "source": "/instagram-character-counter", "destination": "/instagram-caption-character-counter", "permanent": true },
     { "source": "/instagram-caption-line-break-generator", "destination": "/instagram-line-break-generator", "permanent": true }
   ]
 }

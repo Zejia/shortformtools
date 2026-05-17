@@ -148,6 +148,169 @@ function initTitleChecker() {
   check();
 }
 
+function initMoneyCalculator() {
+  const shell = document.querySelector("[data-tool='tiktok-money']");
+  if (!shell) return;
+
+  function calculate() {
+    const views = num("moneyViews");
+    const rpmLow = num("rpmLow") || 0.2;
+    const rpmHigh = num("rpmHigh") || 1;
+    const engagementRate = num("moneyEngagementRate") || 3;
+    const multiplier = Math.max(0.65, Math.min(1.35, 0.85 + engagementRate / 12));
+    const low = (views / 1000) * rpmLow * multiplier;
+    const high = (views / 1000) * rpmHigh * multiplier;
+
+    setText("moneyRange", `$${numberFormat.format(low)} - $${numberFormat.format(high)}`);
+    setText("moneyMid", `$${numberFormat.format((low + high) / 2)}`);
+    setText("moneyMultiplier", `${numberFormat.format(multiplier)}x`);
+    setMeter("moneyMeter", multiplier * 70);
+  }
+
+  shell.querySelectorAll("input").forEach((input) => input.addEventListener("input", calculate));
+  calculate();
+}
+
+function initHashtagGenerator() {
+  const shell = document.querySelector("[data-tool='hashtag']");
+  if (!shell) return;
+
+  const topic = document.getElementById("hashtagTopic");
+  const niche = document.getElementById("hashtagNiche");
+  const output = document.getElementById("hashtagOutput");
+  const copy = document.getElementById("copyHashtags");
+  const generate = document.getElementById("generateHashtags");
+  const banks = {
+    creator: ["creator", "contentcreator", "creatortips", "creatorlife", "socialmediatips"],
+    beauty: ["beautytok", "makeuptips", "skincare", "beautycreator", "grwm"],
+    fitness: ["fitnesstok", "workouttips", "gymtok", "healthylifestyle", "fitnesscreator"],
+    business: ["businesstok", "smallbusiness", "foundertok", "marketingtips", "sidehustle"],
+    food: ["foodtok", "easyrecipe", "homecooking", "foodcreator", "dinnerideas"]
+  };
+
+  function build() {
+    const seed = topic.value.trim().toLowerCase().replace(/[^a-z0-9 ]/g, "").split(/\s+/).filter(Boolean);
+    const selected = banks[niche.value] || banks.creator;
+    const topicTags = seed.slice(0, 3).map((word) => word.length > 2 ? word : "").filter(Boolean);
+    const tags = [...new Set([...topicTags, ...selected, "tiktoktips", "fyp"])].slice(0, 12).map((tag) => `#${tag}`);
+    output.textContent = tags.join(" ");
+    setText("hashtagCount", numberFormat.format(tags.length));
+  }
+
+  generate.addEventListener("click", build);
+  topic.addEventListener("input", build);
+  niche.addEventListener("change", build);
+  copy.addEventListener("click", async () => {
+    await navigator.clipboard.writeText(output.textContent);
+    copy.textContent = "Copied";
+    setTimeout(() => (copy.textContent = "Copy"), 1200);
+  });
+  build();
+}
+
+function initCaptionCounter() {
+  const shell = document.querySelector("[data-tool='caption-counter']");
+  if (!shell) return;
+
+  const input = document.getElementById("captionCounterInput");
+  function count() {
+    const text = input.value;
+    const hashtags = (text.match(/#[\w]+/g) || []).length;
+    const words = text.trim() ? text.trim().split(/\s+/).length : 0;
+    const remaining = Math.max(0, 2200 - text.length);
+    setText("captionCounterChars", numberFormat.format(text.length));
+    setText("captionCounterWords", numberFormat.format(words));
+    setText("captionCounterHashtags", numberFormat.format(hashtags));
+    setText("captionCounterRemaining", numberFormat.format(remaining));
+    setMeter("captionCounterMeter", (text.length / 2200) * 100);
+  }
+
+  input.addEventListener("input", count);
+  count();
+}
+
+function initDescriptionGenerator() {
+  const shell = document.querySelector("[data-tool='youtube-description']");
+  if (!shell) return;
+
+  const title = document.getElementById("descriptionTitle");
+  const summary = document.getElementById("descriptionSummary");
+  const link = document.getElementById("descriptionLink");
+  const cta = document.getElementById("descriptionCta");
+  const output = document.getElementById("descriptionOutput");
+  const copy = document.getElementById("copyDescription");
+
+  function generate() {
+    const lines = [
+      title.value.trim(),
+      "",
+      summary.value.trim(),
+      "",
+      cta.value.trim(),
+      link.value.trim() ? `Resource: ${link.value.trim()}` : "",
+      "",
+      "Chapters:",
+      "00:00 Intro",
+      "00:30 Main idea",
+      "02:00 Key examples",
+      "04:00 Next steps"
+    ].filter((line, index, arr) => line || arr[index - 1] !== "");
+    output.textContent = lines.join("\n").trim();
+    setText("descriptionChars", numberFormat.format(output.textContent.length));
+  }
+
+  shell.querySelectorAll("input, textarea").forEach((input) => input.addEventListener("input", generate));
+  copy.addEventListener("click", async () => {
+    await navigator.clipboard.writeText(output.textContent);
+    copy.textContent = "Copied";
+    setTimeout(() => (copy.textContent = "Copy"), 1200);
+  });
+  generate();
+}
+
+function initShortsTitleGenerator() {
+  const shell = document.querySelector("[data-tool='shorts-title']");
+  if (!shell) return;
+
+  const topic = document.getElementById("shortsTopic");
+  const angle = document.getElementById("shortsAngle");
+  const output = document.getElementById("shortsOutput");
+  const generate = document.getElementById("generateShortsTitles");
+  const copy = document.getElementById("copyShortsTitles");
+
+  function build() {
+    const subject = topic.value.trim() || "your niche";
+    const prefix = angle.value;
+    const titles = [
+      `${prefix}: ${subject}`,
+      `${subject} in 30 seconds`,
+      `Stop doing this with ${subject}`,
+      `The simple ${subject} trick I wish I knew sooner`,
+      `${subject}: before vs after`
+    ];
+    output.replaceChildren(...titles.map((title) => {
+      const item = document.createElement("li");
+      item.textContent = title;
+      return item;
+    }));
+  }
+
+  generate.addEventListener("click", build);
+  topic.addEventListener("input", build);
+  angle.addEventListener("change", build);
+  copy.addEventListener("click", async () => {
+    await navigator.clipboard.writeText([...output.querySelectorAll("li")].map((li) => li.textContent).join("\n"));
+    copy.textContent = "Copied";
+    setTimeout(() => (copy.textContent = "Copy"), 1200);
+  });
+  build();
+}
+
 initTikTok();
 initLineBreaks();
 initTitleChecker();
+initMoneyCalculator();
+initHashtagGenerator();
+initCaptionCounter();
+initDescriptionGenerator();
+initShortsTitleGenerator();
