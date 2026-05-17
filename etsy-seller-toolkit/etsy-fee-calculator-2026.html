@@ -1,0 +1,178 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Etsy Fee Calculator 2026: Updated Seller Fee and Profit Tool</title>
+    <meta name="description" content="Updated Etsy fee calculator for 2026 with listing fees, 6.5% transaction fee, payment processing, Offsite Ads, shipping, discounts and profit.">
+    <link rel="canonical" href="https://etsysellertoolkit.com/etsy-fee-calculator-2026">
+    <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+    <link rel="stylesheet" href="styles.css">
+    <script type="application/ld+json">
+      {"@context":"https://schema.org","@type":"WebSite","name":"Etsy Seller Profit Toolkit","url":"https://etsysellertoolkit.com/"}
+    </script>
+  </head>
+  <body>
+    <header class="site-header">
+      <nav class="nav" aria-label="Primary navigation">
+        <a class="brand" href="index.html"><span class="mark">E</span><span>Etsy Seller Toolkit</span></a>
+        <div class="nav-links">
+          <a href="etsy-fee-calculator.html">Fee calculator</a>
+          <a href="etsy-profit-calculator.html">Profit calculator</a>
+          <a href="etsy-offsite-ads-calculator.html">Offsite Ads</a>
+          <a href="free-etsy-pricing-spreadsheet.html">Spreadsheet</a>
+        </div>
+      </nav>
+    </header>
+
+    <main>
+      <section class="hero wrap">
+        <div>
+          <p class="eyebrow">Updated 2026 Etsy fee calculator</p>
+          <h1>Check 2026 Etsy seller fees before you price a listing.</h1>
+          <p class="lead">Use current fee assumptions for listing renewals, the 6.5% transaction fee, Etsy Payments, Offsite Ads, shipping, discounts and currency conversion.</p>
+          <div class="hero-actions">
+            <a class="button primary" href="etsy-fee-calculator.html">Open fee calculator</a>
+            <a class="button" href="#tools">See all tools</a>
+          </div>
+        </div>
+        <aside class="hero-panel" aria-label="Example order breakdown">
+          <div class="mini-ledger">
+            <div class="ledger-line"><span>Sale revenue</span><strong>$34.99</strong></div>
+            <div class="ledger-line"><span>Etsy and payment fees</span><strong>$4.22</strong></div>
+            <div class="ledger-line"><span>Shipping and product cost</span><strong>$16.80</strong></div>
+            <div class="ledger-line"><span>Estimated profit</span><strong>$13.97</strong></div>
+          </div>
+        </aside>
+      </section>
+
+      <section class="tool-shell wrap" data-tool="etsy-calculator">
+        <div class="tool-grid">
+          <section class="tool-panel">
+            <div class="section-head">
+              <div>
+                <h2>Quick Etsy order calculator</h2>
+                <p>Start with a real listing, then compare discount and ad scenarios.</p>
+              </div>
+              <span class="status ok" id="currencyLabel">USD</span>
+            </div>
+            <div class="preset-row">
+              <button type="button" data-preset="digital">Digital product</button>
+              <button type="button" data-preset="pod">Print on demand</button>
+              <button type="button" data-preset="discount">Discount + Offsite Ads</button>
+            </div>
+            <div class="field-grid">
+              <div class="field full">
+                <label for="countryPreset">Seller payment country</label>
+                <select id="countryPreset">
+                  <option value="US">United States</option>
+                  <option value="UK">United Kingdom</option>
+                  <option value="CA">Canada domestic / US orders</option>
+                  <option value="CA_INTL">Canada international</option>
+                  <option value="AU">Australia domestic</option>
+                  <option value="AU_INTL">Australia international</option>
+                  <option value="EU">EU common rate</option>
+                  <option value="CUSTOM">Custom processing rate</option>
+                </select>
+                <span class="hint" id="paymentPresetText">United States: 3% + $0.25</span>
+              </div>
+              <div class="group-title">Revenue</div>
+              <div class="field"><label for="itemPrice">Item price</label><input id="itemPrice" type="number" min="0" step="0.01" value="28"></div>
+              <div class="field"><label for="quantity">Quantity sold</label><input id="quantity" type="number" min="1" step="1" value="1"></div>
+              <div class="field"><label for="shippingCharged">Shipping charged to buyer</label><input id="shippingCharged" type="number" min="0" step="0.01" value="4.99"></div>
+              <div class="field"><label for="giftWrapCharged">Gift wrap charged</label><input id="giftWrapCharged" type="number" min="0" step="0.01" value="0"></div>
+              <div class="field"><label for="discountRate">Discount percent</label><input id="discountRate" type="number" min="0" max="100" step="0.1" value="0"></div>
+              <div class="field"><label for="discountFixed">Fixed coupon amount</label><input id="discountFixed" type="number" min="0" step="0.01" value="0"></div>
+
+              <div class="group-title">Costs</div>
+              <div class="field"><label for="itemCost">Item cost per unit</label><input id="itemCost" type="number" min="0" step="0.01" value="8.75"></div>
+              <div class="field"><label for="shippingCost">Shipping label cost</label><input id="shippingCost" type="number" min="0" step="0.01" value="4.25"></div>
+              <div class="field"><label for="packagingCost">Packaging cost</label><input id="packagingCost" type="number" min="0" step="0.01" value="0.85"></div>
+              <div class="field"><label for="laborCost">Labor cost for this order</label><input id="laborCost" type="number" min="0" step="0.01" value="3"></div>
+              <div class="field"><label for="adSpend">Etsy Ads spend per order</label><input id="adSpend" type="number" min="0" step="0.01" value="0"></div>
+              <div class="field"><label for="taxCollected">Sales tax collected</label><input id="taxCollected" type="number" min="0" step="0.01" value="0"><span class="hint">Used for payment processing base when applicable.</span></div>
+
+              <div class="group-title">Fee assumptions</div>
+              <div class="field"><label for="listingUnits">Listing fee units</label><input id="listingUnits" type="number" min="0" step="1" value="1"><span class="hint">$0.20 each, including sold quantity renewals.</span></div>
+              <div class="field"><label for="offsiteRate">Offsite Ads percent</label><input id="offsiteRate" type="number" min="0" step="0.1" value="0"><span class="hint">Use 15 or 12 for attributed orders.</span></div>
+              <div class="field"><label for="paymentRate">Custom payment percent</label><input id="paymentRate" type="number" min="0" step="0.1" value="3"></div>
+              <div class="field"><label for="paymentFlat">Custom payment flat fee</label><input id="paymentFlat" type="number" min="0" step="0.01" value="0.25"></div>
+              <div class="field"><label for="regulatoryRate">Regulatory operating fee percent</label><input id="regulatoryRate" type="number" min="0" step="0.1" value="0"></div>
+              <div class="field check-row"><input id="currencyConversion" type="checkbox"><label for="currencyConversion">Apply 2.5% currency conversion fee</label></div>
+              <div class="field check-row"><input id="digitalMode" type="checkbox"><label for="digitalMode">Digital product mode</label></div>
+            </div>
+          </section>
+
+          <aside class="result-panel" aria-live="polite">
+            <div class="result-stack">
+              <div class="metric-large">
+                <span>Estimated net profit</span>
+                <strong id="netProfit">$0.00</strong>
+                <div class="meter" id="profitMeter"></div>
+              </div>
+              <div><span id="statusLabel" class="status ok">Workable</span></div>
+              <div class="metric-grid">
+                <div class="metric"><span>Seller revenue</span><strong id="sellerRevenue">$0.00</strong></div>
+                <div class="metric"><span>Total fees</span><strong id="totalFees">$0.00</strong></div>
+                <div class="metric"><span>Costs</span><strong id="totalCosts">$0.00</strong></div>
+                <div class="metric"><span>Profit margin</span><strong id="profitMargin">0%</strong></div>
+                <div class="metric"><span>Fee rate</span><strong id="feeRate">0%</strong></div>
+                <div class="metric"><span>Break-even item price</span><strong id="breakEvenPrice">$0.00</strong></div>
+              </div>
+              <div class="formula" id="formulaLine"></div>
+              <div id="feeBreakdown"></div>
+              <div class="hero-actions">
+                <button type="button" id="copySummary">Copy summary</button>
+                <button type="button" id="downloadCsv">Download CSV</button>
+              </div>
+            </div>
+          </aside>
+        </div>
+      </section>
+
+      <section class="content-band wrap">
+        <div class="plain-panel">
+          <div class="section-head">
+            <div>
+              <h2>Scenario comparison</h2>
+              <p>Use this before running a coupon, Offsite Ads campaign or price change.</p>
+            </div>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Scenario</th><th>Profit</th><th>Margin</th><th>Fees</th><th>Status</th></tr></thead>
+              <tbody id="scenarioRows"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <section class="content-band wrap" id="tools">
+        <div class="section-head">
+          <div>
+            <h2>Focused Etsy seller tools</h2>
+            <p>Each page targets a specific job, with shared math and clear assumptions.</p>
+          </div>
+        </div>
+        <div class="tool-list">
+          <a class="tool-link" href="etsy-fee-calculator.html"><strong>Etsy fee calculator</strong><span>Break down listing, transaction, processing and ad fees.</span></a>
+          <a class="tool-link" href="etsy-profit-calculator.html"><strong>Etsy profit calculator</strong><span>Calculate margin, break-even price and product economics.</span></a>
+          <a class="tool-link" href="etsy-offsite-ads-calculator.html"><strong>Offsite Ads calculator</strong><span>Compare 12% and 15% attributed ad orders.</span></a>
+          <a class="tool-link" href="etsy-fee-calculator-2026.html"><strong>2026 fee calculator</strong><span>Use updated assumptions and fee source links.</span></a>
+          <a class="tool-link" href="etsy-digital-product-fee-calculator.html"><strong>Digital product fees</strong><span>Model printables, downloads and template bundles.</span></a>
+          <a class="tool-link" href="etsy-shipping-profit-calculator.html"><strong>Shipping profit</strong><span>See how shipping strategy changes margin.</span></a>
+          <a class="tool-link" href="etsy-discount-profit-calculator.html"><strong>Discount profit</strong><span>Check coupons and sales before launching.</span></a>
+          <a class="tool-link" href="free-etsy-pricing-spreadsheet.html"><strong>Pricing spreadsheet</strong><span>Copy a starter CSV for shop pricing research.</span></a>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <div class="footer-inner">
+        <span>Updated for Etsy fee references reviewed in 2026.</span>
+        <span><a href="about.html">About</a> · <a href="privacy.html">Privacy</a> · <a href="terms.html">Terms</a></span>
+      </div>
+    </footer>
+    <script src="app.js"></script>
+  </body>
+</html>
