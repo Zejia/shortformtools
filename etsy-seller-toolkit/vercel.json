@@ -1,6 +1,51 @@
 {
-  "cleanUrls": true,
   "trailingSlash": false,
+  "rewrites": [
+    {
+      "source": "/etsy-fee-calculator",
+      "destination": "/etsy-fee-calculator.html"
+    },
+    {
+      "source": "/etsy-profit-calculator",
+      "destination": "/etsy-profit-calculator.html"
+    },
+    {
+      "source": "/etsy-offsite-ads-calculator",
+      "destination": "/etsy-offsite-ads-calculator.html"
+    },
+    {
+      "source": "/etsy-fee-calculator-2026",
+      "destination": "/etsy-fee-calculator-2026.html"
+    },
+    {
+      "source": "/etsy-digital-product-fee-calculator",
+      "destination": "/etsy-digital-product-fee-calculator.html"
+    },
+    {
+      "source": "/etsy-shipping-profit-calculator",
+      "destination": "/etsy-shipping-profit-calculator.html"
+    },
+    {
+      "source": "/etsy-discount-profit-calculator",
+      "destination": "/etsy-discount-profit-calculator.html"
+    },
+    {
+      "source": "/free-etsy-pricing-spreadsheet",
+      "destination": "/free-etsy-pricing-spreadsheet.html"
+    },
+    {
+      "source": "/about",
+      "destination": "/about.html"
+    },
+    {
+      "source": "/privacy",
+      "destination": "/privacy.html"
+    },
+    {
+      "source": "/terms",
+      "destination": "/terms.html"
+    }
+  ],
   "headers": [
     {
       "source": "/(.*)",
