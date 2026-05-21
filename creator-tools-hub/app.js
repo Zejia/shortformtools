@@ -148,6 +148,196 @@ function initTitleChecker() {
   check();
 }
 
+function initPackagingScorecard() {
+  const shell = document.querySelector("[data-tool='youtube-packaging']");
+  if (!shell) return;
+
+  const title = document.getElementById("packagingTitle");
+  const keyword = document.getElementById("packagingKeyword");
+  const thumbnail = document.getElementById("packagingThumbnail");
+  const payoff = document.getElementById("packagingPayoff");
+  const audience = document.getElementById("packagingAudience");
+  const angle = document.getElementById("packagingAngle");
+  const recommendations = document.getElementById("packagingRecommendations");
+  const variants = document.getElementById("packagingVariants");
+  const badge = document.getElementById("packagingBadge");
+
+  const stopWords = new Set(["the", "a", "an", "and", "or", "to", "for", "with", "your", "you", "how", "that", "this", "from"]);
+
+  function words(text) {
+    return text
+      .toLowerCase()
+      .replace(/[^a-z0-9 ]/g, " ")
+      .split(/\s+/)
+      .filter((word) => word && !stopWords.has(word));
+  }
+
+  function unique(wordsList) {
+    return [...new Set(wordsList)];
+  }
+
+  function capitalize(text) {
+    return text.charAt(0).toUpperCase() + text.slice(1);
+  }
+
+  function titleCase(text) {
+    return text
+      .replace(/\w\S*/g, (word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+      .replace(/\bYoutube\b/g, "YouTube")
+      .replace(/\bTiktok\b/g, "TikTok")
+      .replace(/\bInstagram\b/g, "Instagram");
+  }
+
+  function setList(el, items) {
+    el.replaceChildren(...items.map((item) => {
+      const li = document.createElement("li");
+      li.textContent = item;
+      return li;
+    }));
+  }
+
+  function buildVariants(keywordText, payoffText, angleValue) {
+    const key = keywordText || "youtube video packaging";
+    const titledKey = titleCase(key);
+    const result = [];
+    if (angleValue === "list") {
+      result.push(`${titledKey}: 7 packaging fixes for ${payoffText || "more clicks"}`);
+      result.push(`${titledKey} that actually ${payoffText || "earn more clicks"}`);
+      result.push(`Stop wasting impressions, ${key} fixes for ${payoffText || "better CTR"}`);
+    } else if (angleValue === "howto") {
+      result.push(`How to improve ${key} for ${payoffText || "better click-through rate"}`);
+      result.push(`${titledKey}: a simple framework to ${payoffText || "win more clicks"}`);
+      result.push(`How creators tighten ${key} before they publish`);
+    } else if (angleValue === "mistakes") {
+      result.push(`${titledKey} mistakes that kill ${payoffText || "your CTR"}`);
+      result.push(`Most creators miss this ${key} problem`);
+      result.push(`Fix these ${key} mistakes before you publish`);
+    } else if (angleValue === "case") {
+      result.push(`${titledKey} case study: what changed and why it worked`);
+      result.push(`We rebuilt this ${key} for ${payoffText || "better CTR"}`);
+      result.push(`${titledKey} teardown: the packaging changes that mattered`);
+    } else if (angleValue === "comparison") {
+      result.push(`${titledKey}: before vs after`);
+      result.push(`Good vs bad ${key}, what actually changes clicks`);
+      result.push(`${titledKey} comparison for ${payoffText || "stronger performance"}`);
+    } else {
+      result.push(`${titledKey} reaction: what I would fix before publishing`);
+      result.push(`Reviewing ${key} for ${payoffText || "better click performance"}`);
+      result.push(`${titledKey} critique: keep this, cut that`);
+    }
+    return result;
+  }
+
+  function evaluate() {
+    const titleText = title.value.trim();
+    const keywordText = keyword.value.trim().toLowerCase();
+    const thumbText = thumbnail.value.trim();
+    const payoffText = payoff.value.trim();
+    const audienceValue = audience.value;
+    const angleValue = angle.value;
+
+    const titleLength = titleText.length;
+    const thumbLength = thumbText.length;
+    const titleWords = unique(words(titleText));
+    const thumbWords = unique(words(thumbText));
+    const keywordWords = unique(words(keywordText));
+    const overlapCount = thumbWords.filter((word) => titleWords.includes(word)).length;
+    const keywordFound = keywordText && titleText.toLowerCase().includes(keywordText);
+    const earlyKeyword = keywordText && titleText.toLowerCase().slice(0, 34).includes(keywordText);
+    const mobileFriendly = titleLength >= 42 && titleLength <= 60;
+    const browseFriendly = titleLength <= 58;
+    const thumbFriendly = thumbLength > 0 && thumbLength <= 28;
+    const hasNumber = /\d/.test(titleText) || /\d/.test(thumbText);
+    const hasClearAngle = /how|why|vs|ideas|mistakes|guide|checklist|hooks|examples|template|teardown|review/i.test(titleText);
+
+    let score = 26;
+    if (mobileFriendly) score += 18;
+    if (thumbFriendly) score += 12;
+    if (keywordFound) score += 16;
+    if (earlyKeyword) score += 8;
+    if (overlapCount === 0) score += 10;
+    if (overlapCount > 0 && overlapCount <= 2) score += 6;
+    if (hasNumber) score += 4;
+    if (hasClearAngle) score += 8;
+    if (audienceValue === "search" && keywordFound) score += 8;
+    if (audienceValue === "search" && !earlyKeyword) score -= 8;
+    if (audienceValue === "browse" && !browseFriendly) score -= 8;
+    if (audienceValue === "browse" && overlapCount > 2) score -= 10;
+    if (titleLength > 70) score -= 14;
+    if (thumbLength > 32) score -= 10;
+    score = Math.max(0, Math.min(100, score));
+
+    const recs = [];
+    if (!keywordFound && audienceValue !== "browse") {
+      recs.push("Move the exact target phrase into the title. Right now the package is harder for search to classify.");
+    }
+    if (keywordFound && !earlyKeyword) {
+      recs.push("Front-load the target phrase earlier in the title so the topic is clear before truncation.");
+    }
+    if (!mobileFriendly) {
+      recs.push(titleLength < 42
+        ? "Make the title a little more specific. It is short enough to read, but not yet doing enough work."
+        : "Trim the title. Important words are likely to disappear on smaller mobile surfaces.");
+    }
+    if (!thumbFriendly) {
+      recs.push("Shorten the thumbnail text. Keep it punchy enough to read in a fast homepage scan.");
+    }
+    if (overlapCount > 2) {
+      recs.push("Reduce title and thumbnail repetition. Let the thumbnail add a second meaning instead of echoing the title.");
+    } else if (overlapCount === 0) {
+      recs.push("Create a clearer bridge between title and thumbnail. They should feel connected even when they use different words.");
+    }
+    if (!hasClearAngle) {
+      recs.push("Sharpen the angle. Add a reason to click, such as a framework, mistakes, examples, or a before-and-after contrast.");
+    }
+    if (recs.length === 0) {
+      recs.push("The package already reads clearly. Protect that clarity if you test more emotional or curiosity-heavy versions.");
+      recs.push("If this video is search-led, keep the exact phrase early and do not swap it out for a vaguer hook.");
+      recs.push("If this video is browse-led, test a thumbnail phrase that adds contrast without repeating the title.");
+    } else {
+      if (!payoffText) {
+        recs.push("Write the promised outcome more explicitly. A viewer should know what changes after they click.");
+      }
+      if (recs.length < 3) {
+        recs.push("Keep the topic promise concrete. A viewer should know what outcome they get before they click.");
+      }
+      if (recs.length < 3) {
+        recs.push("Review the package at mobile size before publishing. If the payoff disappears, shorten the title or simplify the thumbnail text.");
+      }
+    }
+
+    const surfaceStatus = audienceValue === "search"
+      ? (keywordFound && earlyKeyword ? "Search-ready" : "Search-weak")
+      : audienceValue === "browse"
+        ? (browseFriendly && overlapCount <= 2 ? "Browse-ready" : "Browse-weak")
+        : (score >= 70 ? "Balanced" : "Needs tuning");
+
+    setText("packagingScore", `${score}`);
+    setMeter("packagingMeter", score);
+    setText("packagingLength", `${titleLength}/60`);
+    setText("packagingThumbLength", `${thumbLength}/28`);
+    setText("packagingKeywordStatus", keywordFound ? (earlyKeyword ? "Early" : "Late") : "Missing");
+    setText("packagingOverlapStatus", overlapCount > 2 ? "Too similar" : overlapCount === 0 ? "Too separate" : "Good split");
+    setText("packagingSurfaceStatus", surfaceStatus);
+    setText("mobileTitlePreview", titleLength > 62 ? `${titleText.slice(0, 59).trim()}...` : (titleText || "Your preview appears here"));
+    setText("mobileTitleMeta", mobileFriendly ? "Readable on mobile and still specific enough." : titleLength > 60 ? "Likely to truncate before the payoff lands." : "Readable, but it may still need more specificity.");
+    setText("thumbnailPreview", thumbText || "Thumbnail text");
+    setText("thumbnailMeta", thumbFriendly ? "Readable enough for quick browse surfaces." : "Too long for fast browse surfaces.");
+
+    badge.textContent = score >= 78 ? "Strong package" : score >= 62 ? "Promising" : "Needs work";
+    badge.className = "badge";
+    if (score < 62) badge.classList.add("warn");
+    if (score < 45) badge.classList.add("bad");
+
+    setList(recommendations, recs.slice(0, 4));
+    setList(variants, buildVariants(keywordText, payoffText, angleValue));
+  }
+
+  shell.querySelectorAll("input, textarea, select").forEach((inputEl) => inputEl.addEventListener("input", evaluate));
+  shell.querySelectorAll("select").forEach((inputEl) => inputEl.addEventListener("change", evaluate));
+  evaluate();
+}
+
 function initMoneyCalculator() {
   const shell = document.querySelector("[data-tool='tiktok-money']");
   if (!shell) return;
@@ -400,6 +590,7 @@ function initChannelNameGenerator() {
 initTikTok();
 initLineBreaks();
 initTitleChecker();
+initPackagingScorecard();
 initMoneyCalculator();
 initHashtagGenerator();
 initCaptionCounter();

@@ -506,6 +506,39 @@ summary {
   font-size: 13px;
 }
 
+.preview-stack {
+  display: grid;
+  gap: 10px;
+}
+
+.surface-preview {
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--paper);
+  padding: 12px;
+  display: grid;
+  gap: 6px;
+}
+
+.surface-label {
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.surface-title {
+  font-size: 18px;
+  line-height: 1.25;
+}
+
+.thumb-copy {
+  font-size: 22px;
+  line-height: 1;
+  letter-spacing: 0.02em;
+}
+
 .seo-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -547,6 +580,10 @@ summary {
   gap: 12px;
   padding: 8px 0;
   border-bottom: 1px solid var(--line);
+}
+
+.status-item strong {
+  text-align: right;
 }
 
 .site-footer {
