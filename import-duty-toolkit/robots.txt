@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://importdutytoolkit.com/sitemap.xml
+Sitemap: https://crossborderkit.com/sitemap.xml

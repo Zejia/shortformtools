@@ -46,7 +46,7 @@ Preset assumptions were reviewed on 2026-05-21 and are intended for planning onl
 - UK preset uses a common `GBP 135` low-value customs-duty line with VAT still modeled separately.
 - EU-like preset uses a common `EUR 150` low-value customs-duty line with VAT modeled from the first euro.
 
-Replace the placeholder domain `https://importdutytoolkit.com/` before production if you launch on a different hostname.
+Replace the placeholder domain `https://crossborderkit.com/` before production if you launch on a different hostname.
 
 ## Local preview
 
