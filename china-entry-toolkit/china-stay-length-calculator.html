@@ -1,0 +1,128 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>China Stay-Length Calculator: 30-Day and 240-Hour Timing</title>
+    <meta name="description" content="Turn your China entry and exit times into a practical 30-day visit deadline and a 240-hour transit deadline estimate.">
+    <link rel="canonical" href="https://chinaentrytoolkit.com/china-stay-length-calculator.html">
+    <meta property="og:title" content="China Stay-Length Calculator">
+    <meta property="og:description" content="Estimate practical stay windows for China's 30-day visit and 240-hour transit rules.">
+    <meta property="og:type" content="website">
+    <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+    <link rel="manifest" href="site.webmanifest">
+    <link rel="stylesheet" href="styles.css">
+  </head>
+  <body>
+    <header class="site-header">
+      <nav class="nav" aria-label="Primary">
+        <a class="brand" href="index.html"><img src="assets/logo.svg" alt="China Entry Toolkit"></a>
+        <div class="nav-links">
+          <a href="china-visa-free-checker.html">Visa-Free Checker</a>
+          <a href="china-visa-free-countries.html">Countries</a>
+          <a href="china-transit-without-visa-checker.html">Transit Checker</a>
+          <a href="240-hour-transit-china.html">240-Hour Guide</a>
+          <a href="china-stay-length-calculator.html" aria-current="page">Stay Calculator</a>
+        </div>
+      </nav>
+    </header>
+
+    <main>
+      <section class="page-hero">
+        <div class="hero-copy">
+          <p class="eyebrow">Timing calculator</p>
+          <h1>How long is your China stay window in practice?</h1>
+          <p class="lede">This page helps you translate actual entry and exit times into a practical timing view for the two main policy families modeled in this release: the 30-day unilateral visit rule and the 240-hour transit rule.</p>
+        </div>
+        <aside class="detail-shell">
+          <span class="stamp">Timing reminder</span>
+          <p>Both policy families referenced in this release use a stay clock that starts from 00:00 on the day after entry. That is why a date-and-time calculator is useful even when you already know the headline limit.</p>
+        </aside>
+      </section>
+
+      <section class="section">
+        <div class="tool-shell" data-stay-calculator>
+          <div class="tool-head">
+            <div>
+              <h3>Stay-length calculator</h3>
+              <p>Enter a mainland China arrival and departure to estimate the raw time window and the practical deadline landmarks used in the current public guidance.</p>
+            </div>
+          </div>
+          <div class="tool-body">
+            <div class="form-panel">
+              <div class="field-grid">
+                <div class="field">
+                  <label for="stayEntry">Entry to mainland China</label>
+                  <input id="stayEntry" class="entry-field" type="datetime-local">
+                </div>
+                <div class="field">
+                  <label for="stayExit">Departure from mainland China</label>
+                  <input id="stayExit" class="exit-field" type="datetime-local">
+                </div>
+              </div>
+            </div>
+            <aside class="result-panel">
+              <div class="result-card">
+                <span class="label">Raw stay time</span>
+                <strong><span class="stay-hours">0</span> hours</strong>
+                <p><span class="stay-days">0</span> days</p>
+              </div>
+              <div class="result-card">
+                <span class="label">30-day visit window starts</span>
+                <strong class="visit-start">Enter valid dates</strong>
+                <p class="visit-output">For the current 30-day unilateral visa-free policy, the stay clock starts at 00:00 on the day after entry.</p>
+              </div>
+              <div class="result-card">
+                <span class="label">30-day visit deadline</span>
+                <strong class="visit-deadline">Enter valid dates</strong>
+              </div>
+              <div class="result-card">
+                <span class="label">240-hour transit deadline</span>
+                <strong class="transit-deadline">Enter valid dates</strong>
+                <p class="transit-output">Add arrival and departure times to compare the raw stay against a 240-hour window.</p>
+              </div>
+            </aside>
+          </div>
+        </div>
+      </section>
+
+      <section class="section">
+        <div class="split-grid">
+          <div class="note-box">
+            <h2>When to use this page</h2>
+            <p>Use it when you already know the nationality rule but need to understand the timing of your actual itinerary. It is especially helpful when a route is close to the edge of the 240-hour transit window.</p>
+          </div>
+          <div class="note-box">
+            <h2>What this page does not do</h2>
+            <p>This page does not decide nationality coverage, trip-purpose coverage, or whether a route satisfies the third-country or third-region rule. Use the other tools for those judgments.</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="section">
+        <div class="tool-grid">
+          <a class="utility-tile" href="china-visa-free-checker.html">
+            <h3>Need nationality plus purpose?</h3>
+            <p>Go back to the main visa-free checker.</p>
+          </a>
+          <a class="utility-tile" href="china-transit-without-visa-checker.html">
+            <h3>Need route logic too?</h3>
+            <p>Use the dedicated transit checker.</p>
+          </a>
+          <a class="utility-tile" href="240-hour-transit-china.html">
+            <h3>Need a rule explanation first?</h3>
+            <p>Read the 240-hour guide in plain English.</p>
+          </a>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <div class="foot">
+        <div><a href="about.html">About</a> · <a href="contact.html">Contact</a> · <a href="privacy.html">Privacy</a> · <a href="terms.html">Terms</a></div>
+        <div>Reviewed against official sources on <span data-policy-review></span>.</div>
+      </div>
+    </footer>
+    <script src="app.js"></script>
+  </body>
+</html>

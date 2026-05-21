@@ -1,0 +1,232 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>China Arrival Checklist Builder for Foreign Travelers</title>
+    <meta name="description" content="Build a practical China arrival checklist for payments, data, transport, hotel check-in, and entry readiness before you land.">
+    <link rel="canonical" href="https://chinaentrytoolkit.com/china-arrival-checklist.html">
+    <meta property="og:title" content="China Arrival Checklist Builder">
+    <meta property="og:description" content="A practical pre-arrival checklist builder for foreign travelers going to China.">
+    <meta property="og:type" content="website">
+    <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+    <link rel="manifest" href="site.webmanifest">
+    <link rel="stylesheet" href="styles.css">
+  </head>
+  <body>
+    <header class="site-header">
+      <nav class="nav" aria-label="Primary">
+        <a class="brand" href="index.html"><img src="assets/logo.svg" alt="China Entry Toolkit"></a>
+        <div class="nav-links">
+          <a href="china-visa-free-checker.html">Visa-Free Checker</a>
+          <a href="china-transit-without-visa-checker.html">Transit Checker</a>
+          <a href="china-arrival-checklist.html" aria-current="page">Arrival Checklist</a>
+          <a href="china-payment-setup-for-foreigners.html">Payment Setup</a>
+          <a href="china-travel-apps.html">Travel Apps</a>
+          <a href="china-stay-length-calculator.html">Stay Calculator</a>
+        </div>
+      </nav>
+    </header>
+
+    <main>
+      <section class="page-hero">
+        <div class="hero-copy">
+          <p class="eyebrow">Arrival readiness</p>
+          <h1>Build the first-day China checklist before you land, not while the airport queue is moving.</h1>
+          <p class="lede">This builder combines entry-basis awareness with the practical tasks that usually create friction after arrival: payment setup, mobile data, ride-hailing, hotel address handling, and the backup layer that saves a rough first hour.</p>
+          <div class="hero-actions">
+            <a class="button primary" href="#arrival-builder">Build the checklist</a>
+            <a class="button ghost" href="china-payment-setup-for-foreigners.html">Review payment setup</a>
+          </div>
+        </div>
+        <aside class="detail-shell">
+          <span class="stamp">Use it before departure</span>
+          <div class="fact-strip">
+            <div class="fact"><strong>Entry-aware</strong><span>Checks whether your day-one plan matches direct visit, transit, or visa travel</span></div>
+            <div class="fact"><strong>Operational output</strong><span>Returns a copy-ready list for before the flight, after landing, and backup planning</span></div>
+            <div class="fact"><strong>Low drama</strong><span>Targets the payment, data, and transport problems that usually show up first</span></div>
+          </div>
+        </aside>
+      </section>
+
+      <section class="section" id="arrival-builder">
+        <div class="section-copy">
+          <p class="eyebrow">Checklist builder</p>
+          <h2>Tell the tool what is already solved, then let it surface the gaps that still matter.</h2>
+          <p class="lede">The goal is not to produce a perfect packing list. It is to identify the few missing tasks that can still turn a simple arrival into a messy one.</p>
+        </div>
+        <div class="tool-shell" data-arrival-checklist>
+          <div class="tool-head">
+            <div>
+              <h3>China arrival checklist builder</h3>
+              <p>Choose the likely entry path, then mark what is already prepared. The output is a practical operating list, not legal advice.</p>
+            </div>
+          </div>
+          <div class="tool-body">
+            <div class="form-panel">
+              <div class="field-grid">
+                <div class="field">
+                  <label for="arrivalCountry">Passport nationality</label>
+                  <select id="arrivalCountry" class="arrival-country"></select>
+                </div>
+                <div class="field">
+                  <label for="arrivalEntry">Expected entry path</label>
+                  <select id="arrivalEntry" class="arrival-entry">
+                    <option value="notSure">I still need to confirm</option>
+                    <option value="direct30">30-day direct visit</option>
+                    <option value="transit240">240-hour transit</option>
+                    <option value="visaHeld">Visa already issued</option>
+                  </select>
+                </div>
+                <div class="field">
+                  <label for="arrivalWindow">Arrival window</label>
+                  <select id="arrivalWindow" class="arrival-window">
+                    <option value="daytime">Daytime arrival</option>
+                    <option value="evening">Evening arrival</option>
+                    <option value="latenight">Late-night arrival</option>
+                  </select>
+                </div>
+                <div class="field">
+                  <label for="arrivalPayment">Current payment setup</label>
+                  <select id="arrivalPayment" class="arrival-payment">
+                    <option value="none">No wallet is ready yet</option>
+                    <option value="installed">App installed, not fully proven</option>
+                    <option value="alipay">Alipay is ready</option>
+                    <option value="wechat">Weixin or WeChat is ready</option>
+                    <option value="both">Alipay and Weixin or WeChat are ready</option>
+                  </select>
+                </div>
+                <div class="field">
+                  <label for="arrivalData">Mobile data plan</label>
+                  <select id="arrivalData" class="arrival-data">
+                    <option value="unset">Not confirmed yet</option>
+                    <option value="roaming">Roaming or eSIM is ready</option>
+                    <option value="wifi">I will rely on airport or hotel Wi-Fi</option>
+                  </select>
+                </div>
+                <div class="field">
+                  <label for="arrivalTransport">First high-pressure moment</label>
+                  <select id="arrivalTransport" class="arrival-transport">
+                    <option value="airportRide">Airport or station ride after landing</option>
+                    <option value="hotelCheckin">Late or time-sensitive hotel check-in</option>
+                    <option value="cashier">First purchase or cashier test</option>
+                  </select>
+                </div>
+                <div class="field">
+                  <label for="arrivalTripStyle">Trip pattern</label>
+                  <select id="arrivalTripStyle" class="arrival-trip-style">
+                    <option value="simple">One city or simple transfer pattern</option>
+                    <option value="railHeavy">Multiple rail legs or multi-city travel</option>
+                  </select>
+                </div>
+                <div class="field">
+                  <label for="arrivalFood">Food communication need</label>
+                  <select id="arrivalFood" class="arrival-food">
+                    <option value="none">No special food note needed</option>
+                    <option value="diet">Dietary preference or ingredient avoidance</option>
+                    <option value="allergy">Allergy warning needed</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="section-copy">
+                <p class="eyebrow">Already prepared</p>
+                <p class="lede">Mark the items that are actually done, not the ones you still expect to do later.</p>
+              </div>
+              <div class="checklist-grid">
+                <label class="check-item"><input type="checkbox" class="arrival-rule-ready"> I already confirmed the entry basis</label>
+                <label class="check-item"><input type="checkbox" class="arrival-address-ready"> I saved the hotel or host address in Chinese</label>
+                <label class="check-item"><input type="checkbox" class="arrival-backup-ready"> I have a second card or emergency cash</label>
+                <label class="check-item"><input type="checkbox" class="arrival-ride-ready"> I already installed DiDi or another pickup plan</label>
+                <label class="check-item"><input type="checkbox" class="arrival-booking-ready"> I have one booking or rail app I can use</label>
+                <label class="check-item"><input type="checkbox" class="arrival-medical-ready"> I prepared a food or allergy card if needed</label>
+              </div>
+            </div>
+
+            <aside class="result-panel">
+              <span class="status-pill">Check carefully</span>
+              <div class="result-card">
+                <span class="label">Arrival readiness</span>
+                <strong class="verdict">Choose a passport to begin.</strong>
+                <p class="reason">This builder will turn your current setup into a practical first-day plan.</p>
+              </div>
+              <div class="result-card">
+                <span class="label">Top priorities</span>
+                <ol class="next-steps"></ol>
+              </div>
+              <div class="result-card">
+                <span class="label">Checklist</span>
+                <div class="arrival-sections"></div>
+              </div>
+              <div class="copy-row">
+                <button type="button" data-copy-arrival="short">Copy priorities</button>
+                <button type="button" data-copy-arrival="full">Copy full checklist</button>
+              </div>
+              <p class="copy-feedback"></p>
+              <div class="fact-strip facts"></div>
+              <p class="source-line"></p>
+            </aside>
+          </div>
+        </div>
+      </section>
+
+      <section class="section">
+        <div class="split-grid">
+          <div class="note-box">
+            <h2>What this builder is good at</h2>
+            <p>It is strongest when the trip is already close to real: passport chosen, route roughly known, hotel booked, and the first arrival hour starting to feel concrete.</p>
+          </div>
+          <div class="note-box">
+            <h2>What it does not replace</h2>
+            <p>It does not replace the actual rule check. If your entry basis is still fuzzy, run the visa-free or transit tool first and then come back here.</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="section">
+        <div class="tool-grid">
+          <a class="utility-tile" href="alipay-for-foreigners-in-china.html">
+            <h3>Alipay for foreigners</h3>
+            <p>Use this when the real blocker is getting the first payment path stable before departure.</p>
+          </a>
+          <a class="utility-tile" href="wechat-pay-for-foreigners-in-china.html">
+            <h3>Weixin or WeChat Pay</h3>
+            <p>Best next step if you want a second wallet or your contacts and hotels already revolve around WeChat.</p>
+          </a>
+          <a class="utility-tile" href="china-payment-apps-for-foreigners.html">
+            <h3>Payment apps comparison</h3>
+            <p>Choose the lowest-friction payment stack instead of installing apps randomly.</p>
+          </a>
+          <a class="utility-tile" href="how-to-use-didi-in-china-as-a-foreigner.html">
+            <h3>Ride-hailing after landing</h3>
+            <p>Helpful when the first operational risk is still the airport or station pickup.</p>
+          </a>
+          <a class="utility-tile" href="china-address-card-generator.html">
+            <h3>Build an address card</h3>
+            <p>Useful when payment is working but pickup and check-in communication still feels risky.</p>
+          </a>
+          <a class="utility-tile" href="china-allergy-card-generator.html">
+            <h3>Build a food or allergy card</h3>
+            <p>Use this if the arrival checklist says meal communication still needs a backup layer.</p>
+          </a>
+        </div>
+      </section>
+
+      <section class="section">
+        <div class="source-box">
+          <h2>Sources reviewed for this page</h2>
+          <p>This page combines the rule logic already modeled elsewhere on China Entry Toolkit with the official Alipay app listing and current Tenpay Global guidance for overseas cards in Weixin Pay. The checklist ordering is an operational inference based on how arrival problems usually stack up in real travel.</p>
+          <p><a href="https://apps.apple.com/us/app/alipay-simplify-your-life/id333206289">Alipay official app listing</a><br><a href="https://www.tenpayglobal.com/en/consumption?type=card">Tenpay Global, overseas cards in Weixin Pay</a></p>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <div class="foot">
+        <div><a href="about.html">About</a> · <a href="contact.html">Contact</a> · <a href="privacy.html">Privacy</a> · <a href="terms.html">Terms</a></div>
+        <div>Reviewed against official sources on <span data-policy-review></span>.</div>
+      </div>
+    </footer>
+    <script src="app.js"></script>
+  </body>
+</html>

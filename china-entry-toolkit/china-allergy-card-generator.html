@@ -1,0 +1,180 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>China Allergy Card Generator for Restaurants and Travel</title>
+    <meta name="description" content="Create a bilingual China allergy card for restaurants and travel. Select common allergens, add diet notes, and copy a Chinese-first card for your phone.">
+    <link rel="canonical" href="https://chinaentrytoolkit.com/china-allergy-card-generator.html">
+    <meta property="og:title" content="China Allergy Card Generator">
+    <meta property="og:description" content="Build a Chinese-first allergy card for restaurants, hotels, and food ordering in China.">
+    <meta property="og:type" content="website">
+    <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+    <link rel="manifest" href="site.webmanifest">
+    <link rel="stylesheet" href="styles.css">
+  </head>
+  <body>
+    <header class="site-header">
+      <nav class="nav" aria-label="Primary">
+        <a class="brand" href="index.html"><img src="assets/logo.svg" alt="China Entry Toolkit"></a>
+        <div class="nav-links">
+          <a href="china-visa-free-checker.html">Visa-Free Checker</a>
+          <a href="china-visa-free-countries.html">Countries</a>
+          <a href="china-transit-without-visa-checker.html">Transit Checker</a>
+          <a href="240-hour-transit-china.html">240-Hour Guide</a>
+          <a href="china-stay-length-calculator.html">Stay Calculator</a>
+        </div>
+      </nav>
+    </header>
+
+    <main>
+      <section class="page-hero">
+        <div class="hero-copy">
+          <p class="eyebrow">Food communication tool</p>
+          <h1>Build a bilingual allergy card before you start eating your way through China.</h1>
+          <p class="lede">Choose the ingredients that are a real problem, add a diet note if needed, and generate a Chinese-first card you can show at restaurants, cafes, hotel breakfasts, and food courts.</p>
+        </div>
+        <aside class="detail-shell">
+          <span class="stamp">Why this helps</span>
+          <div class="fact-strip">
+            <div class="fact"><strong>Chinese first</strong><span>Built to show directly to kitchen or service staff</span></div>
+            <div class="fact"><strong>Copy-ready</strong><span>Copy the full card or just the Chinese lines</span></div>
+            <div class="fact"><strong>Preset phrases</strong><span>No risky freeform translation for core allergy warnings</span></div>
+          </div>
+        </aside>
+      </section>
+
+      <section class="section">
+        <div class="tool-shell" data-allergy-generator>
+          <div class="tool-head">
+            <div>
+              <h2>Allergy card builder</h2>
+              <p>Pick the foods to avoid, set the severity, and keep the message short enough to show fast.</p>
+            </div>
+          </div>
+          <div class="tool-body">
+            <div class="form-panel">
+              <div class="field-grid">
+                <div class="field">
+                  <label for="severity">Severity</label>
+                  <select id="severity" class="allergy-severity">
+                    <option value="severe">Severe allergy</option>
+                    <option value="allergy">Allergy</option>
+                    <option value="sensitive">Strong sensitivity or intolerance</option>
+                  </select>
+                </div>
+                <div class="field">
+                  <label for="dietNote">Extra diet note</label>
+                  <select id="dietNote" class="allergy-diet">
+                    <option value="none">None</option>
+                    <option value="vegetarian">Vegetarian</option>
+                    <option value="vegan">Vegan</option>
+                    <option value="no-pork">No pork</option>
+                    <option value="no-beef">No beef</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="field">
+                <label>Ingredients to avoid</label>
+                <div class="checklist-grid">
+                  <label class="check-item"><input type="checkbox" value="peanuts" data-allergen> Peanuts</label>
+                  <label class="check-item"><input type="checkbox" value="tree-nuts" data-allergen> Tree nuts</label>
+                  <label class="check-item"><input type="checkbox" value="shellfish" data-allergen> Shellfish</label>
+                  <label class="check-item"><input type="checkbox" value="fish" data-allergen> Fish</label>
+                  <label class="check-item"><input type="checkbox" value="egg" data-allergen> Egg</label>
+                  <label class="check-item"><input type="checkbox" value="milk" data-allergen> Milk and dairy</label>
+                  <label class="check-item"><input type="checkbox" value="sesame" data-allergen> Sesame</label>
+                  <label class="check-item"><input type="checkbox" value="soy" data-allergen> Soy</label>
+                  <label class="check-item"><input type="checkbox" value="wheat" data-allergen> Wheat</label>
+                  <label class="check-item"><input type="checkbox" value="gluten" data-allergen> Gluten</label>
+                </div>
+              </div>
+
+              <label class="checkbox-line">
+                <input type="checkbox" class="allergy-cross-contact" checked>
+                <span>Please warn about shared oil, broth, cookware, or utensils.</span>
+              </label>
+              <label class="checkbox-line">
+                <input type="checkbox" class="allergy-meds">
+                <span>Mention that I carry emergency medicine and may need urgent help.</span>
+              </label>
+
+              <div class="field-grid">
+                <div class="field">
+                  <label for="emergencyName">Emergency contact name</label>
+                  <input id="emergencyName" class="allergy-contact-name" type="text" placeholder="Example: John Smith">
+                </div>
+                <div class="field">
+                  <label for="emergencyPhone">Emergency contact phone</label>
+                  <input id="emergencyPhone" class="allergy-contact-phone" type="text" placeholder="Example: +1 555 123 4567">
+                </div>
+              </div>
+            </div>
+
+            <div class="result-panel">
+              <span class="status-pill good">Card preview</span>
+              <div class="copy-row">
+                <button type="button" class="primary" data-copy-allergy="full">Copy bilingual card</button>
+                <button type="button" data-copy-allergy="zh">Copy Chinese only</button>
+                <button type="button" data-copy-allergy="en">Copy English only</button>
+              </div>
+              <p class="copy-feedback" aria-live="polite">Choose at least one allergy or a diet note to build the card.</p>
+
+              <article class="preview-card preview-card-zh">
+                <span class="preview-eyebrow">Chinese card</span>
+                <h3 class="allergy-preview-title-zh">请在点餐前给工作人员看这张卡</h3>
+                <div class="preview-lines allergy-preview-zh"></div>
+                <p class="preview-contact allergy-preview-contact"></p>
+              </article>
+
+              <article class="preview-card">
+                <span class="preview-eyebrow">English backup</span>
+                <h3 class="allergy-preview-title-en">Show this before ordering.</h3>
+                <div class="preview-lines allergy-preview-en"></div>
+              </article>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="section">
+        <div class="split-grid">
+          <div class="source-box">
+            <h2>Best use</h2>
+            <p>Show the Chinese card before ordering, not after the dish arrives. It also helps to keep the message visible on your lock screen or in your photo favorites while traveling.</p>
+          </div>
+          <div class="source-box">
+            <h2>Keep the message honest</h2>
+            <p>Only use the severe setting if that matches your real medical situation. If your issue is mainly dietary, use the diet note and keep the wording simpler for staff.</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="section">
+        <div class="tool-grid">
+          <a class="utility-tile" href="china-address-card-generator.html">
+            <h3>Build an address card</h3>
+            <p>Pair your food card with a taxi or hotel address card for the rest of the trip.</p>
+          </a>
+          <a class="utility-tile" href="china-visa-free-checker.html">
+            <h3>Check entry rules first</h3>
+            <p>Use the main checker if the bigger question is still whether the trip itself fits the current visa-free framework.</p>
+          </a>
+          <a class="utility-tile" href="china-transit-without-visa-checker.html">
+            <h3>Check a transit route</h3>
+            <p>Helpful if the food planning is for a short China stopover rather than a full visit.</p>
+          </a>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <div class="foot">
+        <div><a href="about.html">About</a> · <a href="contact.html">Contact</a> · <a href="privacy.html">Privacy</a> · <a href="terms.html">Terms</a></div>
+        <div>Reviewed against official sources on <span data-policy-review></span>.</div>
+      </div>
+    </footer>
+    <script src="app.js"></script>
+  </body>
+</html>

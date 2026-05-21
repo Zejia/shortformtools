@@ -1,0 +1,241 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Landed Cost Calculator: Per-Unit Import Cost Planner</title>
+    <meta name="description" content="Calculate total landed cost and per-unit import cost with duty, VAT, brokerage, freight, insurance, and low-value threshold modeling.">
+    <link rel="canonical" href="https://importdutytoolkit.com/landed-cost-calculator.html">
+    <meta property="og:title" content="Landed Cost Calculator">
+    <meta property="og:description" content="Model total landed cost and per-unit economics before you quote or replenish imported inventory.">
+    <meta property="og:type" content="article">
+    <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+    <link rel="manifest" href="site.webmanifest">
+    <link rel="stylesheet" href="styles.css">
+  </head>
+  <body>
+    <header class="site-header">
+      <nav class="nav" aria-label="Primary">
+        <a class="brand" href="index.html">
+          <span class="brand-mark">ID</span>
+          <span class="brand-lockup">
+            <strong>Import Duty Toolkit</strong>
+            <span>Landed-cost planning for trade operators</span>
+          </span>
+        </a>
+        <div class="nav-links">
+          <a href="import-duty-calculator.html">Duty calculator</a>
+          <a href="landed-cost-calculator.html">Landed cost</a>
+          <a href="how-to-estimate-import-duty.html">How to estimate</a>
+          <a href="hs-code-lookup-guide.html">HS code guide</a>
+        </div>
+      </nav>
+    </header>
+
+    <main>
+      <section class="page-hero">
+        <div class="page-copy">
+          <p class="eyebrow">Per-unit planning</p>
+          <h1>Turn customs, freight, and tax into a per-unit landed number you can price from.</h1>
+          <p class="lede">The landed-cost framing is useful when the tariff line is only part of the conversation. Buyers, ops leads, and finance teams usually need the unit economics, not just the duty amount.</p>
+          <div class="inline-actions">
+            <a class="button primary" href="#landed-tool">Open landed-cost tool</a>
+            <a class="button ghost" href="import-duty-calculator.html">Open tariff view</a>
+          </div>
+        </div>
+        <aside class="rail-card">
+          <span class="stamp">Use this when the quote is the question</span>
+          <div class="data-stack">
+            <div class="data-row"><span>Best for</span><strong>Margin floors</strong></div>
+            <div class="data-row"><span>Compare</span><strong>Shipment scenarios</strong></div>
+            <div class="data-row"><span>Reviewed</span><strong><span data-review-date></span></strong></div>
+          </div>
+        </aside>
+      </section>
+
+      <section class="section" id="landed-tool">
+        <section class="tool-shell" data-landed-cost-tool>
+          <div class="tool-head">
+            <div>
+              <h2>Landed cost calculator</h2>
+              <p>Use this when you need a pricing number that already carries the customs and handling friction. The scenario table is especially useful before new customer quotes or replenishment orders.</p>
+            </div>
+            <span class="status-pill" data-output="statusTone"><span data-output="status">Watch the paperwork</span></span>
+          </div>
+
+          <div class="tool-grid">
+            <div class="form-panel">
+              <div class="field-grid">
+                <div class="field full">
+                  <label for="marketLanded">Destination market preset</label>
+                  <select id="marketLanded" data-field="market">
+                    <option value="US">United States</option>
+                    <option value="UK">United Kingdom</option>
+                    <option value="EU">EU-like VAT mode</option>
+                    <option value="CUSTOM">Custom</option>
+                  </select>
+                  <span class="hint" data-output="thresholdNote"></span>
+                </div>
+                <div class="field">
+                  <label for="productLanded">Product value</label>
+                  <input id="productLanded" data-field="productValue" type="number" min="0" step="0.01" value="4200">
+                </div>
+                <div class="field">
+                  <label for="unitsLanded">Units in shipment</label>
+                  <input id="unitsLanded" data-field="units" type="number" min="1" step="1" value="700">
+                </div>
+                <div class="field">
+                  <label for="shipLanded">Shipping cost</label>
+                  <input id="shipLanded" data-field="shippingCost" type="number" min="0" step="0.01" value="360">
+                </div>
+                <div class="field">
+                  <label for="insuranceLanded">Insurance cost</label>
+                  <input id="insuranceLanded" data-field="insuranceCost" type="number" min="0" step="0.01" value="42">
+                </div>
+                <div class="field">
+                  <label for="rateLanded">Duty rate</label>
+                  <input id="rateLanded" data-field="dutyRate" type="number" min="0" step="0.1" value="6">
+                </div>
+                <div class="field">
+                  <label for="vatLanded">Additional tax or VAT rate</label>
+                  <input id="vatLanded" data-field="taxRate" type="number" min="0" step="0.1" value="20">
+                </div>
+                <div class="field">
+                  <label for="brokerLanded">Brokerage or customs fees</label>
+                  <input id="brokerLanded" data-field="brokerage" type="number" min="0" step="0.01" value="58">
+                </div>
+                <div class="field">
+                  <label for="miscLanded">Misc landed cost</label>
+                  <input id="miscLanded" data-field="misc" type="number" min="0" step="0.01" value="22">
+                </div>
+                <div class="field">
+                  <label for="bufferLanded">FX or compliance buffer %</label>
+                  <input id="bufferLanded" data-field="bufferRate" type="number" min="0" step="0.1" value="2.5">
+                </div>
+                <div class="field">
+                  <label for="thresholdLanded">Low-value threshold</label>
+                  <input id="thresholdLanded" data-field="threshold" type="number" min="0" step="0.01" value="150">
+                </div>
+                <label class="check-row span-2"><input data-field="useDeMinimis" type="checkbox" checked> <span>Apply low-value relief when eligible</span></label>
+              </div>
+
+              <details class="details-block">
+                <summary>Advanced assumptions</summary>
+                <div class="details-grid">
+                  <div class="field">
+                    <label for="reliefLanded">Threshold treatment</label>
+                    <select id="reliefLanded" data-field="reliefMode">
+                      <option value="none">No automatic relief</option>
+                      <option value="duty-only">Waive duty only</option>
+                      <option value="duty-and-tax">Waive duty and tax</option>
+                    </select>
+                  </div>
+                  <label class="check-row"><input data-field="includeShippingInDuty" type="checkbox" checked> <span>Include shipping in duty base</span></label>
+                  <label class="check-row"><input data-field="includeInsuranceInDuty" type="checkbox" checked> <span>Include insurance in duty base</span></label>
+                  <label class="check-row"><input data-field="taxIncludesDuty" type="checkbox" checked> <span>Apply tax on top of duty</span></label>
+                  <label class="check-row"><input data-field="taxIncludesBrokerage" type="checkbox" checked> <span>Include brokerage in tax base</span></label>
+                </div>
+                <p class="inline-note" data-output="assumptionNote"></p>
+              </details>
+            </div>
+
+            <aside class="result-panel" aria-live="polite">
+              <div class="metric-large">
+                <span>Total landed cost</span>
+                <strong data-output="totalLanded">-</strong>
+                <div class="meter" data-output="meter"></div>
+              </div>
+              <div class="kpi-grid">
+                <div class="kpi"><span>Per-unit landed</span><strong data-output="perUnit">-</strong></div>
+                <div class="kpi"><span>Customs value</span><strong data-output="customsValue">-</strong></div>
+                <div class="kpi"><span>Duty</span><strong data-output="duty">-</strong></div>
+                <div class="kpi"><span>Tax or VAT</span><strong data-output="tax">-</strong></div>
+                <div class="kpi"><span>Landed uplift</span><strong data-output="upliftPercent">-</strong></div>
+                <div class="kpi"><span>Duty and tax share</span><strong data-output="rateBurden">-</strong></div>
+              </div>
+              <div class="result-card">
+                <span class="label">Threshold check</span>
+                <strong data-output="thresholdFlag">-</strong>
+                <p class="list-copy">Current threshold: <span data-output="thresholdLabel"></span></p>
+              </div>
+              <div class="result-card">
+                <span class="label">Modeled tax base</span>
+                <strong data-output="taxBase">-</strong>
+                <p class="list-copy">FX buffer modeled separately: <span data-output="bufferCost"></span></p>
+              </div>
+              <div class="formula-line" data-output="formulaLine"></div>
+              <div class="hero-actions">
+                <button type="button" data-output="copySummary">Copy summary</button>
+                <a class="button ghost" href="hs-code-lookup-guide.html">Prep HS-code brief</a>
+              </div>
+            </aside>
+          </div>
+
+          <div class="content-grid">
+            <div class="content-panel">
+              <h3>Scenario table</h3>
+              <div class="table-wrap">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Scenario</th>
+                      <th>Duty</th>
+                      <th>Tax</th>
+                      <th>Total landed</th>
+                      <th>Per unit</th>
+                      <th>Status</th>
+                    </tr>
+                  </thead>
+                  <tbody data-output="scenarioRows"></tbody>
+                </table>
+              </div>
+            </div>
+            <div class="content-panel">
+              <h3>Operational readout</h3>
+              <ul class="insights-list" data-output="insights"></ul>
+            </div>
+            <div class="content-panel">
+              <h3>Use the per-unit result for</h3>
+              <ul class="checklist">
+                <li>Margin-floor checks before channel quotes or list-price updates.</li>
+                <li>Comparing whether a larger combined shipment lowers the real unit cost after brokerage and admin fees.</li>
+                <li>Estimating how much room you have before freight spikes, duty disputes, or FX movement break the deal.</li>
+              </ul>
+            </div>
+          </div>
+        </section>
+      </section>
+
+      <section class="section">
+        <div class="section-copy">
+          <p class="eyebrow">Reading the number</p>
+          <h2>A better landed-cost workflow</h2>
+          <p>Most teams go wrong by stopping at the first clean-looking total. Use the three checks below before you call the number done.</p>
+        </div>
+        <div class="panel-grid">
+          <div class="content-panel">
+            <h3>1. Audit the value basis</h3>
+            <p>If the quote is FOB but your model quietly used CIF, or the other way around, the landed number can look precise and still be structurally wrong.</p>
+          </div>
+          <div class="content-panel">
+            <h3>2. Compare a stressed file</h3>
+            <p>If a one-step freight slip or a two-point rate shift breaks the unit economics, the business decision should change before the PO does.</p>
+          </div>
+          <div class="content-panel">
+            <h3>3. Capture the assumptions</h3>
+            <p>Record the preset, rate, threshold mode, and basis used. That keeps Pricing, Ops, and Finance from quoting the same product from different math.</p>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        <span>Preset assumptions reviewed <span data-review-date></span>. Planning tool only, not legal advice.</span>
+        <span><a href="about.html">About</a> · <a href="contact.html">Contact</a> · <a href="privacy.html">Privacy</a> · <a href="terms.html">Terms</a></span>
+      </div>
+    </footer>
+
+    <script src="app.js"></script>
+  </body>
+</html>

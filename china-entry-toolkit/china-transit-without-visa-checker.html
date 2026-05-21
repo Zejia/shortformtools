@@ -1,0 +1,212 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>China Transit Without Visa Checker: 240-Hour Route Screening</title>
+    <meta name="description" content="Check whether your China route may fit the current 240-hour visa-free transit policy by nationality, route logic, stay window, and port-area confirmations.">
+    <link rel="canonical" href="https://chinaentrytoolkit.com/china-transit-without-visa-checker.html">
+    <meta property="og:title" content="China Transit Without Visa Checker">
+    <meta property="og:description" content="Route screening for China's current 240-hour visa-free transit policy.">
+    <meta property="og:type" content="website">
+    <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+    <link rel="manifest" href="site.webmanifest">
+    <link rel="stylesheet" href="styles.css">
+  </head>
+  <body>
+    <header class="site-header">
+      <nav class="nav" aria-label="Primary">
+        <a class="brand" href="index.html"><img src="assets/logo.svg" alt="China Entry Toolkit"></a>
+        <div class="nav-links">
+          <a href="china-visa-free-checker.html">Visa-Free Checker</a>
+          <a href="china-visa-free-countries.html">Countries</a>
+          <a href="china-transit-without-visa-checker.html" aria-current="page">Transit Checker</a>
+          <a href="240-hour-transit-china.html">240-Hour Guide</a>
+          <a href="china-stay-length-calculator.html">Stay Calculator</a>
+        </div>
+      </nav>
+    </header>
+
+    <main>
+      <section class="page-hero">
+        <div class="hero-copy">
+          <p class="eyebrow">Transit mode</p>
+          <h1>Does your route look eligible for China's current 240-hour transit policy?</h1>
+          <p class="lede">Use this page if your plan is not a simple visit. It screens nationality coverage, the third-country or third-region rule, the raw time window, and the port-area confirmations that usually trip travelers up.</p>
+        </div>
+        <aside class="detail-shell">
+          <span class="stamp">Transit snapshot</span>
+          <div class="fact-strip">
+            <div class="fact"><strong>55</strong><span>eligible nationalities in the current public transit framework</span></div>
+            <div class="fact"><strong>240 hours</strong><span>maximum stay window, up to 10 days</span></div>
+            <div class="fact"><strong>65 ports</strong><span>designated entry ports referenced in the latest public update used here</span></div>
+          </div>
+        </aside>
+      </section>
+
+      <section class="section">
+        <div class="tool-shell" data-transit-checker>
+          <div class="tool-head">
+            <div>
+              <h3>240-hour transit checker</h3>
+              <p>This tool works best when you already know your origin, your onward destination after China, and your rough time window inside mainland China.</p>
+            </div>
+          </div>
+          <div class="tool-body">
+            <div class="form-panel">
+              <div class="field-grid">
+                <div class="field">
+                  <label for="tcCountry">Passport nationality</label>
+                  <select id="tcCountry" class="country-field"></select>
+                </div>
+                <div class="field">
+                  <label for="tcPurpose">Trip purpose inside China</label>
+                  <select id="tcPurpose" class="purpose-field">
+                    <option value="tourism">Tourism</option>
+                    <option value="business">Business</option>
+                    <option value="family">Visit to relatives or friends</option>
+                    <option value="exchange">Exchange visit</option>
+                    <option value="study">Study</option>
+                    <option value="work">Work</option>
+                    <option value="media">News reporting</option>
+                  </select>
+                </div>
+                <div class="field">
+                  <label for="tcOrigin">Origin before China</label>
+                  <select id="tcOrigin" class="origin-field"></select>
+                </div>
+                <div class="field">
+                  <label for="tcDestination">Onward destination after China</label>
+                  <select id="tcDestination" class="destination-field"></select>
+                </div>
+                <div class="field">
+                  <label for="tcArrival">Arrival in mainland China</label>
+                  <input id="tcArrival" class="arrival-field" type="datetime-local">
+                </div>
+                <div class="field">
+                  <label for="tcDeparture">Departure from mainland China</label>
+                  <input id="tcDeparture" class="departure-field" type="datetime-local">
+                </div>
+                <div class="field">
+                  <label for="tcZone">Planned transit area</label>
+                  <select id="tcZone" class="zone-field"></select>
+                  <small class="zone-note">Pick a transit region to see the most useful reminder for your stay area.</small>
+                </div>
+              </div>
+              <label class="checkbox-line"><input class="ordinary-field" type="checkbox" checked> I am using an ordinary passport</label>
+              <label class="checkbox-line"><input class="onward-field" type="checkbox"> I have a confirmed onward ticket or other confirmed onward departure arrangement</label>
+              <label class="checkbox-line"><input class="port-field" type="checkbox"> I know my first mainland entry point is one of the designated 240-hour transit ports</label>
+              <label class="checkbox-line"><input class="area-field" type="checkbox"> I will stay inside the permitted area for that transit entry region</label>
+            </div>
+            <aside class="result-panel">
+              <span class="status-pill">Check carefully</span>
+              <div class="result-card">
+                <span class="label">Verdict</span>
+                <strong class="verdict">Choose a nationality to begin.</strong>
+                <p class="reason">This page screens the route logic of China's current 240-hour transit policy.</p>
+              </div>
+              <div class="result-card">
+                <span class="label">What to do next</span>
+                <ul class="next-steps"></ul>
+              </div>
+              <div class="result-card">
+                <span class="label">Raw time window</span>
+                <strong class="transit-hours-output">Enter valid arrival and departure times</strong>
+              </div>
+              <div class="fact-strip facts"></div>
+              <p class="source-line"></p>
+            </aside>
+          </div>
+        </div>
+      </section>
+
+      <section class="section">
+        <div class="section-copy">
+          <p class="eyebrow">What breaks eligibility</p>
+          <h2>Most failed transit plans go wrong in one of four places.</h2>
+        </div>
+        <div class="cluster-grid">
+          <article class="cluster-tile">
+            <h3>Same-country loop</h3>
+            <p>If the route is essentially country A → China → country A, the third-country or third-region rule is usually not satisfied.</p>
+          </article>
+          <article class="cluster-tile">
+            <h3>No onward proof</h3>
+            <p>You need confirmed onward arrangements, not just a plan in your head.</p>
+          </article>
+          <article class="cluster-tile">
+            <h3>Wrong port or wrong area</h3>
+            <p>The nationality and route may fit, but the entry point and stay area still need to align with the designated geography.</p>
+          </article>
+          <article class="cluster-tile">
+            <h3>Unsupported activity</h3>
+            <p>Tourism, business, family visits, and exchange visits fit the current framework used here. Work, study, and news reporting do not.</p>
+          </article>
+        </div>
+      </section>
+
+      <section class="section">
+        <div class="split-grid">
+          <div class="note-box">
+            <h2>Third-country and third-region reminder</h2>
+            <p>Hong Kong SAR, Macao SAR, and the Taiwan region count as valid third regions in the public transit interpretation used here. That is why many travelers can structure a route like country A → mainland China → Hong Kong SAR.</p>
+          </div>
+          <div class="note-box">
+            <h2>Time rule reminder</h2>
+            <p>The official interpretation says the stay is measured from 00:00 on the day after entry. This checker still asks for your raw stay window because that is the easiest first-pass filter when comparing itineraries.</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="section">
+        <div class="section-copy">
+          <p class="eyebrow">Transit content cluster</p>
+          <h2>Give searchers the route answer before asking them to trust the tool.</h2>
+          <p class="lede">These pages target the questions people ask before they are ready to fill out the checker.</p>
+        </div>
+        <div class="tool-grid">
+          <a class="utility-tile" href="10-day-visa-free-china.html">
+            <h3>10-day visa-free China</h3>
+            <p>Explains why many travelers use this phrase when they really mean the 240-hour transit policy.</p>
+          </a>
+          <a class="utility-tile" href="how-does-china-visa-free-transit-work.html">
+            <h3>How does transit work?</h3>
+            <p>Use this if you need the 24-hour versus 240-hour framework in simple language first.</p>
+          </a>
+          <a class="utility-tile" href="can-i-leave-the-airport-during-china-transit-without-visa.html">
+            <h3>Can I leave the airport?</h3>
+            <p>Practical answer page about temporary entry permits, restricted areas, and city-stop expectations.</p>
+          </a>
+          <a class="utility-tile" href="china-transit-rule-third-country-examples.html">
+            <h3>Third-country rule examples</h3>
+            <p>Use this if your itinerary confusion is really about what counts as a valid onward destination.</p>
+          </a>
+          <a class="utility-tile" href="china-transit-route-examples.html">
+            <h3>Transit route examples</h3>
+            <p>Examples of valid and invalid route shapes based on the current public policy language.</p>
+          </a>
+          <a class="utility-tile" href="china-visa-free-for-us-citizens.html">
+            <h3>US citizen transit answer</h3>
+            <p>Useful because US travelers are on the current 240-hour list but not the unilateral 30-day list.</p>
+          </a>
+        </div>
+      </section>
+
+      <section class="section">
+        <div class="source-box">
+          <h2>Official sources used for this page</h2>
+          <p>This checker is modeled from the National Immigration Administration's visa-free transit policy interpretation published on July 4, 2025, together with the public notice that expanded the designated 240-hour entry ports to 65 effective November 5, 2025.</p>
+          <p><a href="https://en.nia.gov.cn/n147418/n147463/c183412/content.html">Transit policy interpretation</a><br><a href="https://en.nia.gov.cn/n147418/n147468/c187308/content.html">65-port update notice</a></p>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <div class="foot">
+        <div><a href="about.html">About</a> · <a href="contact.html">Contact</a> · <a href="privacy.html">Privacy</a> · <a href="terms.html">Terms</a></div>
+        <div>Reviewed against official sources on <span data-policy-review></span>.</div>
+      </div>
+    </footer>
+    <script src="app.js"></script>
+  </body>
+</html>

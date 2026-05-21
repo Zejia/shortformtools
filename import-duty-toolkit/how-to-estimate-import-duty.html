@@ -1,0 +1,199 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>How to Estimate Import Duty: A Practical Workflow</title>
+    <meta name="description" content="A practical workflow for estimating import duty, customs value, VAT, and landed cost before you file or quote.">
+    <link rel="canonical" href="https://importdutytoolkit.com/how-to-estimate-import-duty.html">
+    <meta property="og:title" content="How to Estimate Import Duty">
+    <meta property="og:description" content="Learn the workflow for customs value, thresholds, HS code checks, and landed-cost planning.">
+    <meta property="og:type" content="article">
+    <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+    <link rel="manifest" href="site.webmanifest">
+    <link rel="stylesheet" href="styles.css">
+    <script type="application/ld+json">{"@context":"https://schema.org","@type":"Article","headline":"How to Estimate Import Duty","dateModified":"2026-05-21","author":{"@type":"Organization","name":"Import Duty Toolkit"},"publisher":{"@type":"Organization","name":"Import Duty Toolkit"},"mainEntityOfPage":"https://importdutytoolkit.com/how-to-estimate-import-duty.html"}</script>
+  </head>
+  <body>
+    <header class="site-header">
+      <nav class="nav" aria-label="Primary">
+        <a class="brand" href="index.html">
+          <span class="brand-mark">ID</span>
+          <span class="brand-lockup">
+            <strong>Import Duty Toolkit</strong>
+            <span>Landed-cost planning for trade operators</span>
+          </span>
+        </a>
+        <div class="nav-links">
+          <a href="import-duty-calculator.html">Duty calculator</a>
+          <a href="landed-cost-calculator.html">Landed cost</a>
+          <a href="how-to-estimate-import-duty.html">How to estimate</a>
+          <a href="hs-code-lookup-guide.html">HS code guide</a>
+        </div>
+      </nav>
+    </header>
+
+    <main>
+      <section class="page-hero">
+        <div class="page-copy">
+          <p class="eyebrow">Guide page</p>
+          <h1>How to estimate import duty without pretending the tariff line is the whole story.</h1>
+          <p class="lede">A good estimate has four parts: the right customs value, a defensible rate, explicit low-value threshold behavior, and the non-duty costs that still land on the shipment.</p>
+          <div class="inline-actions">
+            <a class="button primary" href="import-duty-calculator.html">Open the calculator</a>
+            <a class="button ghost" href="hs-code-lookup-guide.html">Prep the HS-code brief</a>
+          </div>
+        </div>
+        <aside class="rail-card">
+          <span class="stamp">Practical workflow</span>
+          <p>Reviewed <span data-review-date></span>. The steps below are for planning. Confirm the filing logic with a customs professional before entry.</p>
+        </aside>
+      </section>
+
+      <section class="section">
+        <div class="formula-band">
+          <span class="eyebrow">Base formula</span>
+          <strong>Estimated landed cost = product value + freight + insurance + brokerage + misc + FX buffer + duty + import tax</strong>
+          <p class="list-copy">Duty is not always charged on the same base that tax is. That is why the calculator keeps those assumptions separate.</p>
+        </div>
+      </section>
+
+      <section class="section">
+        <div class="section-copy">
+          <p class="eyebrow">Step by step</p>
+          <h2>Use this order when you estimate.</h2>
+        </div>
+        <div class="panel-grid">
+          <div class="content-panel">
+            <strong>Step 1</strong>
+            <h3>Define the customs value basis</h3>
+            <p>Start by checking whether your commercial reality is closer to FOB, CIF, or another basis. Many errors come from copying a rate onto the wrong declared base.</p>
+          </div>
+          <div class="content-panel">
+            <strong>Step 2</strong>
+            <h3>Get the probable HS code range</h3>
+            <p>If classification is still fuzzy, do not lock the duty rate yet. Build a quick broker brief with material, use, construction, and origin detail first.</p>
+          </div>
+          <div class="content-panel">
+            <strong>Step 3</strong>
+            <h3>Model threshold behavior openly</h3>
+            <p>Some markets waive duty but still collect VAT or shift the collection point. Do not hide that assumption inside one generic checkbox.</p>
+          </div>
+          <div class="content-panel">
+            <strong>Step 4</strong>
+            <h3>Add the admin friction</h3>
+            <p>Brokerage, disbursement, compliance checks, and FX buffer often decide whether a shipment still works, especially on smaller consignments.</p>
+          </div>
+          <div class="content-panel">
+            <strong>Step 5</strong>
+            <h3>Stress-test the file</h3>
+            <p>Run one cleaner scenario and one stressed scenario. If a freight slip or rate dispute breaks the economics, that changes the business decision now.</p>
+          </div>
+          <div class="content-panel">
+            <strong>Step 6</strong>
+            <h3>Capture assumptions with the number</h3>
+            <p>When someone sees the landed total later, they should also see the duty base, rate source, threshold mode, and whether brokerage was included.</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="section">
+        <div class="section-copy">
+          <p class="eyebrow">Starter threshold map</p>
+          <h2>How the built-in presets think about low-value relief</h2>
+        </div>
+        <div class="content-panel">
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Preset</th>
+                  <th>Threshold line used in the toolkit</th>
+                  <th>Default relief treatment</th>
+                  <th>Why it matters</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>United States</td>
+                  <td>None by default</td>
+                  <td>No automatic relief</td>
+                  <td>The preset assumes broad de minimis treatment is not generally available, so the file is modeled without it.</td>
+                </tr>
+                <tr>
+                  <td>United Kingdom</td>
+                  <td>GBP 135</td>
+                  <td>Waive duty only</td>
+                  <td>Low-value customs-duty relief can exist while VAT still matters, often with collection-point complexity.</td>
+                </tr>
+                <tr>
+                  <td>EU-like VAT mode</td>
+                  <td>EUR 150</td>
+                  <td>Waive duty only</td>
+                  <td>The preset assumes VAT still applies, so the model separates duty relief from the tax layer.</td>
+                </tr>
+                <tr>
+                  <td>Custom</td>
+                  <td>User-defined</td>
+                  <td>User-defined</td>
+                  <td>Use this only when you have market-specific or broker-specific instructions the starter presets do not cover.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <section class="section">
+        <div class="section-copy">
+          <p class="eyebrow">Where teams usually miss</p>
+          <h2>Common import-duty estimation mistakes</h2>
+        </div>
+        <div class="panel-grid">
+          <div class="content-panel">
+            <h3>Treating HS code as settled too early</h3>
+            <p>If the rate changes meaningfully across two plausible headings, the real answer is classification work, not calculator confidence.</p>
+          </div>
+          <div class="content-panel">
+            <h3>Using product value as a stand-in for landed reality</h3>
+            <p>Freight, brokerage, and tax can move the economics more than expected, especially on low-ticket items or urgent shipments.</p>
+          </div>
+          <div class="content-panel">
+            <h3>Pricing from the best case only</h3>
+            <p>A business that prices from the cleanest scenario tends to relearn the same customs lesson every quarter.</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="section">
+        <div class="section-copy">
+          <p class="eyebrow">Next step</p>
+          <h2>Move from guide to tool</h2>
+        </div>
+        <div class="utility-grid">
+          <a class="utility-tile" href="import-duty-calculator.html">
+            <h3>Run the import-duty calculator</h3>
+            <p>Use the tariff-first view when the rate and customs basis are the main questions.</p>
+          </a>
+          <a class="utility-tile" href="landed-cost-calculator.html">
+            <h3>Run the landed-cost calculator</h3>
+            <p>Use the per-unit and total-cost view when you are pricing or replenishing.</p>
+          </a>
+          <a class="utility-tile" href="hs-code-lookup-guide.html">
+            <h3>Build an HS-code brief</h3>
+            <p>Collect the product facts your broker will need to give you a defensible code range.</p>
+          </a>
+        </div>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        <span>Preset assumptions reviewed <span data-review-date></span>. Planning tool only, not legal advice.</span>
+        <span><a href="about.html">About</a> · <a href="contact.html">Contact</a> · <a href="privacy.html">Privacy</a> · <a href="terms.html">Terms</a></span>
+      </div>
+    </footer>
+
+    <script src="app.js"></script>
+  </body>
+</html>

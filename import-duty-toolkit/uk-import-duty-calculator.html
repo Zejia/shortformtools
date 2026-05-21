@@ -1,0 +1,240 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>UK Import Duty Calculator: VAT, Customs Duty and Landed Cost</title>
+    <meta name="description" content="Estimate UK import duty, VAT, brokerage, and landed cost with a UK-focused calculator that keeps the GBP 135 customs-duty line and VAT treatment visible.">
+    <link rel="canonical" href="https://importdutytoolkit.com/uk-import-duty-calculator.html">
+    <meta property="og:title" content="UK Import Duty Calculator">
+    <meta property="og:description" content="UK-focused import duty and VAT planning with landed-cost math, threshold behavior, brokerage, and per-unit cost outputs.">
+    <meta property="og:type" content="article">
+    <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+    <link rel="manifest" href="site.webmanifest">
+    <link rel="stylesheet" href="styles.css">
+  </head>
+  <body>
+    <header class="site-header">
+      <nav class="nav" aria-label="Primary">
+        <a class="brand" href="index.html">
+          <span class="brand-mark">ID</span>
+          <span class="brand-lockup">
+            <strong>Import Duty Toolkit</strong>
+            <span>Landed-cost planning for trade operators</span>
+          </span>
+        </a>
+        <div class="nav-links">
+          <a href="import-duty-calculator.html">Duty calculator</a>
+          <a href="landed-cost-calculator.html">Landed cost</a>
+          <a href="how-to-estimate-import-duty.html">How to estimate</a>
+          <a href="hs-code-lookup-guide.html">HS code guide</a>
+        </div>
+      </nav>
+    </header>
+
+    <main>
+      <section class="page-hero">
+        <div class="page-copy">
+          <p class="eyebrow">United Kingdom</p>
+          <h1>Model UK import duty and VAT together, because landed cost is rarely one line item.</h1>
+          <p class="lede">The UK-specific view keeps the common GBP 135 customs-duty line visible while still modeling VAT, brokerage, and freight in the same file. That is usually what teams need before they quote or replenish into the UK.</p>
+          <div class="inline-actions">
+            <a class="button primary" href="#uk-tool">Open UK import duty calculator</a>
+            <a class="button ghost" href="de-minimis-calculator.html">Compare threshold behavior</a>
+          </div>
+        </div>
+        <aside class="rail-card">
+          <span class="stamp">UK preset reviewed <span data-review-date></span></span>
+          <div class="data-stack">
+            <div class="data-row"><span>Threshold line</span><strong>GBP 135</strong></div>
+            <div class="data-row"><span>Tax mode</span><strong>VAT still matters</strong></div>
+            <div class="data-row"><span>Best for</span><strong>Delivered pricing</strong></div>
+          </div>
+        </aside>
+      </section>
+
+      <section class="section" id="uk-tool">
+        <section class="tool-shell" data-landed-cost-tool>
+          <div class="tool-head">
+            <div>
+              <h2>UK import duty calculator</h2>
+              <p>Use this when the UK file needs both customs-duty and VAT logic kept explicit before a quote, import cycle, or broker handoff.</p>
+            </div>
+            <span class="status-pill" data-output="statusTone"><span data-output="status">Watch the paperwork</span></span>
+          </div>
+
+          <div class="tool-grid">
+            <div class="form-panel">
+              <div class="field-grid">
+                <div class="field full">
+                  <label for="marketUk">Destination market preset</label>
+                  <select id="marketUk" data-field="market">
+                    <option value="US">United States</option>
+                    <option value="UK" selected>United Kingdom</option>
+                    <option value="EU">EU-like VAT mode</option>
+                    <option value="CUSTOM">Custom</option>
+                  </select>
+                  <span class="hint" data-output="thresholdNote"></span>
+                </div>
+                <div class="field">
+                  <label for="productUk">Product value</label>
+                  <input id="productUk" data-field="productValue" type="number" min="0" step="0.01" value="110">
+                </div>
+                <div class="field">
+                  <label for="unitsUk">Units in shipment</label>
+                  <input id="unitsUk" data-field="units" type="number" min="1" step="1" value="48">
+                </div>
+                <div class="field">
+                  <label for="shipUk">Shipping cost</label>
+                  <input id="shipUk" data-field="shippingCost" type="number" min="0" step="0.01" value="24">
+                </div>
+                <div class="field">
+                  <label for="insuranceUk">Insurance cost</label>
+                  <input id="insuranceUk" data-field="insuranceCost" type="number" min="0" step="0.01" value="4">
+                </div>
+                <div class="field">
+                  <label for="rateUk">Duty rate</label>
+                  <input id="rateUk" data-field="dutyRate" type="number" min="0" step="0.1" value="6">
+                </div>
+                <div class="field">
+                  <label for="vatUk">Additional tax or VAT rate</label>
+                  <input id="vatUk" data-field="taxRate" type="number" min="0" step="0.1" value="20">
+                </div>
+                <div class="field">
+                  <label for="brokerUk">Brokerage or customs fees</label>
+                  <input id="brokerUk" data-field="brokerage" type="number" min="0" step="0.01" value="42">
+                </div>
+                <div class="field">
+                  <label for="miscUk">Misc landed cost</label>
+                  <input id="miscUk" data-field="misc" type="number" min="0" step="0.01" value="8">
+                </div>
+                <div class="field">
+                  <label for="bufferUk">FX or compliance buffer %</label>
+                  <input id="bufferUk" data-field="bufferRate" type="number" min="0" step="0.1" value="2">
+                </div>
+                <div class="field">
+                  <label for="thresholdUk">Low-value threshold</label>
+                  <input id="thresholdUk" data-field="threshold" type="number" min="0" step="0.01" value="135">
+                </div>
+                <label class="check-row span-2"><input data-field="useDeMinimis" type="checkbox" checked> <span>Apply low-value relief when eligible</span></label>
+              </div>
+
+              <details class="details-block">
+                <summary>Advanced assumptions</summary>
+                <div class="details-grid">
+                  <div class="field">
+                    <label for="reliefUk">Threshold treatment</label>
+                    <select id="reliefUk" data-field="reliefMode">
+                      <option value="none">No automatic relief</option>
+                      <option value="duty-only" selected>Waive duty only</option>
+                      <option value="duty-and-tax">Waive duty and tax</option>
+                    </select>
+                  </div>
+                  <label class="check-row"><input data-field="includeShippingInDuty" type="checkbox" checked> <span>Include shipping in duty base</span></label>
+                  <label class="check-row"><input data-field="includeInsuranceInDuty" type="checkbox" checked> <span>Include insurance in duty base</span></label>
+                  <label class="check-row"><input data-field="taxIncludesDuty" type="checkbox" checked> <span>Apply tax on top of duty</span></label>
+                  <label class="check-row"><input data-field="taxIncludesBrokerage" type="checkbox" checked> <span>Include brokerage in tax base</span></label>
+                </div>
+                <p class="inline-note" data-output="assumptionNote"></p>
+              </details>
+            </div>
+
+            <aside class="result-panel" aria-live="polite">
+              <div class="metric-large">
+                <span>Total landed cost</span>
+                <strong data-output="totalLanded">-</strong>
+                <div class="meter" data-output="meter"></div>
+              </div>
+              <div class="kpi-grid">
+                <div class="kpi"><span>Duty</span><strong data-output="duty">-</strong></div>
+                <div class="kpi"><span>Tax or VAT</span><strong data-output="tax">-</strong></div>
+                <div class="kpi"><span>Per-unit landed</span><strong data-output="perUnit">-</strong></div>
+                <div class="kpi"><span>Customs value</span><strong data-output="customsValue">-</strong></div>
+                <div class="kpi"><span>Landed uplift</span><strong data-output="upliftPercent">-</strong></div>
+                <div class="kpi"><span>Duty and tax share</span><strong data-output="rateBurden">-</strong></div>
+              </div>
+              <div class="result-card">
+                <span class="label">Threshold check</span>
+                <strong data-output="thresholdFlag">-</strong>
+                <p class="list-copy">Current threshold: <span data-output="thresholdLabel"></span></p>
+              </div>
+              <div class="result-card">
+                <span class="label">Modeled tax base</span>
+                <strong data-output="taxBase">-</strong>
+                <p class="list-copy">FX buffer modeled separately: <span data-output="bufferCost"></span></p>
+              </div>
+              <div class="formula-line" data-output="formulaLine"></div>
+              <div class="hero-actions">
+                <button type="button" data-output="copySummary">Copy summary</button>
+                <a class="button ghost" href="landed-cost-calculator.html">Open landed-cost view</a>
+              </div>
+            </aside>
+          </div>
+
+          <div class="content-grid">
+            <div class="content-panel">
+              <h3>Scenario table</h3>
+              <div class="table-wrap">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Scenario</th>
+                      <th>Duty</th>
+                      <th>Tax</th>
+                      <th>Total landed</th>
+                      <th>Per unit</th>
+                      <th>Status</th>
+                    </tr>
+                  </thead>
+                  <tbody data-output="scenarioRows"></tbody>
+                </table>
+              </div>
+            </div>
+            <div class="content-panel">
+              <h3>UK-specific notes</h3>
+              <ul class="insights-list" data-output="insights"></ul>
+            </div>
+            <div class="content-panel">
+              <h3>Common UK use cases</h3>
+              <ul class="checklist">
+                <li>Checking whether a shipment below the customs-duty line still carries enough VAT and overhead to change pricing.</li>
+                <li>Comparing two quoting assumptions: under the low-value line and above it.</li>
+                <li>Seeing whether brokerage and tax-base treatment are large enough to change the commercial decision even when duty is waived.</li>
+              </ul>
+            </div>
+          </div>
+        </section>
+      </section>
+
+      <section class="section">
+        <div class="section-copy">
+          <p class="eyebrow">Related routes</p>
+          <h2>Use the UK-specific page when the threshold line changes the conversation.</h2>
+        </div>
+        <div class="utility-grid">
+          <a class="utility-tile" href="de-minimis-calculator.html">
+            <h3>De minimis calculator</h3>
+            <p>Helpful if you want to isolate threshold behavior before folding it back into a wider landed-cost file.</p>
+          </a>
+          <a class="utility-tile" href="customs-duty-calculator.html">
+            <h3>Customs duty calculator</h3>
+            <p>Use the customs-first version if the broker handoff and clearance-cost framing matter more than UK-specific wording.</p>
+          </a>
+          <a class="utility-tile" href="how-to-estimate-import-duty.html">
+            <h3>Duty estimation workflow</h3>
+            <p>Walk through customs value, threshold treatment, and classification checks before you treat the number as final.</p>
+          </a>
+        </div>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        <span>Preset assumptions reviewed <span data-review-date></span>. Planning tool only, not legal advice.</span>
+        <span><a href="about.html">About</a> · <a href="contact.html">Contact</a> · <a href="privacy.html">Privacy</a> · <a href="terms.html">Terms</a></span>
+      </div>
+    </footer>
+
+    <script src="app.js"></script>
+  </body>
+</html>

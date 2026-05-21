@@ -1,0 +1,15 @@
+{
+  "name": "Import Duty Toolkit",
+  "short_name": "Duty Toolkit",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#f4efe6",
+  "theme_color": "#1f4c5f",
+  "icons": [
+    {
+      "src": "assets/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml"
+    }
+  ]
+}

@@ -1,0 +1,190 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>China Address Card Generator for Foreign Travelers</title>
+    <meta name="description" content="Build a bilingual China address card for taxis, hotel check-in, or asking for help. Paste the exact Chinese address and copy a clean mobile-friendly card.">
+    <link rel="canonical" href="https://chinaentrytoolkit.com/china-address-card-generator.html">
+    <meta property="og:title" content="China Address Card Generator">
+    <meta property="og:description" content="Create a bilingual China address card you can show to drivers, hotel staff, or station staff.">
+    <meta property="og:type" content="website">
+    <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+    <link rel="manifest" href="site.webmanifest">
+    <link rel="stylesheet" href="styles.css">
+  </head>
+  <body>
+    <header class="site-header">
+      <nav class="nav" aria-label="Primary">
+        <a class="brand" href="index.html"><img src="assets/logo.svg" alt="China Entry Toolkit"></a>
+        <div class="nav-links">
+          <a href="china-visa-free-checker.html">Visa-Free Checker</a>
+          <a href="china-visa-free-countries.html">Countries</a>
+          <a href="china-transit-without-visa-checker.html">Transit Checker</a>
+          <a href="240-hour-transit-china.html">240-Hour Guide</a>
+          <a href="china-stay-length-calculator.html">Stay Calculator</a>
+        </div>
+      </nav>
+    </header>
+
+    <main>
+      <section class="page-hero">
+        <div class="hero-copy">
+          <p class="eyebrow">Arrival support tool</p>
+          <h1>Make a China address card you can actually show on your phone.</h1>
+          <p class="lede">Use this generator for taxi rides, hotel check-in, or asking station staff for help. Paste the exact Simplified Chinese place name and address from your booking, host, or map pin, then copy a clean bilingual card.</p>
+        </div>
+        <aside class="detail-shell">
+          <span class="stamp">Best use</span>
+          <div class="fact-strip">
+            <div class="fact"><strong>Bilingual</strong><span>Chinese-first card with English backup lines</span></div>
+            <div class="fact"><strong>Copy-ready</strong><span>Separate Chinese, English, or full bilingual output</span></div>
+            <div class="fact"><strong>No auto-translation</strong><span>Safer for real addresses and hotel names</span></div>
+          </div>
+        </aside>
+      </section>
+
+      <section class="section">
+        <div class="tool-shell" data-address-generator>
+          <div class="tool-head">
+            <div>
+              <h2>Address card builder</h2>
+              <p>Start with a use case, then paste the exact address lines you want to show.</p>
+            </div>
+          </div>
+          <div class="tool-body">
+            <div class="form-panel">
+              <div class="field">
+                <label>Card type</label>
+                <div class="toggle-group">
+                  <button type="button" data-address-preset="taxi" aria-pressed="true">Taxi</button>
+                  <button type="button" data-address-preset="hotel" aria-pressed="false">Hotel check-in</button>
+                  <button type="button" data-address-preset="help" aria-pressed="false">Ask for help</button>
+                </div>
+              </div>
+
+              <div class="field-grid">
+                <div class="field">
+                  <label for="placeNameEn">Place name in English</label>
+                  <input id="placeNameEn" class="address-place-en" type="text" placeholder="Example: Grand Hyatt Beijing">
+                </div>
+                <div class="field">
+                  <label for="placeNameZh">Place name in Chinese</label>
+                  <input id="placeNameZh" class="address-place-zh" type="text" placeholder="例：北京东方君悦大酒店">
+                </div>
+                <div class="field">
+                  <label for="addressEn">Address in English</label>
+                  <textarea id="addressEn" class="address-line-en" placeholder="Example: 1 East Chang An Avenue, Dongcheng District, Beijing"></textarea>
+                </div>
+                <div class="field">
+                  <label for="addressZh">Address in Chinese</label>
+                  <textarea id="addressZh" class="address-line-zh" placeholder="例：北京市东城区东长安街1号"></textarea>
+                </div>
+                <div class="field">
+                  <label for="districtEn">District or city note in English</label>
+                  <input id="districtEn" class="address-area-en" type="text" placeholder="Example: Near Wangfujing">
+                </div>
+                <div class="field">
+                  <label for="districtZh">District or city note in Chinese</label>
+                  <input id="districtZh" class="address-area-zh" type="text" placeholder="例：近王府井">
+                </div>
+                <div class="field">
+                  <label for="contactName">Contact name or hotel desk</label>
+                  <input id="contactName" class="address-contact-name" type="text" placeholder="Example: Front desk / Ms. Li">
+                </div>
+                <div class="field">
+                  <label for="contactPhone">Phone or WeChat ID</label>
+                  <input id="contactPhone" class="address-contact-phone" type="text" placeholder="Example: +86 10 1234 5678">
+                </div>
+                <div class="field full-span">
+                  <label for="noteEn">Extra note in English</label>
+                  <input id="noteEn" class="address-note-en" type="text" placeholder="Example: I have luggage and need the main entrance.">
+                </div>
+                <div class="field full-span">
+                  <label for="noteZh">Extra note in Chinese</label>
+                  <input id="noteZh" class="address-note-zh" type="text" placeholder="例：我有行李，请带我到正门。">
+                </div>
+              </div>
+
+              <div class="note-box">
+                <h3>Important</h3>
+                <p>This tool does not machine-translate addresses. For real travel use, paste the exact Simplified Chinese name and address from your hotel, host, train ticket, map pin, or booking page.</p>
+              </div>
+            </div>
+
+            <div class="result-panel">
+              <span class="status-pill good">Ready to show</span>
+              <div class="copy-row">
+                <button type="button" class="primary" data-copy-address="full">Copy bilingual card</button>
+                <button type="button" data-copy-address="zh">Copy Chinese only</button>
+                <button type="button" data-copy-address="en">Copy English only</button>
+              </div>
+              <p class="copy-feedback" aria-live="polite">Add at least a place name or address to generate a copy-ready card.</p>
+
+              <article class="preview-card preview-card-zh">
+                <span class="preview-eyebrow">Chinese card</span>
+                <p class="preview-kicker address-request-zh">请带我去这个地址。</p>
+                <h3 class="address-preview-place-zh">在这里填入中文地点名称</h3>
+                <div class="preview-lines">
+                  <p class="address-preview-line-zh">在这里填入中文地址</p>
+                  <p class="address-preview-area-zh">可选：区域或地标说明</p>
+                  <p class="address-preview-note-zh">可选：中文补充说明</p>
+                </div>
+                <p class="preview-contact address-preview-contact">联系人 / 电话</p>
+              </article>
+
+              <article class="preview-card">
+                <span class="preview-eyebrow">English backup</span>
+                <p class="preview-kicker address-request-en">Please take me to this address.</p>
+                <h3 class="address-preview-place-en">Add the place name in English</h3>
+                <div class="preview-lines">
+                  <p class="address-preview-line-en">Add the address in English</p>
+                  <p class="address-preview-area-en">Optional area or landmark note</p>
+                  <p class="address-preview-note-en">Optional extra note</p>
+                </div>
+              </article>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="section">
+        <div class="split-grid">
+          <div class="source-box">
+            <h2>Good use cases</h2>
+            <p>Taxi pickup from the airport, checking into a hotel late at night, asking station staff for help, or showing a driver the exact Chinese destination after a long flight.</p>
+          </div>
+          <div class="source-box">
+            <h2>What makes the card work better</h2>
+            <p>Keep the Chinese lines large and exact. If the place has an official Chinese name, use that instead of a phonetic guess. A phone number also helps when the destination is hard to find.</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="section">
+        <div class="tool-grid">
+          <a class="utility-tile" href="china-allergy-card-generator.html">
+            <h3>Build an allergy card too</h3>
+            <p>Useful if the trip also involves restaurant, cafe, or street-food communication.</p>
+          </a>
+          <a class="utility-tile" href="china-stay-length-calculator.html">
+            <h3>Check your stay timing</h3>
+            <p>Handy when the trip is close to the edge of a 30-day or 240-hour window.</p>
+          </a>
+          <a class="utility-tile" href="china-transit-without-visa-checker.html">
+            <h3>Check the entry route</h3>
+            <p>Use the transit checker if the real question is still visa-free eligibility rather than arrival logistics.</p>
+          </a>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <div class="foot">
+        <div><a href="about.html">About</a> · <a href="contact.html">Contact</a> · <a href="privacy.html">Privacy</a> · <a href="terms.html">Terms</a></div>
+        <div>Reviewed against official sources on <span data-policy-review></span>.</div>
+      </div>
+    </footer>
+    <script src="app.js"></script>
+  </body>
+</html>

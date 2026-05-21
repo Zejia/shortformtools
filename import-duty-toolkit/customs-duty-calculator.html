@@ -1,0 +1,240 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Customs Duty Calculator: Duty, Tax and Clearance Cost Planner</title>
+    <meta name="description" content="Estimate customs duty, tax, brokerage, and total landed cost with a customs-first calculator built for shipment planning and clearance prep.">
+    <link rel="canonical" href="https://importdutytoolkit.com/customs-duty-calculator.html">
+    <meta property="og:title" content="Customs Duty Calculator">
+    <meta property="og:description" content="Model customs duty, tax, brokerage, and low-value threshold behavior before clearance turns into a cost surprise.">
+    <meta property="og:type" content="article">
+    <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+    <link rel="manifest" href="site.webmanifest">
+    <link rel="stylesheet" href="styles.css">
+  </head>
+  <body>
+    <header class="site-header">
+      <nav class="nav" aria-label="Primary">
+        <a class="brand" href="index.html">
+          <span class="brand-mark">ID</span>
+          <span class="brand-lockup">
+            <strong>Import Duty Toolkit</strong>
+            <span>Landed-cost planning for trade operators</span>
+          </span>
+        </a>
+        <div class="nav-links">
+          <a href="import-duty-calculator.html">Duty calculator</a>
+          <a href="landed-cost-calculator.html">Landed cost</a>
+          <a href="how-to-estimate-import-duty.html">How to estimate</a>
+          <a href="hs-code-lookup-guide.html">HS code guide</a>
+        </div>
+      </nav>
+    </header>
+
+    <main>
+      <section class="page-hero">
+        <div class="page-copy">
+          <p class="eyebrow">Clearance planning</p>
+          <h1>Estimate the customs duty layer before the file reaches the broker.</h1>
+          <p class="lede">This version centers the clearance side of the problem: customs value, duty exposure, tax base, brokerage, and the extra overhead that often gets missed when teams only talk about tariff rates.</p>
+          <div class="inline-actions">
+            <a class="button primary" href="#customs-tool">Open customs duty calculator</a>
+            <a class="button ghost" href="hs-code-lookup-guide.html">Prep the classification brief</a>
+          </div>
+        </div>
+        <aside class="rail-card">
+          <span class="stamp">Use this when the clearance cost is the risk</span>
+          <div class="data-stack">
+            <div class="data-row"><span>Focus</span><strong>Broker handoff</strong></div>
+            <div class="data-row"><span>Best for</span><strong>Customs-value checks</strong></div>
+            <div class="data-row"><span>Reviewed</span><strong><span data-review-date></span></strong></div>
+          </div>
+        </aside>
+      </section>
+
+      <section class="section" id="customs-tool">
+        <section class="tool-shell" data-landed-cost-tool>
+          <div class="tool-head">
+            <div>
+              <h2>Customs duty calculator</h2>
+              <p>Use this to pressure-test the cost of clearance before you quote delivered pricing or send a broker incomplete assumptions.</p>
+            </div>
+            <span class="status-pill" data-output="statusTone"><span data-output="status">Watch the paperwork</span></span>
+          </div>
+
+          <div class="tool-grid">
+            <div class="form-panel">
+              <div class="field-grid">
+                <div class="field full">
+                  <label for="marketCustoms">Destination market preset</label>
+                  <select id="marketCustoms" data-field="market">
+                    <option value="US">United States</option>
+                    <option value="UK">United Kingdom</option>
+                    <option value="EU">EU-like VAT mode</option>
+                    <option value="CUSTOM">Custom</option>
+                  </select>
+                  <span class="hint" data-output="thresholdNote"></span>
+                </div>
+                <div class="field">
+                  <label for="productCustoms">Product value</label>
+                  <input id="productCustoms" data-field="productValue" type="number" min="0" step="0.01" value="2600">
+                </div>
+                <div class="field">
+                  <label for="unitsCustoms">Units in shipment</label>
+                  <input id="unitsCustoms" data-field="units" type="number" min="1" step="1" value="520">
+                </div>
+                <div class="field">
+                  <label for="shipCustoms">Shipping cost</label>
+                  <input id="shipCustoms" data-field="shippingCost" type="number" min="0" step="0.01" value="240">
+                </div>
+                <div class="field">
+                  <label for="insuranceCustoms">Insurance cost</label>
+                  <input id="insuranceCustoms" data-field="insuranceCost" type="number" min="0" step="0.01" value="28">
+                </div>
+                <div class="field">
+                  <label for="rateCustoms">Duty rate</label>
+                  <input id="rateCustoms" data-field="dutyRate" type="number" min="0" step="0.1" value="7">
+                </div>
+                <div class="field">
+                  <label for="vatCustoms">Additional tax or VAT rate</label>
+                  <input id="vatCustoms" data-field="taxRate" type="number" min="0" step="0.1" value="20">
+                </div>
+                <div class="field">
+                  <label for="brokerCustoms">Brokerage or customs fees</label>
+                  <input id="brokerCustoms" data-field="brokerage" type="number" min="0" step="0.01" value="64">
+                </div>
+                <div class="field">
+                  <label for="miscCustoms">Misc landed cost</label>
+                  <input id="miscCustoms" data-field="misc" type="number" min="0" step="0.01" value="16">
+                </div>
+                <div class="field">
+                  <label for="bufferCustoms">FX or compliance buffer %</label>
+                  <input id="bufferCustoms" data-field="bufferRate" type="number" min="0" step="0.1" value="2">
+                </div>
+                <div class="field">
+                  <label for="thresholdCustoms">Low-value threshold</label>
+                  <input id="thresholdCustoms" data-field="threshold" type="number" min="0" step="0.01" value="135">
+                </div>
+                <label class="check-row span-2"><input data-field="useDeMinimis" type="checkbox"> <span>Apply low-value relief when eligible</span></label>
+              </div>
+
+              <details class="details-block">
+                <summary>Advanced assumptions</summary>
+                <div class="details-grid">
+                  <div class="field">
+                    <label for="reliefCustoms">Threshold treatment</label>
+                    <select id="reliefCustoms" data-field="reliefMode">
+                      <option value="none">No automatic relief</option>
+                      <option value="duty-only">Waive duty only</option>
+                      <option value="duty-and-tax">Waive duty and tax</option>
+                    </select>
+                  </div>
+                  <label class="check-row"><input data-field="includeShippingInDuty" type="checkbox" checked> <span>Include shipping in duty base</span></label>
+                  <label class="check-row"><input data-field="includeInsuranceInDuty" type="checkbox" checked> <span>Include insurance in duty base</span></label>
+                  <label class="check-row"><input data-field="taxIncludesDuty" type="checkbox" checked> <span>Apply tax on top of duty</span></label>
+                  <label class="check-row"><input data-field="taxIncludesBrokerage" type="checkbox" checked> <span>Include brokerage in tax base</span></label>
+                </div>
+                <p class="inline-note" data-output="assumptionNote"></p>
+              </details>
+            </div>
+
+            <aside class="result-panel" aria-live="polite">
+              <div class="metric-large">
+                <span>Total landed cost</span>
+                <strong data-output="totalLanded">-</strong>
+                <div class="meter" data-output="meter"></div>
+              </div>
+              <div class="kpi-grid">
+                <div class="kpi"><span>Duty</span><strong data-output="duty">-</strong></div>
+                <div class="kpi"><span>Tax or VAT</span><strong data-output="tax">-</strong></div>
+                <div class="kpi"><span>Per-unit landed</span><strong data-output="perUnit">-</strong></div>
+                <div class="kpi"><span>Customs value</span><strong data-output="customsValue">-</strong></div>
+                <div class="kpi"><span>Landed uplift</span><strong data-output="upliftPercent">-</strong></div>
+                <div class="kpi"><span>Duty and tax share</span><strong data-output="rateBurden">-</strong></div>
+              </div>
+              <div class="result-card">
+                <span class="label">Threshold check</span>
+                <strong data-output="thresholdFlag">-</strong>
+                <p class="list-copy">Current threshold: <span data-output="thresholdLabel"></span></p>
+              </div>
+              <div class="result-card">
+                <span class="label">Modeled tax base</span>
+                <strong data-output="taxBase">-</strong>
+                <p class="list-copy">FX buffer modeled separately: <span data-output="bufferCost"></span></p>
+              </div>
+              <div class="formula-line" data-output="formulaLine"></div>
+              <div class="hero-actions">
+                <button type="button" data-output="copySummary">Copy summary</button>
+                <a class="button ghost" href="import-duty-calculator.html">Open import duty page</a>
+              </div>
+            </aside>
+          </div>
+
+          <div class="content-grid">
+            <div class="content-panel">
+              <h3>Scenario table</h3>
+              <div class="table-wrap">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Scenario</th>
+                      <th>Duty</th>
+                      <th>Tax</th>
+                      <th>Total landed</th>
+                      <th>Per unit</th>
+                      <th>Status</th>
+                    </tr>
+                  </thead>
+                  <tbody data-output="scenarioRows"></tbody>
+                </table>
+              </div>
+            </div>
+            <div class="content-panel">
+              <h3>Customs-side notes</h3>
+              <ul class="insights-list" data-output="insights"></ul>
+            </div>
+            <div class="content-panel">
+              <h3>Use this page for</h3>
+              <ul class="checklist">
+                <li>Broker kickoff when you need a first customs-value estimate and cost range.</li>
+                <li>Internal review of whether brokerage and tax base assumptions are aligned across ops and finance.</li>
+                <li>Comparing whether a shipment is still viable after non-duty clearance friction is added back in.</li>
+              </ul>
+            </div>
+          </div>
+        </section>
+      </section>
+
+      <section class="section">
+        <div class="section-copy">
+          <p class="eyebrow">Related paths</p>
+          <h2>Customs math still sits inside a bigger trade workflow.</h2>
+        </div>
+        <div class="utility-grid">
+          <a class="utility-tile" href="hs-code-lookup-guide.html">
+            <h3>HS code lookup guide</h3>
+            <p>Use the broker brief builder when the customs answer still depends on classification quality.</p>
+          </a>
+          <a class="utility-tile" href="de-minimis-calculator.html">
+            <h3>De minimis calculator</h3>
+            <p>Model low-value threshold behavior directly when the shipment economics depend on relief.</p>
+          </a>
+          <a class="utility-tile" href="us-import-duty-calculator.html">
+            <h3>US import duty calculator</h3>
+            <p>Open the US-specific view when there is no import VAT and threshold assumptions need extra caution.</p>
+          </a>
+        </div>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        <span>Preset assumptions reviewed <span data-review-date></span>. Planning tool only, not legal advice.</span>
+        <span><a href="about.html">About</a> · <a href="contact.html">Contact</a> · <a href="privacy.html">Privacy</a> · <a href="terms.html">Terms</a></span>
+      </div>
+    </footer>
+
+    <script src="app.js"></script>
+  </body>
+</html>
