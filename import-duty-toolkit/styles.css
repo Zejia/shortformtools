@@ -728,6 +728,58 @@ th {
   color: var(--ink);
 }
 
+.consent-banner {
+  position: fixed;
+  inset: auto 18px 18px;
+  z-index: 50;
+  max-width: min(760px, calc(100vw - 36px));
+}
+
+.consent-panel {
+  border: 1px solid var(--line);
+  border-radius: 24px;
+  padding: 18px;
+  background: oklch(98.8% 0.006 85 / 0.98);
+  box-shadow: 0 24px 64px oklch(22% 0.02 236 / 0.2);
+  display: grid;
+  gap: 16px;
+}
+
+.consent-copy {
+  display: grid;
+  gap: 8px;
+}
+
+.consent-copy strong {
+  font-size: 1rem;
+}
+
+.consent-copy p {
+  margin: 0;
+  color: var(--muted);
+}
+
+.consent-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.consent-manage {
+  min-height: auto;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  border-radius: 0;
+  color: inherit;
+  text-decoration: underline;
+}
+
+.consent-manage:hover {
+  background: transparent;
+  border-color: transparent;
+}
+
 .sr-only {
   position: absolute;
   width: 1px;
@@ -765,6 +817,12 @@ th {
 @media (max-width: 760px) {
   body {
     font-size: 15px;
+  }
+
+  .consent-banner {
+    inset-inline: 12px;
+    bottom: 12px;
+    max-width: calc(100vw - 24px);
   }
 
   .nav {

@@ -3,6 +3,8 @@ const UNILATERAL_VISA_FREE_END = "December 31, 2026";
 const UNILATERAL_VISA_FREE_SOURCE_DATE = "February 17, 2026";
 const TRANSIT_POLICY_SOURCE_DATE = "July 4, 2025";
 const TRANSIT_PORT_UPDATE_DATE = "November 5, 2025";
+const ADSENSE_CLIENT = "ca-pub-4259477754165351";
+const CONSENT_STORAGE_KEY = "chinaentrytoolkit-consent-v1";
 
 const countryRows = [
   ["AL", "Albania", "Europe", false, true],
@@ -719,6 +721,115 @@ function initPolicyMeta() {
   document.querySelectorAll("[data-policy-review]").forEach((node) => {
     node.textContent = SITE_REVIEW_DATE;
   });
+}
+
+function readConsentChoice() {
+  try {
+    return localStorage.getItem(CONSENT_STORAGE_KEY);
+  } catch (_error) {
+    return null;
+  }
+}
+
+function writeConsentChoice(choice) {
+  try {
+    localStorage.setItem(CONSENT_STORAGE_KEY, choice);
+  } catch (_error) {
+    // Ignore storage failures in privacy-restricted browsers.
+  }
+}
+
+function loadAdSense() {
+  if (!ADSENSE_CLIENT || document.querySelector(`script[data-adsense-client="${ADSENSE_CLIENT}"]`)) {
+    return;
+  }
+
+  const script = document.createElement("script");
+  script.async = true;
+  script.crossOrigin = "anonymous";
+  script.dataset.adsenseClient = ADSENSE_CLIENT;
+  script.src = `https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${ADSENSE_CLIENT}`;
+  document.head.appendChild(script);
+}
+
+function applyConsentChoice(choice) {
+  if (choice === "accepted") {
+    if ("requestIdleCallback" in window) {
+      window.requestIdleCallback(() => loadAdSense(), { timeout: 1800 });
+    } else {
+      window.setTimeout(() => loadAdSense(), 240);
+    }
+  }
+}
+
+function hideConsentBanner() {
+  document.querySelector("[data-consent-banner]")?.remove();
+}
+
+function showConsentBanner() {
+  if (document.querySelector("[data-consent-banner]")) return;
+
+  const banner = document.createElement("aside");
+  banner.className = "consent-banner";
+  banner.dataset.consentBanner = "true";
+  banner.innerHTML = `
+    <div class="consent-panel" role="dialog" aria-live="polite" aria-label="Cookie preferences">
+      <div class="consent-copy">
+        <strong>Privacy choices</strong>
+        <p>China Entry Toolkit can use local storage and Google AdSense cookies to remember your consent choice, support ads, and keep the tools free. The checker tools still work if you continue without ad cookies.</p>
+      </div>
+      <div class="consent-actions">
+        <button type="button" class="primary" data-consent-action="accept">Allow ad cookies</button>
+        <button type="button" data-consent-action="reject">Continue without ads</button>
+        <a class="button ghost" href="privacy.html">Read privacy policy</a>
+      </div>
+    </div>
+  `;
+
+  banner.querySelectorAll("[data-consent-action]").forEach((button) => {
+    button.addEventListener("click", () => {
+      const choice = button.getAttribute("data-consent-action") === "accept" ? "accepted" : "rejected";
+      writeConsentChoice(choice);
+      applyConsentChoice(choice);
+      hideConsentBanner();
+    });
+  });
+
+  document.body.appendChild(banner);
+}
+
+function mountConsentManager() {
+  if (document.querySelector("[data-consent-manage]")) return;
+
+  const button = document.createElement("button");
+  button.type = "button";
+  button.className = "consent-manage";
+  button.dataset.consentManage = "true";
+  button.textContent = "Privacy choices";
+  button.addEventListener("click", () => {
+    hideConsentBanner();
+    showConsentBanner();
+  });
+
+  const footerMeta = document.querySelector(".site-footer .foot div:first-child");
+  if (footerMeta) {
+    footerMeta.append(" · ");
+    footerMeta.appendChild(button);
+    return;
+  }
+
+  document.body.appendChild(button);
+}
+
+function initConsentAndAds() {
+  mountConsentManager();
+  const choice = readConsentChoice();
+  if (choice === "accepted" || choice === "rejected") {
+    applyConsentChoice(choice);
+    return;
+  }
+
+  showConsentBanner();
 }
 
 function initEligibilityCheckers() {
@@ -1584,6 +1695,7 @@ function initArrivalChecklistBuilder() {
 
 document.addEventListener("DOMContentLoaded", () => {
   initPolicyMeta();
+  initConsentAndAds();
   initEligibilityCheckers();
   initCountryCatalog();
   initTransitChecker();
