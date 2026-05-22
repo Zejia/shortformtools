@@ -10,6 +10,9 @@
     <meta property="og:description" content="Free TikTok, Instagram and YouTube tools for creators.">
     <meta property="og:type" content="website">
     <meta property="og:image" content="https://shortformtools.com/assets/creator-analytics-workspace.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
     <link rel="manifest" href="site.webmanifest">
     <link rel="stylesheet" href="styles.css">
@@ -29,17 +32,36 @@
     </header>
 
     <main>
-      <section class="hero">
-        <div class="intro">
-          <p class="eyebrow">Free creator calculators</p>
-          <h1>Creator Tools Hub</h1>
-          <p class="lede">Fast public tools for the repetitive bits of creator work: engagement rates, caption spacing, and title checks.</p>
-          <p class="inline-note">ShortformTools.com publishes lightweight creator utilities plus the supporting guides that explain how to use them, what each metric means, and where the formulas come from.</p>
-          <div class="tool-shell" data-tool="tiktok">
+      <section class="hero creator-hero">
+        <div class="intro creator-intro">
+          <p class="eyebrow">Working pages for working creators</p>
+          <h1>The fast surface for creator math, packaging checks, and publishing prep.</h1>
+          <p class="lede">Open a calculator, test a title, clean up caption formatting, then move into the next task without a login wall or a bloated dashboard.</p>
+          <p class="inline-note">This site is built for search-driven creator work. Tools are public, formulas stay visible, and the supporting pages explain why the numbers or copy rules matter.</p>
+
+          <div class="creator-pulse" aria-label="What the homepage covers">
+            <div class="creator-pulse-card">
+              <span class="creator-pulse-label">Measure</span>
+              <strong>Engagement and money math</strong>
+              <p>TikTok rate checks, RPM assumptions, and basic performance sanity checks.</p>
+            </div>
+            <div class="creator-pulse-card">
+              <span class="creator-pulse-label">Package</span>
+              <strong>Titles, thumbnails, and hooks</strong>
+              <p>Quick surfaces for checking whether the publishing package is doing its job.</p>
+            </div>
+            <div class="creator-pulse-card">
+              <span class="creator-pulse-label">Publish</span>
+              <strong>Captions, bios, and descriptions</strong>
+              <p>Formatting and copy helpers that remove repetitive pre-publish friction.</p>
+            </div>
+          </div>
+
+          <div class="tool-shell creator-tool-shell" data-tool="tiktok">
             <div class="tool-head">
               <div>
-                <h2>TikTok engagement rate calculator</h2>
-                <p>Calculate by followers or views.</p>
+                <h2>TikTok engagement rate quick check</h2>
+                <p>Run a first-pass check by followers or by views, then copy the summary into your notes or client thread.</p>
               </div>
               <div class="segmented" aria-label="Calculation mode">
                 <button type="button" data-mode="followers" aria-pressed="true">Followers</button>
@@ -70,73 +92,149 @@
             </div>
           </div>
         </div>
-        <div class="hero-media">
-          <img src="assets/creator-analytics-workspace.png" alt="Creator analytics workspace with video cards and performance charts">
+
+        <aside class="creator-board" aria-label="Creator workflow overview">
+          <div class="creator-board-frame">
+            <div class="creator-board-head">
+              <span class="creator-board-tag">Shortform workbench</span>
+              <strong>What creators usually need next</strong>
+            </div>
+            <div class="creator-board-media">
+              <img src="assets/creator-analytics-workspace.png" alt="Creator analytics workspace with video cards and performance charts">
+            </div>
+            <div class="creator-board-stack">
+              <div class="creator-board-row">
+                <span>Check what moved</span>
+                <strong>TikTok engagement rate</strong>
+              </div>
+              <div class="creator-board-row">
+                <span>Fix the packaging</span>
+                <strong>YouTube title checker</strong>
+              </div>
+              <div class="creator-board-row">
+                <span>Clean the posting surface</span>
+                <strong>Instagram line breaks</strong>
+              </div>
+            </div>
+          </div>
+
+          <div class="creator-note-grid">
+            <article class="creator-note-card">
+              <span class="creator-note-label">Useful default</span>
+              <h3>No black-box scoring</h3>
+              <p>The homepage shows a live tool immediately, then routes into clearer supporting pages instead of burying the work under marketing copy.</p>
+            </article>
+            <article class="creator-note-card">
+              <span class="creator-note-label">Best fit</span>
+              <h3>Solo creators, editors, and small teams</h3>
+              <p>Built for the workflows that happen between publishing decisions, not for teams shopping for an all-in-one SaaS product.</p>
+            </article>
+          </div>
+        </aside>
+      </section>
+
+      <section class="section">
+        <div class="section-heading">
+          <p class="eyebrow">Three live workflows</p>
+          <h2>Use the homepage like a creator ops desk, not a directory.</h2>
+        </div>
+        <div class="workflow-grid">
+          <article class="workflow-card">
+            <span class="workflow-index">01</span>
+            <h3>Performance check</h3>
+            <p>Run a rate or earnings estimate first, so you know whether the content problem is distribution, monetization, or packaging.</p>
+            <a href="tiktok-engagement-rate-calculator.html">Open TikTok engagement rate calculator</a>
+          </article>
+          <article class="workflow-card">
+            <span class="workflow-index">02</span>
+            <h3>Packaging review</h3>
+            <p>Move into title checks and packaging scorecards when the raw post performed below expectation and the creative wrapper needs work.</p>
+            <a href="youtube-packaging-scorecard.html">Open YouTube packaging scorecard</a>
+          </article>
+          <article class="workflow-card">
+            <span class="workflow-index">03</span>
+            <h3>Caption cleanup</h3>
+            <p>Finish with line breaks, bios, or descriptions when the post is ready and the last task is formatting or tightening the copy surface.</p>
+            <a href="instagram-line-break-generator.html">Open Instagram line break generator</a>
+          </article>
         </div>
       </section>
 
       <section class="section">
-        <h2>Why creators use this site</h2>
-        <p>Most pages here solve one narrow workflow problem. We keep the inputs public, show the formulas in plain English, and link related tools together so creators can move from checking a metric to fixing the underlying packaging or copy.</p>
-        <div class="content-grid">
+        <div class="section-heading">
+          <p class="eyebrow">Platform clusters</p>
+          <h2>Start from the platform you are working on right now.</h2>
+          <p class="lede">Each cluster is organized around one platform-specific task family, so creators can move through related tools without losing context.</p>
+        </div>
+        <div class="cluster-river">
+          <article class="cluster-column cluster-column-tiktok">
+            <div class="cluster-column-head">
+              <span>TikTok</span>
+              <strong>Measure what happened, then plan the next test.</strong>
+            </div>
+            <a class="cluster-link" href="tiktok-engagement-rate-calculator.html">Engagement rate calculator</a>
+            <a class="cluster-link" href="tiktok-money-calculator.html">Money calculator</a>
+            <a class="cluster-link" href="tiktok-hashtag-generator.html">Hashtag generator</a>
+            <a class="cluster-link" href="tiktok-bio-generator.html">Bio generator</a>
+          </article>
+          <article class="cluster-column cluster-column-instagram">
+            <div class="cluster-column-head">
+              <span>Instagram</span>
+              <strong>Clean the text surface and tighten account positioning.</strong>
+            </div>
+            <a class="cluster-link" href="instagram-line-break-generator.html">Line break generator</a>
+            <a class="cluster-link" href="instagram-caption-character-counter.html">Caption character counter</a>
+            <a class="cluster-link" href="instagram-bio-generator.html">Bio generator</a>
+          </article>
+          <article class="cluster-column cluster-column-youtube">
+            <div class="cluster-column-head">
+              <span>YouTube</span>
+              <strong>Pressure-test titles, descriptions, and packaging choices before publish.</strong>
+            </div>
+            <a class="cluster-link" href="youtube-title-checker.html">Title checker</a>
+            <a class="cluster-link" href="youtube-packaging-scorecard.html">Packaging scorecard</a>
+            <a class="cluster-link" href="youtube-description-generator.html">Description generator</a>
+            <a class="cluster-link" href="youtube-shorts-title-generator.html">Shorts title generator</a>
+            <a class="cluster-link" href="youtube-channel-name-generator.html">Channel name generator</a>
+          </article>
+        </div>
+      </section>
+
+      <section class="section">
+        <div class="section-heading">
+          <p class="eyebrow">Trust layer</p>
+          <h2>Support pages that explain the numbers and keep the site useful.</h2>
+        </div>
+        <div class="content-grid creator-support-grid">
           <article class="content-card">
-            <h3>Clear formulas</h3>
-            <p>Each calculator is built around visible assumptions instead of black-box scoring. That makes outputs easier to trust and compare across platforms.</p>
+            <h3>Creator metrics glossary</h3>
+            <p>Definitions and formulas for RPM, CPM, CTR, saves, shares, retention, and the engagement-rate variants that creators compare most often.</p>
+            <a href="creator-metrics-glossary.html">Open glossary</a>
           </article>
           <article class="content-card">
-            <h3>Lightweight pages</h3>
-            <p>Tools load quickly, work without accounts, and avoid dashboards that hide the actual calculation or formatting logic.</p>
+            <h3>Tool methodology</h3>
+            <p>How the calculators are scoped, what assumptions each one makes, and how pages are updated when platform behavior changes.</p>
+            <a href="tool-methodology.html">Read methodology</a>
           </article>
           <article class="content-card">
-            <h3>Useful supporting pages</h3>
-            <p>We publish glossary and methodology pages so the site is more than a pile of isolated generators.</p>
+            <h3>About the library</h3>
+            <p>Who the site is for, why the tools are built in narrow task clusters, and how new pages are chosen.</p>
+            <a href="about.html">About Creator Tools Hub</a>
           </article>
         </div>
       </section>
 
       <section class="section">
-        <h2>Search plan</h2>
-        <p>The first pages target low-difficulty, tool-intent keywords rather than broad creator terms.</p>
-        <div class="seo-grid">
-          <div class="seo-block"><h3>Primary cluster</h3><ul><li>TikTok engagement rate calculator</li><li>TikTok money calculator</li><li>TikTok hashtag and bio generators</li></ul></div>
-          <div class="seo-block"><h3>Support clusters</h3><ul><li>Instagram caption and bio tools</li><li>YouTube title and description tools</li><li>YouTube channel name generator</li></ul></div>
+        <div class="section-heading">
+          <p class="eyebrow">Outside this niche</p>
+          <h2>Other focused utility sites in the workspace.</h2>
         </div>
-      </section>
-
-      <section class="section">
-        <h2>Tools</h2>
-        <p>Each page is built around a single search task, with short supporting notes and related tools for internal linking.</p>
-        <div class="tool-list">
-          <a class="tool-card" href="tiktok-engagement-rate-calculator.html"><h3>TikTok engagement rate calculator</h3><p>KD 7 seed, useful CPC, clear tool intent.</p></a>
-          <a class="tool-card" href="tiktok-money-calculator.html"><h3>TikTok money calculator</h3><p>Estimate creator earnings from views and RPM assumptions.</p></a>
-          <a class="tool-card" href="tiktok-hashtag-generator.html"><h3>TikTok hashtag generator</h3><p>Generate focused hashtags from a topic and niche.</p></a>
-          <a class="tool-card" href="tiktok-bio-generator.html"><h3>TikTok bio generator</h3><p>Draft account bios around a niche and promise.</p></a>
-          <a class="tool-card" href="instagram-line-break-generator.html"><h3>Instagram line break generator</h3><p>Small but direct formatter keyword with simple utility.</p></a>
-          <a class="tool-card" href="instagram-caption-character-counter.html"><h3>Instagram caption character counter</h3><p>Count caption length, words, hashtags, and remaining space.</p></a>
-          <a class="tool-card" href="instagram-bio-generator.html"><h3>Instagram bio generator</h3><p>Create concise bio options for creators and small brands.</p></a>
-          <a class="tool-card" href="youtube-title-checker.html"><h3>YouTube title checker</h3><p>Low KD title optimization cluster for creators.</p></a>
-          <a class="tool-card" href="youtube-packaging-scorecard.html"><h3>YouTube packaging scorecard</h3><p>Score title and thumbnail packaging before you publish.</p></a>
-          <a class="tool-card" href="youtube-description-generator.html"><h3>YouTube description generator</h3><p>Create a clean description draft with CTA and chapters.</p></a>
-          <a class="tool-card" href="youtube-shorts-title-generator.html"><h3>YouTube Shorts title generator</h3><p>Generate short-form title angles for fast testing.</p></a>
-          <a class="tool-card" href="youtube-channel-name-generator.html"><h3>YouTube channel name generator</h3><p>Generate name directions from topic, audience, and style.</p></a>
-        </div>
-      </section>
-
-      <section class="section">
-        <h2>Guides and trust pages</h2>
-        <p>These pages help users understand the site, not just click a button. They also make the project easier to review as a real publisher-run utility library.</p>
-        <div class="tool-list">
-          <a class="tool-card" href="creator-metrics-glossary.html"><h3>Creator metrics glossary</h3><p>Definitions and formulas for engagement rate, RPM, CPM, CTR, saves, shares, retention, and more.</p></a>
-          <a class="tool-card" href="tool-methodology.html"><h3>Tool methodology</h3><p>How we scope, test, and update creator calculators and generators on ShortformTools.com.</p></a>
-          <a class="tool-card" href="about.html"><h3>About Creator Tools Hub</h3><p>Who the site is for, how pages are chosen, and what kind of feedback improves the library.</p></a>
-        </div>
-      </section>
-
-      <section class="section">
-        <h2>Other tool sites</h2>
-        <p>We are also building focused utility sites outside the creator niche when a search task deserves its own dedicated experience.</p>
-        <div class="tool-list">
-          <a class="tool-card" href="https://etsy.shortformtools.com/"><h3>Etsy Seller Toolkit</h3><p>Fee, profit, discount, shipping, and Offsite Ads calculators for Etsy sellers.</p></a>
+        <div class="creator-crosslink">
+          <div>
+            <h3>Etsy Seller Toolkit</h3>
+            <p>Fee, profit, shipping, discount, and Offsite Ads calculators for sellers who need pricing math, not a marketplace guru pitch.</p>
+          </div>
+          <a class="button primary" href="https://etsy.shortformtools.com/">Open the Etsy toolkit</a>
         </div>
       </section>
     </main>

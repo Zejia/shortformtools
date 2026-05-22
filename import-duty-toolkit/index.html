@@ -10,6 +10,9 @@
     <meta property="og:title" content="Import Duty Toolkit">
     <meta property="og:description" content="Landed cost, import-duty, tariff estimation, and customs prep tools for real shipments.">
     <meta property="og:type" content="website">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,700&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
     <link rel="manifest" href="site.webmanifest">
     <link rel="stylesheet" href="styles.css">
@@ -37,45 +40,46 @@
     </header>
 
     <main>
-      <section class="home-hero">
+      <section class="home-hero import-hero">
         <div class="hero-copy">
           <p class="eyebrow">Trade math before the shipment moves</p>
-          <h1>Landed-cost tools that feel closer to an import desk than a toy calculator.</h1>
-          <p class="lede">Model duty, VAT, freight, brokerage, low-value threshold behavior, and per-unit landed cost in one place. The point is not just the number, it is the operating decision that follows it.</p>
+          <h1>Model landed cost like an operating file, not a toy estimate.</h1>
+          <p class="lede">Use one shared planner for customs value, duty, tax or VAT, brokerage, FX buffer, and per-unit landed cost. The goal is not just a number. It is a better quoting, replenishment, and customs-prep decision.</p>
           <div class="hero-actions">
-            <a class="button primary" href="#main-tool">Open the planner</a>
+            <a class="button primary" href="#main-tool">Open the main planner</a>
             <a class="button ghost" href="how-to-estimate-import-duty.html">Read the estimation workflow</a>
           </div>
-          <div class="signal-strip" aria-label="Why this toolkit exists">
+          <div class="signal-strip" aria-label="What the toolkit is built for">
             <div class="signal">
-              <strong>1</strong>
-              <span>Calculator shared across the homepage and dedicated tool pages, so every SEO page still does real work.</span>
+              <strong>Quote</strong>
+              <span>Pressure-test a landed price before you promise it to a buyer or sales channel.</span>
             </div>
             <div class="signal">
-              <strong>4</strong>
-              <span>Starter destination modes: US, UK, EU-like VAT mode, and Custom for broker-confirmed assumptions.</span>
+              <strong>Reorder</strong>
+              <span>Compare consolidation, freight shifts, and threshold assumptions before the PO is placed.</span>
             </div>
             <div class="signal">
-              <strong>3</strong>
-              <span>Planning layers: customs value, total landed, and scenario stress-testing before you quote or reorder.</span>
+              <strong>File</strong>
+              <span>Surface the customs questions that still need broker confirmation before goods move.</span>
             </div>
           </div>
         </div>
 
-        <aside class="hero-rail">
-          <div class="rail-card">
+        <aside class="manifest-board" aria-label="Trade file summary">
+          <div class="rail-card manifest-card">
             <span class="stamp">Preset assumptions reviewed <span data-review-date></span></span>
-            <h2>Built for quoting, replenishment, and customs prep.</h2>
-            <p class="lede">Use it when you are deciding whether to consolidate, whether an item still clears your margin floor, or whether the file needs a classification check before you publish price.</p>
-            <div class="data-stack">
-              <div class="data-row"><span>Customs value</span><strong>Declared basis</strong></div>
-              <div class="data-row"><span>Duty and tax</span><strong>Modeled separately</strong></div>
-              <div class="data-row"><span>Operational overhead</span><strong>Brokerage + buffer</strong></div>
+            <h2>Built for quoting, replenishment, and customs prep under real margin pressure.</h2>
+            <div class="manifest-stack">
+              <div class="manifest-row"><span>Declared basis</span><strong>Product value plus configurable freight and insurance inputs</strong></div>
+              <div class="manifest-row"><span>Duty and tax</span><strong>Modeled separately so relief assumptions stay visible</strong></div>
+              <div class="manifest-row"><span>Operational overhead</span><strong>Brokerage, misc fees, and FX buffer are part of the file, not hidden outside it</strong></div>
             </div>
           </div>
-          <div class="mini-panel">
-            <h3>What makes this different</h3>
-            <p>Threshold logic is explicit, scenario pressure tests are built in, and the HS-code guide includes a broker brief builder so you can move from estimate to classification prep faster.</p>
+          <div class="preset-rack">
+            <div class="preset-chip"><strong>US</strong><span>Conservative threshold logic</span></div>
+            <div class="preset-chip"><strong>UK</strong><span>GBP 135 duty line with VAT modeled separately</span></div>
+            <div class="preset-chip"><strong>EU-like</strong><span>VAT from the first euro, low-value duty line visible</span></div>
+            <div class="preset-chip"><strong>Custom</strong><span>Override inputs with broker-confirmed treatment</span></div>
           </div>
         </aside>
       </section>
@@ -84,7 +88,7 @@
         <div class="section-copy">
           <p class="eyebrow">Main planner</p>
           <h2>Run the first landed-cost pass here.</h2>
-          <p>The presets are meant to get the file into the right shape fast. Then you can override the rate, threshold, and basis assumptions with your broker's instructions.</p>
+          <p>The presets get the shipment into a realistic planning shape quickly. Then you can replace the assumptions with broker instructions, market-specific tax logic, or a different declaration basis.</p>
         </div>
 
         <section class="tool-shell" data-landed-cost-tool>
@@ -235,13 +239,37 @@
             <div class="content-panel">
               <h3>Before you trust the number</h3>
               <ul class="checklist">
-                <li>Check whether your supplier quote is FOB, CIF, or DDP before you decide what belongs in the duty base.</li>
+                <li>Check whether the supplier quote is FOB, CIF, or DDP before you decide what belongs in the duty base.</li>
                 <li>Confirm the HS code and origin claim, especially when the duty rate is high enough to change margin materially.</li>
-                <li>Quote two versions when the file is fragile: base assumptions and stressed assumptions.</li>
+                <li>Quote one base version and one stressed version when the file is sensitive to freight, brokerage, or threshold treatment.</li>
               </ul>
             </div>
           </div>
         </section>
+      </section>
+
+      <section class="section">
+        <div class="section-copy">
+          <p class="eyebrow">Operational lanes</p>
+          <h2>Use the planner in the context of the trade decision you are actually making.</h2>
+        </div>
+        <div class="trade-lane-grid">
+          <article class="trade-lane-card">
+            <span class="trade-lane-index">01</span>
+            <h3>Quoting</h3>
+            <p>Protect margin by checking whether duty, tax, brokerage, and freight still leave room for the price you want to publish.</p>
+          </article>
+          <article class="trade-lane-card">
+            <span class="trade-lane-index">02</span>
+            <h3>Replenishment</h3>
+            <p>Compare small-file convenience against the cost of repeated brokerage, disbursement, and freight overhead.</p>
+          </article>
+          <article class="trade-lane-card">
+            <span class="trade-lane-index">03</span>
+            <h3>Customs prep</h3>
+            <p>Surface the files that need better classification evidence, a cleaner declaration basis, or broker review before release.</p>
+          </article>
+        </div>
       </section>
 
       <section class="section">
@@ -271,42 +299,10 @@
             <h3>Customs duty calculator</h3>
             <p>Use the clearance-first route when brokerage, customs value, and broker handoff are the main concern.</p>
           </a>
-          <a class="utility-tile" href="us-import-duty-calculator.html">
-            <h3>US import duty calculator</h3>
-            <p>Open the US-specific view with conservative threshold logic and no federal import VAT in the starter model.</p>
-          </a>
-          <a class="utility-tile" href="uk-import-duty-calculator.html">
-            <h3>UK import duty calculator</h3>
-            <p>Use the UK-specific route when the GBP 135 customs-duty line and VAT treatment shape the decision.</p>
-          </a>
           <a class="utility-tile" href="de-minimis-calculator.html">
             <h3>De minimis calculator</h3>
             <p>Model low-value threshold behavior directly when a relief assumption might change the whole file.</p>
           </a>
-        </div>
-      </section>
-
-      <section class="section">
-        <div class="section-copy">
-          <p class="eyebrow">Use cases</p>
-          <h2>Built around operational decisions.</h2>
-        </div>
-        <div class="panel-grid">
-          <div class="content-panel">
-            <strong>Quoting</strong>
-            <h3>Stop underpricing landed goods.</h3>
-            <p>Use the per-unit result and stressed scenarios before you hand a customer or channel partner a number you cannot defend later.</p>
-          </div>
-          <div class="content-panel">
-            <strong>Replenishment</strong>
-            <h3>Compare consolidation versus frequent small files.</h3>
-            <p>Brokerage, disbursement, and FX friction often matter more than the headline tariff line on smaller consignments.</p>
-          </div>
-          <div class="content-panel">
-            <strong>Customs prep</strong>
-            <h3>Surface the questions that still need a broker.</h3>
-            <p>When the model is fragile, the answer is not another calculator. It is better classification evidence and a clearer declaration basis.</p>
-          </div>
         </div>
       </section>
 

@@ -19,7 +19,7 @@
   --shadow: 0 18px 60px oklch(23% 0.025 242 / 0.11);
   --radius: 18px;
   --radius-sm: 12px;
-  font-family: "Avenir Next", "Segoe UI", system-ui, sans-serif;
+  font-family: "Public Sans", "Avenir Next", "Segoe UI", sans-serif;
 }
 
 * {
@@ -224,7 +224,7 @@ h3 {
   margin: 0;
   line-height: 1.06;
   letter-spacing: -0.02em;
-  font-family: "Iowan Old Style", "Palatino Linotype", "Book Antiqua", Georgia, serif;
+  font-family: "Newsreader", "Iowan Old Style", "Palatino Linotype", Georgia, serif;
 }
 
 h1 {
@@ -306,6 +306,90 @@ h3 {
   background:
     radial-gradient(circle at top right, oklch(92% 0.035 72), transparent 28%),
     linear-gradient(180deg, oklch(98.5% 0.01 85), oklch(97% 0.01 85));
+}
+
+.china-hero h1 {
+  max-width: 11ch;
+}
+
+.travel-board,
+.travel-lane-card {
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--panel);
+  box-shadow: var(--shadow);
+}
+
+.travel-board {
+  min-height: 100%;
+  padding: 22px;
+  display: grid;
+  gap: 18px;
+  background:
+    radial-gradient(circle at top right, oklch(92% 0.035 72), transparent 28%),
+    linear-gradient(180deg, oklch(98.5% 0.01 85), oklch(96.8% 0.012 85));
+}
+
+.travel-board h2 {
+  font-size: clamp(1.8rem, 3vw, 2.7rem);
+  line-height: 1;
+}
+
+.travel-board-stack {
+  display: grid;
+  gap: 10px;
+}
+
+.travel-board-row {
+  display: grid;
+  gap: 6px;
+  padding: 14px 16px;
+  border-radius: 16px;
+  background: oklch(98.8% 0.006 85 / 0.92);
+  border: 1px solid var(--line);
+}
+
+.travel-board-row span {
+  color: var(--muted);
+  font-size: 0.8rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.travel-board-row strong {
+  font-size: 1rem;
+  line-height: 1.35;
+}
+
+.travel-lane-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.travel-lane-card {
+  padding: 18px;
+  display: grid;
+  gap: 12px;
+}
+
+.travel-lane-index {
+  color: var(--persimmon);
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+}
+
+.travel-lane-card p {
+  margin: 0;
+  color: var(--muted);
+}
+
+.travel-lane-card a {
+  color: var(--navy);
+  font-weight: 700;
+  text-decoration: none;
 }
 
 .route-labels {
@@ -918,6 +1002,10 @@ textarea {
   }
 
   .country-row {
+    grid-template-columns: 1fr;
+  }
+
+  .travel-lane-grid {
     grid-template-columns: 1fr;
   }
 }

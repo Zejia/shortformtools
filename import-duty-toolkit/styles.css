@@ -18,7 +18,7 @@
   --shadow: 0 20px 56px oklch(22% 0.02 236 / 0.12);
   --radius: 22px;
   --radius-sm: 14px;
-  font-family: "Avenir Next", "Segoe UI", sans-serif;
+  font-family: "IBM Plex Sans", "Avenir Next", "Segoe UI", sans-serif;
 }
 
 * {
@@ -248,7 +248,7 @@ h3 {
   margin: 0;
   line-height: 1.07;
   letter-spacing: -0.02em;
-  font-family: "Iowan Old Style", "Palatino Linotype", Georgia, serif;
+  font-family: "Fraunces", "Iowan Old Style", "Palatino Linotype", Georgia, serif;
 }
 
 h1 {
@@ -313,7 +313,103 @@ p {
 
 .signal strong {
   font-size: 1.7rem;
-  font-family: "SF Mono", "Cascadia Code", monospace;
+  font-family: "IBM Plex Mono", "SF Mono", "Cascadia Code", monospace;
+}
+
+.import-hero h1 {
+  max-width: 11ch;
+}
+
+.manifest-board,
+.trade-lane-card {
+  display: grid;
+  gap: 14px;
+}
+
+.manifest-card {
+  background:
+    linear-gradient(180deg, oklch(99% 0.005 85), oklch(95.8% 0.012 220)),
+    var(--panel);
+}
+
+.manifest-stack {
+  display: grid;
+  gap: 10px;
+}
+
+.manifest-row {
+  display: grid;
+  gap: 6px;
+  padding: 14px 16px;
+  border-radius: 16px;
+  background: oklch(99% 0.004 85 / 0.94);
+  border: 1px solid var(--line);
+}
+
+.manifest-row span {
+  color: var(--muted);
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.manifest-row strong {
+  font-size: 1rem;
+  line-height: 1.35;
+}
+
+.preset-rack {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.preset-chip,
+.trade-lane-card {
+  border: 1px solid var(--line);
+  background: oklch(99% 0.004 85 / 0.96);
+  box-shadow: var(--shadow);
+}
+
+.preset-chip {
+  border-radius: 18px;
+  padding: 14px;
+  display: grid;
+  gap: 6px;
+}
+
+.preset-chip strong {
+  font-size: 1rem;
+  font-family: "IBM Plex Mono", "SF Mono", monospace;
+}
+
+.preset-chip span {
+  color: var(--muted);
+  font-size: 0.88rem;
+}
+
+.trade-lane-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.trade-lane-card {
+  border-radius: 22px;
+  padding: 18px;
+}
+
+.trade-lane-index {
+  color: var(--teal);
+  font-size: 0.78rem;
+  font-family: "IBM Plex Mono", "SF Mono", monospace;
+  letter-spacing: 0.12em;
+}
+
+.trade-lane-card p {
+  margin: 0;
+  color: var(--muted);
 }
 
 .signal span {
@@ -652,7 +748,7 @@ th {
 }
 
 .content-panel strong {
-  font-family: "SF Mono", "Cascadia Code", monospace;
+  font-family: "IBM Plex Mono", "SF Mono", "Cascadia Code", monospace;
   font-size: 0.95rem;
 }
 
@@ -694,7 +790,7 @@ th {
 
 .formula-band strong {
   font-size: 1.15rem;
-  font-family: "SF Mono", "Cascadia Code", monospace;
+  font-family: "IBM Plex Mono", "SF Mono", "Cascadia Code", monospace;
 }
 
 .page-list {
@@ -810,6 +906,11 @@ th {
   .field-grid,
   .details-grid,
   .kpi-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .preset-rack,
+  .trade-lane-grid {
     grid-template-columns: 1fr;
   }
 }

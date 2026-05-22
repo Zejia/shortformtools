@@ -11,6 +11,9 @@
     <meta property="og:description" content="Visa-free and transit eligibility tools for foreigners planning travel to China.">
     <meta property="og:type" content="website">
     <meta property="og:image" content="https://chinaentrytoolkit.com/assets/logo.svg">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,500;6..72,700&family=Public+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
     <link rel="manifest" href="site.webmanifest">
     <link rel="stylesheet" href="styles.css">
@@ -33,45 +36,59 @@
     </header>
 
     <main>
-      <section class="home-hero">
+      <section class="home-hero china-hero">
         <div class="hero-copy">
-          <p class="eyebrow">Entry rules, simplified</p>
-          <h1>China entry rules for real trips, not just articles.</h1>
-          <p class="lede">Use a fast checker to screen the two policy families that matter most for foreign travelers right now: the 30-day unilateral visa-free list and the 240-hour transit without visa policy.</p>
+          <p class="eyebrow">Travel rule desk</p>
+          <h1>Check the China entry question you actually have, then move straight into the right tool.</h1>
+          <p class="lede">This site is built for real trip planning under time pressure: direct-entry checks, 240-hour transit route logic, stay timing, and the arrival tasks that become urgent once the flight is booked.</p>
           <div class="hero-actions">
-            <a class="button primary" href="china-visa-free-checker.html">Open the main checker</a>
-            <a class="button ghost" href="china-transit-without-visa-checker.html">Check a transit route</a>
+            <a class="button primary" href="#entry-checker">Run the first-pass checker</a>
+            <a class="button ghost" href="china-transit-without-visa-checker.html">Open the transit route checker</a>
           </div>
-          <div class="signal-row" aria-label="Site signals">
-            <div class="signal"><strong>50</strong><span>countries on the current unilateral 30-day list modeled in this release</span></div>
-            <div class="signal"><strong>55</strong><span>countries on the current 240-hour transit list modeled in this release</span></div>
-            <div class="signal"><strong>65</strong><span>designated entry ports referenced in the current 240-hour transit policy</span></div>
+          <div class="signal-row" aria-label="Modeled rule families">
+            <div class="signal"><strong>30-day</strong><span>Unilateral visa-free direct entry for the current covered passport list and visit purposes.</span></div>
+            <div class="signal"><strong>240-hour</strong><span>Transit without visa for eligible third-country itineraries, ports, and stay areas.</span></div>
+            <div class="signal"><strong>Day one</strong><span>Arrival readiness tools for payments, apps, local transport, and bilingual support cards.</span></div>
           </div>
         </div>
-        <aside class="map-panel" aria-label="Travel scene">
+
+        <aside class="travel-board" aria-label="Travel decision board">
           <span class="stamp">Reviewed <span data-policy-review></span></span>
-          <h2>Built for the moments when you need a practical answer fast.</h2>
-          <p class="lede">The site is designed for travelers comparing routes, checking nationality coverage, and estimating whether a stay window is inside the current published rules.</p>
+          <h2>Built for the airport-lounge moment when you need a practical answer, not a generic travel article.</h2>
+          <div class="travel-board-stack">
+            <div class="travel-board-row">
+              <span>Direct visit</span>
+              <strong>Am I on the unilateral visa-free list, and does my purpose fit?</strong>
+            </div>
+            <div class="travel-board-row">
+              <span>Transit route</span>
+              <strong>Does my passport, route, port, and stay window fit the 240-hour rule?</strong>
+            </div>
+            <div class="travel-board-row">
+              <span>Arrival setup</span>
+              <strong>What still needs to be solved before wheels down?</strong>
+            </div>
+          </div>
           <div class="route-labels">
             <span class="route-pill">Passport country check</span>
-            <span class="route-pill">Third-country transit logic</span>
+            <span class="route-pill">Third-country route logic</span>
             <span class="route-pill">Stay-length timing</span>
-            <span class="route-pill">Arrival readiness</span>
+            <span class="route-pill">Payment and airport readiness</span>
           </div>
         </aside>
       </section>
 
-      <section class="section">
+      <section class="section" id="entry-checker">
         <div class="section-copy">
-          <p class="eyebrow">Quick start</p>
-          <h2>Run a first-pass eligibility check.</h2>
-          <p class="lede">Start here if you want a practical screening answer before you dive into the country list or the longer transit guide.</p>
+          <p class="eyebrow">First-pass check</p>
+          <h2>Run one clear screening pass before you go deeper.</h2>
+          <p class="lede">Switch between direct-visit mode and transit mode. This checker is designed to narrow the rule family quickly, then route you to the page that answers the next real question.</p>
         </div>
         <div class="tool-shell eligibility-tool">
           <div class="tool-head">
             <div>
               <h3>China entry checker</h3>
-              <p>Switch between direct visit mode and transit mode. This tool is for first-pass screening, not final legal clearance.</p>
+              <p>Good for the first screening step. It helps you identify the rule family, the obvious blockers, and the next page to open.</p>
             </div>
             <div class="toggle-group" aria-label="Entry mode">
               <button type="button" data-mode="visit" aria-pressed="true">Direct visit</button>
@@ -101,7 +118,7 @@
                 <div class="field">
                   <label for="stayDays">Planned stay in China</label>
                   <input id="stayDays" class="days-field" type="number" min="0" max="365" step="1" value="12">
-                  <small>Used in direct visit mode.</small>
+                  <small>Used in direct-visit mode.</small>
                 </div>
               </div>
               <label class="checkbox-line"><input class="ordinary-field" type="checkbox" checked> I am traveling on an ordinary passport</label>
@@ -130,7 +147,7 @@
               <div class="result-card">
                 <span class="label">Verdict</span>
                 <strong class="verdict">Choose a nationality to begin.</strong>
-                <p class="reason">This first release screens the current public policy patterns most foreign travelers care about.</p>
+                <p class="reason">This release screens the public policy patterns most foreign travelers need first.</p>
               </div>
               <div class="result-card">
                 <span class="label">What to do next</span>
@@ -145,49 +162,109 @@
 
       <section class="section">
         <div class="section-copy">
-          <p class="eyebrow">Start with the right page</p>
-          <h2>Choose the entry task, not just the topic.</h2>
+          <p class="eyebrow">Task routing</p>
+          <h2>Pick the entry task, not just the entry topic.</h2>
+        </div>
+        <div class="travel-lane-grid">
+          <article class="travel-lane-card">
+            <span class="travel-lane-index">01</span>
+            <h3>Direct-entry question</h3>
+            <p>Use this lane if you are asking whether your passport can enter without a regular visa for a short visit and a permitted purpose.</p>
+            <a href="china-visa-free-checker.html">Open the visa-free checker</a>
+          </article>
+          <article class="travel-lane-card">
+            <span class="travel-lane-index">02</span>
+            <h3>Transit route question</h3>
+            <p>Use this lane when the real blocker is the route shape, onward destination, stay hours, or whether you can leave the airport.</p>
+            <a href="china-transit-without-visa-checker.html">Open the transit checker</a>
+          </article>
+          <article class="travel-lane-card">
+            <span class="travel-lane-index">03</span>
+            <h3>Arrival-readiness question</h3>
+            <p>Use this lane once the entry basis is clear and the next problems are payments, transport, addresses, or day-one logistics.</p>
+            <a href="china-arrival-checklist.html">Open the arrival checklist</a>
+          </article>
+        </div>
+      </section>
+
+      <section class="section">
+        <div class="section-copy">
+          <p class="eyebrow">Most-used routes</p>
+          <h2>Start from the practical page that matches the trip.</h2>
         </div>
         <div class="tool-grid">
           <a class="utility-tile" href="china-visa-free-checker.html">
             <h3>Visa-free checker</h3>
-            <p>Best for direct visits when you want to know whether the current 30-day unilateral rule may cover your passport and trip purpose.</p>
-          </a>
-          <a class="utility-tile" href="china-visa-free-countries.html">
-            <h3>Visa-free countries list</h3>
-            <p>Filter the current unilateral country list by region and see whether each country is also on the 240-hour transit list.</p>
+            <p>Best for direct visits under the current unilateral 30-day framework.</p>
           </a>
           <a class="utility-tile" href="china-transit-without-visa-checker.html">
             <h3>Transit checker</h3>
-            <p>Use this for third-country route logic, stay windows, and port-area confirmations tied to the 240-hour policy.</p>
-          </a>
-          <a class="utility-tile" href="240-hour-transit-china.html">
-            <h3>240-hour guide</h3>
-            <p>Read the rule in plain English, with examples of what counts as a valid onward route and what usually breaks eligibility.</p>
+            <p>Best for 240-hour transit route logic, port questions, and stay-window checks.</p>
           </a>
           <a class="utility-tile" href="china-stay-length-calculator.html">
             <h3>Stay-length calculator</h3>
-            <p>Turn entry and exit times into a practical deadline view for both 30-day visit windows and 240-hour transit timing.</p>
+            <p>Turn entry and exit times into a deadline view for both visit and transit cases.</p>
+          </a>
+          <a class="utility-tile" href="china-visa-free-countries.html">
+            <h3>Visa-free countries list</h3>
+            <p>Filter the current covered list by region and compare it with transit eligibility.</p>
+          </a>
+          <a class="utility-tile" href="240-hour-transit-china.html">
+            <h3>240-hour guide</h3>
+            <p>Read the current transit framework in plain English before you lock a route.</p>
           </a>
           <a class="utility-tile" href="china-arrival-checklist.html">
             <h3>Arrival checklist builder</h3>
-            <p>Turn entry status, payment setup, mobile data, and first-day logistics into a copy-ready arrival plan before you fly.</p>
+            <p>Move from rule checking to a working arrival plan before the flight.</p>
           </a>
         </div>
       </section>
 
       <section class="section">
         <div class="section-copy">
-          <p class="eyebrow">After entry is clear</p>
-          <h2>Move from rule checking to day-one readiness.</h2>
-          <p class="lede">Many travelers solve the entry question first, then hit a second operational cluster: payment setup, app choice, airport pickup, and hotel arrival. This part of the site is built for that handoff.</p>
+          <p class="eyebrow">Passport intent</p>
+          <h2>Answer nationality-specific searches directly.</h2>
+          <p class="lede">These pages are designed for the exact passport questions travelers type into search, then route them back into the right live checker.</p>
+        </div>
+        <div class="tool-grid">
+          <a class="utility-tile" href="china-visa-free-for-us-citizens.html">
+            <h3>US citizens</h3>
+            <p>Direct answer on why most US travelers need the transit route rather than the unilateral visa-free list.</p>
+          </a>
+          <a class="utility-tile" href="china-visa-free-for-canadians.html">
+            <h3>Canadians</h3>
+            <p>Canada-specific guidance for direct-entry visits and transit alternatives.</p>
+          </a>
+          <a class="utility-tile" href="china-visa-free-for-uk-citizens.html">
+            <h3>UK citizens</h3>
+            <p>British passport answer page for both short direct visits and transit planning.</p>
+          </a>
+          <a class="utility-tile" href="china-visa-free-for-australians.html">
+            <h3>Australians</h3>
+            <p>Fast answer page for Australian passport holders comparing direct-entry and transit paths.</p>
+          </a>
+          <a class="utility-tile" href="china-visa-free-for-germans.html">
+            <h3>Germans</h3>
+            <p>Germany-specific page for direct-entry visits and onward transit through China.</p>
+          </a>
+          <a class="utility-tile" href="china-visa-free-for-french-citizens.html">
+            <h3>French citizens</h3>
+            <p>France-specific answer page for short visits, route logic, and current transit alternatives.</p>
+          </a>
+        </div>
+      </section>
+
+      <section class="section">
+        <div class="section-copy">
+          <p class="eyebrow">Day-one support</p>
+          <h2>Once entry is clear, solve the arrival blockers in order.</h2>
         </div>
         <div class="helper-grid">
           <div class="tool-shell">
             <div class="tool-head">
               <div>
                 <h3>Arrival readiness sequence</h3>
-                <p>Use the tool first, then drill into the support page that matches the real blocker.</p>
+                <p>Use the rule checker first, then move into the support page that fixes the real on-the-ground blocker.</p>
               </div>
             </div>
             <div class="form-panel">
@@ -195,22 +272,22 @@
                 <div class="timeline-step">
                   <span class="step-index">1</span>
                   <div>
-                    <h3>Confirm entry basis</h3>
-                    <p>Run the visa-free or transit checker so the arrival plan starts from the right rule.</p>
+                    <h3>Confirm the entry basis</h3>
+                    <p>Start with the visa-free or transit checker so the whole plan is anchored to the right rule.</p>
                   </div>
                 </div>
                 <div class="timeline-step">
                   <span class="step-index">2</span>
                   <div>
                     <h3>Build the arrival checklist</h3>
-                    <p>Surface the real gaps in payment, data, pickup, hotel address handling, and backup planning.</p>
+                    <p>Surface the real gaps in payments, data, pickup planning, and hotel address handling.</p>
                   </div>
                 </div>
                 <div class="timeline-step">
                   <span class="step-index">3</span>
                   <div>
-                    <h3>Fix the blocking utility</h3>
-                    <p>Move into payment setup, app-choice, or transport guidance only after the tool shows what is still open.</p>
+                    <h3>Open the blocking utility</h3>
+                    <p>Move into payment setup, travel apps, DiDi guidance, or bilingual support cards only after the checklist shows what is still unresolved.</p>
                   </div>
                 </div>
               </div>
@@ -223,10 +300,12 @@
           <div class="detail-shell">
             <span class="stamp">Useful next pages</span>
             <div class="route-labels">
+              <a class="route-pill" href="china-travel-apps.html">Travel apps before departure</a>
               <a class="route-pill" href="alipay-for-foreigners-in-china.html">Alipay setup path</a>
               <a class="route-pill" href="wechat-pay-for-foreigners-in-china.html">Weixin or WeChat backup path</a>
-              <a class="route-pill" href="china-payment-apps-for-foreigners.html">Payment stack comparison</a>
               <a class="route-pill" href="how-to-use-didi-in-china-as-a-foreigner.html">Airport or station ride plan</a>
+              <a class="route-pill" href="china-address-card-generator.html">Bilingual address card</a>
+              <a class="route-pill" href="china-allergy-card-generator.html">Bilingual allergy card</a>
             </div>
           </div>
         </div>
@@ -234,163 +313,8 @@
 
       <section class="section">
         <div class="section-copy">
-          <p class="eyebrow">Country intent</p>
-          <h2>Answer the passport-specific searches directly.</h2>
-          <p class="lede">These pages target the queries travelers actually type, then route them into the right checker instead of forcing them through a generic article.</p>
-        </div>
-        <div class="tool-grid">
-          <a class="utility-tile" href="china-visa-free-for-us-citizens.html">
-            <h3>US citizens</h3>
-            <p>Direct answer on why US passport holders usually need the transit route, not the unilateral 30-day list.</p>
-          </a>
-          <a class="utility-tile" href="china-visa-free-for-canadians.html">
-            <h3>Canadians</h3>
-            <p>Clear answer on direct 30-day visa-free entry plus when Canadians can also use the 240-hour transit framework.</p>
-          </a>
-          <a class="utility-tile" href="china-visa-free-for-uk-citizens.html">
-            <h3>UK citizens</h3>
-            <p>Nationality-specific answer page for British passport holders planning direct visits or onward transit.</p>
-          </a>
-          <a class="utility-tile" href="china-visa-free-for-australians.html">
-            <h3>Australians</h3>
-            <p>Fast answer page for Australian passport holders comparing direct-entry and transit options.</p>
-          </a>
-          <a class="utility-tile" href="china-visa-free-for-germans.html">
-            <h3>Germans</h3>
-            <p>Germany-specific page for direct-entry visits and onward transit through China.</p>
-          </a>
-          <a class="utility-tile" href="china-visa-free-for-french-citizens.html">
-            <h3>French citizens</h3>
-            <p>France-specific answer page for short visits, route logic, and current transit alternatives.</p>
-          </a>
-          <a class="utility-tile" href="china-visa-free-for-japanese-citizens.html">
-            <h3>Japanese citizens</h3>
-            <p>Japan-specific page for direct-entry travel and the current 240-hour transit route.</p>
-          </a>
-          <a class="utility-tile" href="which-countries-can-enter-china-visa-free.html">
-            <h3>Which countries qualify?</h3>
-            <p>Question-led landing page answering the broad country-list query with region counts and next steps.</p>
-          </a>
-          <a class="utility-tile" href="10-day-visa-free-china.html">
-            <h3>10-day visa-free China</h3>
-            <p>Explainer for the high-intent search phrase that usually means the current 240-hour transit policy.</p>
-          </a>
-        </div>
-      </section>
-
-      <section class="section">
-        <div class="section-copy">
-          <p class="eyebrow">Transit questions</p>
-          <h2>Build content around the route confusion, not just the route checker.</h2>
-          <p class="lede">These pages capture the people who are still figuring out the rule, the route shape, or whether they can leave the airport.</p>
-        </div>
-        <div class="tool-grid">
-          <a class="utility-tile" href="how-does-china-visa-free-transit-work.html">
-            <h3>How transit works</h3>
-            <p>Plain-English explanation of the 24-hour and 240-hour transit policies and when each one applies.</p>
-          </a>
-          <a class="utility-tile" href="how-to-apply-144-hour-visa-free-transit-in-china.html">
-            <h3>144-hour transit answer</h3>
-            <p>Bridge page for travelers still searching the older 144-hour phrase and needing the current 240-hour answer.</p>
-          </a>
-          <a class="utility-tile" href="can-i-leave-the-airport-during-china-transit-without-visa.html">
-            <h3>Can I leave the airport?</h3>
-            <p>Practical answer page for travelers trying to understand whether a layover can become a short city stay.</p>
-          </a>
-          <a class="utility-tile" href="china-transit-rule-third-country-examples.html">
-            <h3>Third-country rule examples</h3>
-            <p>Examples of valid and invalid route patterns, including Hong Kong SAR, Macao SAR, and Taiwan region.</p>
-          </a>
-          <a class="utility-tile" href="china-transit-route-examples.html">
-            <h3>Transit route examples</h3>
-            <p>Route library for common traveler patterns like US to China to Hong Kong SAR or Canada to China to Japan.</p>
-          </a>
-          <a class="utility-tile" href="china-transit-without-visa-checker.html">
-            <h3>Run the transit checker</h3>
-            <p>Use the live checker once you know your passport, route, and stay window.</p>
-          </a>
-        </div>
-      </section>
-
-      <section class="section">
-        <div class="section-copy">
-          <p class="eyebrow">Arrival tools</p>
-          <h2>Help travelers after the flight is booked, not just before.</h2>
-          <p class="lede">These support utilities are smaller search terms than the entry-policy cluster, but they make the site more useful, more shareable, and more likely to earn repeat visits.</p>
-        </div>
-        <div class="tool-grid">
-          <a class="utility-tile" href="china-travel-apps.html">
-            <h3>China travel apps</h3>
-            <p>What to install before the trip for payments, maps, rides, rail booking, and local communication.</p>
-          </a>
-          <a class="utility-tile" href="china-arrival-checklist.html">
-            <h3>China arrival checklist</h3>
-            <p>Interactive builder for entry readiness, payment setup, mobile data, pickup planning, and fallback coverage.</p>
-          </a>
-          <a class="utility-tile" href="china-payment-setup-for-foreigners.html">
-            <h3>China payment setup</h3>
-            <p>Pre-arrival checklist for payment apps, card backups, first test purchases, and day-one failure planning.</p>
-          </a>
-          <a class="utility-tile" href="china-payment-apps-for-foreigners.html">
-            <h3>China payment apps for foreigners</h3>
-            <p>Choose the lowest-friction wallet stack instead of installing overlapping payment apps without a plan.</p>
-          </a>
-          <a class="utility-tile" href="alipay-for-foreigners-in-china.html">
-            <h3>Alipay for foreigners</h3>
-            <p>Practical setup path for travelers who want one main payment method ready before wheels down.</p>
-          </a>
-          <a class="utility-tile" href="wechat-pay-for-foreigners-in-china.html">
-            <h3>Weixin or WeChat Pay</h3>
-            <p>Backup-wallet guidance for trips where local coordination may already revolve around WeChat.</p>
-          </a>
-          <a class="utility-tile" href="how-to-use-didi-in-china-as-a-foreigner.html">
-            <h3>How to use DiDi</h3>
-            <p>Practical ride-hailing guide for airport pickup, driver messaging, payment setup, and smoother first rides.</p>
-          </a>
-          <a class="utility-tile" href="china-address-card-generator.html">
-            <h3>China address card generator</h3>
-            <p>Build a bilingual phone-ready card for taxis, hotel check-in, or asking station staff for help.</p>
-          </a>
-          <a class="utility-tile" href="china-allergy-card-generator.html">
-            <h3>China allergy card generator</h3>
-            <p>Create a Chinese-first food warning card for restaurants, hotel breakfasts, and food ordering.</p>
-          </a>
-        </div>
-      </section>
-
-      <section class="section">
-        <div class="section-copy">
-          <p class="eyebrow">What this release models</p>
-          <h2>Two policy families, one clear scope.</h2>
-        </div>
-        <div class="split-grid">
-          <div class="source-box">
-            <h3>30-day unilateral visa-free entry</h3>
-            <p>This release models the current public list of countries covered by the unilateral 30-day visa-free policy for ordinary passport holders.</p>
-            <ul>
-              <li>Business</li>
-              <li>Tourism</li>
-              <li>Visits to relatives and friends</li>
-              <li>Exchange visits</li>
-              <li>Transit</li>
-            </ul>
-          </div>
-          <div class="source-box">
-            <h3>240-hour visa-free transit</h3>
-            <p>This release also models the current 240-hour transit framework for nationals of 55 countries traveling from China to a third country or region through designated ports and permitted areas.</p>
-            <ul>
-              <li>Requires a valid onward route</li>
-              <li>Requires confirmed departure arrangements</li>
-              <li>Requires a designated entry port and permitted stay area</li>
-            </ul>
-          </div>
-        </div>
-      </section>
-
-      <section class="section">
-        <div class="section-copy">
-          <p class="eyebrow">Sources</p>
-          <h2>Official references used for this release</h2>
+          <p class="eyebrow">Official source base</p>
+          <h2>Current policy references used in this release.</h2>
         </div>
         <div class="story-grid">
           <div class="note-box">
@@ -399,8 +323,8 @@
             <p><a href="https://en.nia.gov.cn/n147418/n147463/c183390/content.html">Open official source</a></p>
           </div>
           <div class="note-box">
-            <h3>Visa-free transit policy interpretation</h3>
-            <p>National Immigration Administration policy interpretation published July 4, 2025, plus the November 5, 2025 port update notice.</p>
+            <h3>Transit policy and port update</h3>
+            <p>National Immigration Administration policy interpretation published July 4, 2025, plus the November 5, 2025 notice expanding eligible entry ports.</p>
             <p><a href="https://en.nia.gov.cn/n147418/n147463/c183412/content.html">Transit policy interpretation</a><br><a href="https://en.nia.gov.cn/n147418/n147468/c187308/content.html">65-port update notice</a></p>
           </div>
         </div>
