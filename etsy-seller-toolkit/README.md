@@ -6,6 +6,7 @@ Core pages:
 
 - `etsy-fee-calculator.html`
 - `etsy-profit-calculator.html`
+- `etsy-price-target-calculator.html`
 - `etsy-offsite-ads-calculator.html`
 - `etsy-fee-calculator-2026.html`
 - `etsy-digital-product-fee-calculator.html`

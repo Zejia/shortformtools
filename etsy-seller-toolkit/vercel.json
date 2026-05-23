@@ -17,6 +17,11 @@
       "permanent": true
     },
     {
+      "source": "/etsy-price-target-calculator.html",
+      "destination": "/etsy-price-target-calculator",
+      "permanent": true
+    },
+    {
       "source": "/etsy-offsite-ads-calculator.html",
       "destination": "/etsy-offsite-ads-calculator",
       "permanent": true
@@ -75,6 +80,10 @@
     {
       "source": "/etsy-profit-calculator",
       "destination": "/etsy-profit-calculator.html"
+    },
+    {
+      "source": "/etsy-price-target-calculator",
+      "destination": "/etsy-price-target-calculator.html"
     },
     {
       "source": "/etsy-offsite-ads-calculator",
