@@ -15,6 +15,17 @@ function setMeter(id, value) {
   if (el) el.style.setProperty("--value", `${Math.max(0, Math.min(value, 100))}%`);
 }
 
+function downloadTextFile(filename, text) {
+  if (!text) return;
+  const blob = new Blob([text], { type: "text/plain;charset=utf-8" });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = filename;
+  link.click();
+  URL.revokeObjectURL(url);
+}
+
 function rateBadge(rate) {
   if (rate >= 8) return ["Excellent", ""];
   if (rate >= 4) return ["Healthy", ""];
@@ -676,6 +687,7 @@ function initContentBriefGenerator() {
   const audience = document.getElementById("briefAudience");
   const outcome = document.getElementById("briefOutcome");
   const copy = document.getElementById("copyBrief");
+  const download = document.getElementById("downloadBrief");
   let lastBrief = "";
 
   function build() {
@@ -729,6 +741,11 @@ function initContentBriefGenerator() {
     await navigator.clipboard.writeText(lastBrief);
     copy.textContent = "Copied brief";
     setTimeout(() => (copy.textContent = "Copy brief"), 1200);
+  });
+  download?.addEventListener("click", () => {
+    downloadTextFile("creator-content-brief.txt", lastBrief);
+    download.textContent = "Downloaded";
+    setTimeout(() => (download.textContent = "Download .txt"), 1200);
   });
   build();
 }
