@@ -455,6 +455,16 @@ Margin: ${pct(report.result.margin)}`;
     });
   });
 
+  document.querySelectorAll("[data-coupon-rate]").forEach((button) => {
+    button.addEventListener("click", () => {
+      byId("discountRate").value = button.dataset.couponRate || 0;
+      calculateAndRender();
+      document.querySelectorAll("[data-coupon-rate]").forEach((item) => {
+        item.setAttribute("aria-pressed", String(item === button));
+      });
+    });
+  });
+
   calculateAndRender();
 }
 
