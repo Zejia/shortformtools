@@ -22,6 +22,11 @@
       "permanent": true
     },
     {
+      "source": "/etsy-bundle-pricing-calculator.html",
+      "destination": "/etsy-bundle-pricing-calculator",
+      "permanent": true
+    },
+    {
       "source": "/etsy-offsite-ads-calculator.html",
       "destination": "/etsy-offsite-ads-calculator",
       "permanent": true
@@ -84,6 +89,10 @@
     {
       "source": "/etsy-price-target-calculator",
       "destination": "/etsy-price-target-calculator.html"
+    },
+    {
+      "source": "/etsy-bundle-pricing-calculator",
+      "destination": "/etsy-bundle-pricing-calculator.html"
     },
     {
       "source": "/etsy-offsite-ads-calculator",
