@@ -546,6 +546,186 @@ function attachCopySummary(scope) {
   });
 }
 
+function readMarginInputs(scope) {
+  const baseInputs = readToolInputs(scope);
+  return {
+    ...baseInputs,
+    salePrice: safeNumber(byField(scope, "salePrice")?.value),
+    marketplaceFeeRate: safeNumber(byField(scope, "marketplaceFeeRate")?.value) / 100,
+    fulfillmentCost: safeNumber(byField(scope, "fulfillmentCost")?.value),
+    returnAllowanceRate: safeNumber(byField(scope, "returnAllowanceRate")?.value) / 100,
+    targetMargin: safeNumber(byField(scope, "targetMargin")?.value) / 100
+  };
+}
+
+function calculateImportMargin(inputs, landed = calculateLandedCost(inputs)) {
+  const landedPerUnit = landed.perUnit;
+  const marketplaceFee = inputs.salePrice * inputs.marketplaceFeeRate;
+  const returnAllowance = inputs.salePrice * inputs.returnAllowanceRate;
+  const channelCosts = marketplaceFee + inputs.fulfillmentCost + returnAllowance;
+  const profitPerUnit = inputs.salePrice - landedPerUnit - channelCosts;
+  const grossMargin = inputs.salePrice > 0 ? (profitPerUnit / inputs.salePrice) * 100 : 0;
+  const markupOnLanded = landedPerUnit > 0 ? (profitPerUnit / landedPerUnit) * 100 : 0;
+  const variableRate = inputs.marketplaceFeeRate + inputs.returnAllowanceRate;
+  const denominator = 1 - variableRate - inputs.targetMargin;
+  const targetPrice = denominator > 0 ? (landedPerUnit + inputs.fulfillmentCost) / denominator : Infinity;
+  const breakEvenPrice = variableRate < 1 ? (landedPerUnit + inputs.fulfillmentCost) / (1 - variableRate) : Infinity;
+
+  return {
+    landedPerUnit,
+    marketplaceFee,
+    returnAllowance,
+    channelCosts,
+    profitPerUnit,
+    grossMargin,
+    markupOnLanded,
+    targetPrice,
+    breakEvenPrice
+  };
+}
+
+function marginHealth(result) {
+  if (result.profitPerUnit < 0) return ["Below break-even", "bad"];
+  if (result.grossMargin < 15) return ["Thin resale margin", "warn"];
+  if (result.grossMargin < 30) return ["Workable", "good"];
+  return ["Healthy resale spread", "good"];
+}
+
+function renderMarginScenarioTable(scope, inputs, landed) {
+  const body = byOutput(scope, "marginScenarioRows");
+  if (!body) return;
+  const scenarios = [
+    { label: "Current sale price", patch: {} },
+    { label: "Sale price -10%", patch: { salePrice: inputs.salePrice * 0.9 } },
+    { label: "Freight +12%", patch: { shippingCost: inputs.shippingCost * 1.12 } },
+    { label: "Duty rate +2 pts", patch: { dutyRate: inputs.dutyRate + 0.02 } }
+  ];
+
+  body.innerHTML = scenarios
+    .map((scenario) => {
+      const merged = { ...inputs, ...scenario.patch };
+      const scenarioLanded = scenario.patch.shippingCost || scenario.patch.dutyRate
+        ? calculateLandedCost(merged)
+        : landed;
+      const result = calculateImportMargin(merged, scenarioLanded);
+      const [status] = marginHealth(result);
+      return `<tr>
+        <td>${scenario.label}</td>
+        <td>${formatCurrency(scenarioLanded.perUnit, inputs.currency)}</td>
+        <td>${formatCurrency(merged.salePrice, inputs.currency)}</td>
+        <td>${formatCurrency(result.profitPerUnit, inputs.currency)}</td>
+        <td>${formatPercent(result.grossMargin)}</td>
+        <td>${status}</td>
+      </tr>`;
+    })
+    .join("");
+}
+
+function buildMarginInsights(inputs, landed, result) {
+  const notes = [];
+  if (result.profitPerUnit < 0) {
+    notes.push(`The current resale price is below break-even. Raise price to at least ${formatCurrency(result.breakEvenPrice, inputs.currency)} before this SKU can absorb channel costs.`);
+  } else if (result.grossMargin < inputs.targetMargin * 100) {
+    notes.push(`The SKU is profitable, but it misses the target margin. A ${formatPercent(inputs.targetMargin * 100)} target needs about ${formatCurrency(result.targetPrice, inputs.currency)} per unit.`);
+  } else {
+    notes.push(`The current resale price clears the target margin under these import and channel-cost assumptions.`);
+  }
+  if (landed.upliftPercent >= 35) {
+    notes.push(`Import overhead is ${formatPercent(landed.upliftPercent)} above product value, so freight, tax, and brokerage deserve the same attention as supplier cost.`);
+  }
+  if (inputs.marketplaceFeeRate >= 0.15) {
+    notes.push("Marketplace fees are a major part of the resale spread. Compare direct wholesale or B2B pricing before assuming this SKU works on every channel.");
+  }
+  if (result.targetPrice === Infinity) {
+    notes.push("The target margin is mathematically impossible with the entered channel-fee and return rates. Lower the target or reduce variable channel costs.");
+  }
+  return notes;
+}
+
+function renderImportMarginTool(scope) {
+  const inputs = readMarginInputs(scope);
+  const landed = calculateLandedCost(inputs);
+  const result = calculateImportMargin(inputs, landed);
+  const [status, tone] = marginHealth(result);
+
+  setText(scope, "thresholdNote", inputs.preset.thresholdNote);
+  setText(scope, "assumptionNote", inputs.preset.basisNote);
+  setText(scope, "landedPerUnit", formatCurrency(landed.perUnit, inputs.currency));
+  setText(scope, "resaleProfit", formatCurrency(result.profitPerUnit, inputs.currency));
+  setText(scope, "resaleMargin", formatPercent(result.grossMargin));
+  setText(scope, "targetResalePrice", Number.isFinite(result.targetPrice) ? formatCurrency(result.targetPrice, inputs.currency) : "No safe price");
+  setText(scope, "breakEvenResalePrice", Number.isFinite(result.breakEvenPrice) ? formatCurrency(result.breakEvenPrice, inputs.currency) : "No safe price");
+  setText(scope, "channelCosts", formatCurrency(result.channelCosts, inputs.currency));
+  setText(scope, "marginStatus", status);
+  setText(
+    scope,
+    "marginFormulaLine",
+    `Profit per unit = ${formatCurrency(inputs.salePrice, inputs.currency)} sale price - ${formatCurrency(landed.perUnit, inputs.currency)} landed cost - ${formatCurrency(result.channelCosts, inputs.currency)} channel costs = ${formatCurrency(result.profitPerUnit, inputs.currency)}.`
+  );
+
+  const statusNode = byOutput(scope, "marginStatusTone");
+  if (statusNode) statusNode.className = `status-pill ${tone}`;
+  const meter = byOutput(scope, "marginMeter");
+  if (meter) meter.style.setProperty("--value", `${clamp(result.grossMargin, 0, 45) / 45 * 100}%`);
+
+  const insightList = byOutput(scope, "marginInsights");
+  if (insightList) {
+    insightList.innerHTML = buildMarginInsights(inputs, landed, result)
+      .map((item) => `<li>${item}</li>`)
+      .join("");
+  }
+
+  renderMarginScenarioTable(scope, inputs, landed);
+}
+
+function initImportMarginTools() {
+  document.querySelectorAll("[data-import-margin-tool]").forEach((scope) => {
+    const marketField = byField(scope, "market");
+    if (marketField) {
+      applyPreset(scope, marketField.value || "US");
+      marketField.addEventListener("change", () => {
+        applyPreset(scope, marketField.value);
+        renderImportMarginTool(scope);
+      });
+    }
+
+    scope.querySelectorAll("input, select").forEach((field) => {
+      field.addEventListener("input", () => renderImportMarginTool(scope));
+      field.addEventListener("change", () => renderImportMarginTool(scope));
+    });
+
+    const copyButton = byOutput(scope, "copyMarginSummary");
+    copyButton?.addEventListener("click", async () => {
+      const inputs = readMarginInputs(scope);
+      const landed = calculateLandedCost(inputs);
+      const result = calculateImportMargin(inputs, landed);
+      const summary = [
+        `${inputs.preset.label} import resale margin`,
+        `Landed cost per unit: ${formatCurrency(landed.perUnit, inputs.currency)}`,
+        `Sale price: ${formatCurrency(inputs.salePrice, inputs.currency)}`,
+        `Channel costs: ${formatCurrency(result.channelCosts, inputs.currency)}`,
+        `Profit per unit: ${formatCurrency(result.profitPerUnit, inputs.currency)}`,
+        `Gross margin: ${formatPercent(result.grossMargin)}`,
+        `Target resale price: ${Number.isFinite(result.targetPrice) ? formatCurrency(result.targetPrice, inputs.currency) : "No safe price"}`
+      ].join("\n");
+      try {
+        await navigator.clipboard.writeText(summary);
+        copyButton.textContent = "Copied";
+        window.setTimeout(() => {
+          copyButton.textContent = "Copy margin plan";
+        }, 1200);
+      } catch (_error) {
+        copyButton.textContent = "Copy failed";
+        window.setTimeout(() => {
+          copyButton.textContent = "Copy margin plan";
+        }, 1200);
+      }
+    });
+
+    renderImportMarginTool(scope);
+  });
+}
+
 function initLandedCostTools() {
   const tools = document.querySelectorAll("[data-landed-cost-tool]");
   tools.forEach((scope) => {
@@ -760,5 +940,6 @@ document.addEventListener("DOMContentLoaded", () => {
   initStaticBits();
   initConsentAndAds();
   initLandedCostTools();
+  initImportMarginTools();
   initHsBriefBuilder();
 });
