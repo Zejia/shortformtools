@@ -1,0 +1,229 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Import Supplier Quote Comparison Calculator: Landed Cost per Unit</title>
+    <meta name="description" content="Compare three import supplier quotes with duty, VAT, freight, brokerage, inspection, defect allowance, landed cost per unit, and cash tied up before you choose a vendor.">
+    <meta name="google-adsense-account" content="ca-pub-4259477754165351">
+    <link rel="canonical" href="https://crossborderkit.com/import-supplier-quote-comparison-calculator.html">
+    <meta property="og:title" content="Import Supplier Quote Comparison Calculator">
+    <meta property="og:description" content="Compare supplier quotes by landed cost per unit, not just factory price.">
+    <meta property="og:type" content="article">
+    <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+    <link rel="manifest" href="site.webmanifest">
+    <link rel="stylesheet" href="styles.css">
+    <script type="application/ld+json">{"@context":"https://schema.org","@type":"WebPage","name":"Import Supplier Quote Comparison Calculator","url":"https://crossborderkit.com/import-supplier-quote-comparison-calculator.html","description":"Compare three import supplier quotes by landed cost per unit, duty, VAT, freight, brokerage, inspection, defect allowance, and cash tied up.","dateModified":"2026-05-23","isPartOf":{"@type":"WebSite","name":"Import Duty Toolkit","url":"https://crossborderkit.com/"}}</script>
+    <script type="application/ld+json">{"@context":"https://schema.org","@type":"SoftwareApplication","name":"Import Supplier Quote Comparison Calculator","applicationCategory":"BusinessApplication","operatingSystem":"Web","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"},"url":"https://crossborderkit.com/import-supplier-quote-comparison-calculator.html"}</script>
+  </head>
+  <body>
+    <header class="site-header">
+      <nav class="nav" aria-label="Primary">
+        <a class="brand" href="index.html">
+          <span class="brand-mark">ID</span>
+          <span class="brand-lockup">
+            <strong>Import Duty Toolkit</strong>
+            <span>Landed-cost planning for trade operators</span>
+          </span>
+        </a>
+        <div class="nav-links">
+          <a href="import-duty-calculator.html">Duty calculator</a>
+          <a href="landed-cost-calculator.html">Landed cost</a>
+          <a href="import-margin-calculator.html">Margin</a>
+          <a href="import-supplier-quote-comparison-calculator.html">Quote compare</a>
+          <a href="hs-code-lookup-guide.html">HS code guide</a>
+        </div>
+      </nav>
+    </header>
+
+    <main>
+      <section class="page-hero">
+        <div class="page-copy">
+          <p class="eyebrow">Supplier quote comparison calculator</p>
+          <h1>Compare import supplier quotes by landed cost, not factory price.</h1>
+          <p class="lede">A cheaper unit quote can lose after freight, duty, VAT, brokerage, inspection, defect allowance, or MOQ cash pressure. Put three supplier offers into the same landed-cost model before choosing a vendor.</p>
+          <div class="inline-actions">
+            <a class="button primary" href="#quote-tool">Compare quotes</a>
+            <a class="button ghost" href="landed-cost-calculator.html">Open landed-cost calculator</a>
+          </div>
+        </div>
+        <aside class="rail-card">
+          <span class="stamp">For PO and RFQ review</span>
+          <div class="data-stack">
+            <div class="data-row"><span>Compares</span><strong>3 supplier quotes</strong></div>
+            <div class="data-row"><span>Ranks by</span><strong>Landed cost per sellable unit</strong></div>
+            <div class="data-row"><span>Reviewed</span><strong><span data-review-date></span></strong></div>
+          </div>
+        </aside>
+      </section>
+
+      <section class="section" id="quote-tool">
+        <section class="tool-shell" data-supplier-quote-tool>
+          <div class="tool-head">
+            <div>
+              <h2>Import supplier quote comparison planner</h2>
+              <p>Enter shared customs assumptions, then compare supplier-specific unit cost, MOQ, freight, inspection, defect allowance, and lead time.</p>
+            </div>
+            <span class="status-pill good" data-output="quoteStatusTone"><span data-output="quoteStatus">Ready to compare</span></span>
+          </div>
+
+          <div class="tool-grid">
+            <div class="form-panel">
+              <div class="field-grid">
+                <div class="field full">
+                  <label for="quoteMarket">Destination market preset</label>
+                  <select id="quoteMarket" data-field="market">
+                    <option value="US">United States</option>
+                    <option value="UK">United Kingdom</option>
+                    <option value="EU">EU-like VAT mode</option>
+                    <option value="CUSTOM">Custom</option>
+                  </select>
+                  <span class="hint" data-output="thresholdNote"></span>
+                </div>
+                <div class="field">
+                  <label for="quoteDutyRate">Duty rate</label>
+                  <input id="quoteDutyRate" data-field="dutyRate" type="number" min="0" step="0.1" value="6">
+                </div>
+                <div class="field">
+                  <label for="quoteTaxRate">Additional tax or VAT rate</label>
+                  <input id="quoteTaxRate" data-field="taxRate" type="number" min="0" step="0.1" value="20">
+                </div>
+                <div class="field">
+                  <label for="quoteBrokerage">Brokerage or customs fees</label>
+                  <input id="quoteBrokerage" data-field="brokerage" type="number" min="0" step="0.01" value="58">
+                </div>
+                <div class="field">
+                  <label for="quoteBufferRate">FX or compliance buffer %</label>
+                  <input id="quoteBufferRate" data-field="bufferRate" type="number" min="0" step="0.1" value="2.5">
+                </div>
+                <div class="field">
+                  <label for="quoteTargetSellPrice">Target sell price per unit</label>
+                  <input id="quoteTargetSellPrice" data-field="targetSellPrice" type="number" min="0" step="0.01" value="18">
+                </div>
+                <div class="field">
+                  <label for="quoteTargetMargin">Target gross margin %</label>
+                  <input id="quoteTargetMargin" data-field="targetMargin" type="number" min="0" max="80" step="0.1" value="30">
+                </div>
+                <div class="field">
+                  <label for="quoteThreshold">Low-value threshold</label>
+                  <input id="quoteThreshold" data-field="threshold" type="number" min="0" step="0.01" value="150">
+                </div>
+                <label class="check-row span-2"><input data-field="useDeMinimis" type="checkbox" checked> <span>Apply low-value relief when eligible</span></label>
+
+                <div class="group-title span-2">Supplier A</div>
+                <div class="field"><label for="supplierAName">Supplier name</label><input id="supplierAName" data-field="supplierAName" value="Supplier A"></div>
+                <div class="field"><label for="supplierAUnitCost">Unit quote</label><input id="supplierAUnitCost" data-field="supplierAUnitCost" type="number" min="0" step="0.01" value="5.80"></div>
+                <div class="field"><label for="supplierAUnits">Order units / MOQ</label><input id="supplierAUnits" data-field="supplierAUnits" type="number" min="1" step="1" value="900"></div>
+                <div class="field"><label for="supplierAFreight">Freight quote</label><input id="supplierAFreight" data-field="supplierAFreight" type="number" min="0" step="0.01" value="520"></div>
+                <div class="field"><label for="supplierAInsurance">Insurance</label><input id="supplierAInsurance" data-field="supplierAInsurance" type="number" min="0" step="0.01" value="45"></div>
+                <div class="field"><label for="supplierAExtra">Inspection/tooling/sample cost</label><input id="supplierAExtra" data-field="supplierAExtra" type="number" min="0" step="0.01" value="120"></div>
+                <div class="field"><label for="supplierADefectRate">Defect allowance %</label><input id="supplierADefectRate" data-field="supplierADefectRate" type="number" min="0" max="60" step="0.1" value="2"></div>
+                <div class="field"><label for="supplierALeadDays">Lead time days</label><input id="supplierALeadDays" data-field="supplierALeadDays" type="number" min="0" step="1" value="35"></div>
+
+                <div class="group-title span-2">Supplier B</div>
+                <div class="field"><label for="supplierBName">Supplier name</label><input id="supplierBName" data-field="supplierBName" value="Supplier B"></div>
+                <div class="field"><label for="supplierBUnitCost">Unit quote</label><input id="supplierBUnitCost" data-field="supplierBUnitCost" type="number" min="0" step="0.01" value="5.35"></div>
+                <div class="field"><label for="supplierBUnits">Order units / MOQ</label><input id="supplierBUnits" data-field="supplierBUnits" type="number" min="1" step="1" value="1200"></div>
+                <div class="field"><label for="supplierBFreight">Freight quote</label><input id="supplierBFreight" data-field="supplierBFreight" type="number" min="0" step="0.01" value="760"></div>
+                <div class="field"><label for="supplierBInsurance">Insurance</label><input id="supplierBInsurance" data-field="supplierBInsurance" type="number" min="0" step="0.01" value="55"></div>
+                <div class="field"><label for="supplierBExtra">Inspection/tooling/sample cost</label><input id="supplierBExtra" data-field="supplierBExtra" type="number" min="0" step="0.01" value="180"></div>
+                <div class="field"><label for="supplierBDefectRate">Defect allowance %</label><input id="supplierBDefectRate" data-field="supplierBDefectRate" type="number" min="0" max="60" step="0.1" value="4"></div>
+                <div class="field"><label for="supplierBLeadDays">Lead time days</label><input id="supplierBLeadDays" data-field="supplierBLeadDays" type="number" min="0" step="1" value="48"></div>
+
+                <div class="group-title span-2">Supplier C</div>
+                <div class="field"><label for="supplierCName">Supplier name</label><input id="supplierCName" data-field="supplierCName" value="Supplier C"></div>
+                <div class="field"><label for="supplierCUnitCost">Unit quote</label><input id="supplierCUnitCost" data-field="supplierCUnitCost" type="number" min="0" step="0.01" value="6.10"></div>
+                <div class="field"><label for="supplierCUnits">Order units / MOQ</label><input id="supplierCUnits" data-field="supplierCUnits" type="number" min="1" step="1" value="700"></div>
+                <div class="field"><label for="supplierCFreight">Freight quote</label><input id="supplierCFreight" data-field="supplierCFreight" type="number" min="0" step="0.01" value="430"></div>
+                <div class="field"><label for="supplierCInsurance">Insurance</label><input id="supplierCInsurance" data-field="supplierCInsurance" type="number" min="0" step="0.01" value="38"></div>
+                <div class="field"><label for="supplierCExtra">Inspection/tooling/sample cost</label><input id="supplierCExtra" data-field="supplierCExtra" type="number" min="0" step="0.01" value="90"></div>
+                <div class="field"><label for="supplierCDefectRate">Defect allowance %</label><input id="supplierCDefectRate" data-field="supplierCDefectRate" type="number" min="0" max="60" step="0.1" value="1.5"></div>
+                <div class="field"><label for="supplierCLeadDays">Lead time days</label><input id="supplierCLeadDays" data-field="supplierCLeadDays" type="number" min="0" step="1" value="30"></div>
+              </div>
+
+              <details class="details-block">
+                <summary>Advanced customs assumptions</summary>
+                <div class="details-grid">
+                  <div class="field">
+                    <label for="quoteRelief">Threshold treatment</label>
+                    <select id="quoteRelief" data-field="reliefMode">
+                      <option value="none">No automatic relief</option>
+                      <option value="duty-only">Waive duty only</option>
+                      <option value="duty-and-tax">Waive duty and tax</option>
+                    </select>
+                  </div>
+                  <label class="check-row"><input data-field="includeShippingInDuty" type="checkbox" checked> <span>Include shipping in duty base</span></label>
+                  <label class="check-row"><input data-field="includeInsuranceInDuty" type="checkbox" checked> <span>Include insurance in duty base</span></label>
+                  <label class="check-row"><input data-field="taxIncludesDuty" type="checkbox" checked> <span>Apply tax on top of duty</span></label>
+                  <label class="check-row"><input data-field="taxIncludesBrokerage" type="checkbox" checked> <span>Include brokerage in tax base</span></label>
+                </div>
+                <p class="inline-note" data-output="assumptionNote"></p>
+              </details>
+            </div>
+
+            <aside class="result-panel" aria-live="polite">
+              <div class="metric-large">
+                <span>Best landed cost per sellable unit</span>
+                <strong data-output="quoteBestPerUnit">-</strong>
+                <div class="meter" data-output="quoteMeter"></div>
+              </div>
+              <div class="kpi-grid">
+                <div class="kpi"><span>Recommended supplier</span><strong data-output="quoteBestName">-</strong></div>
+                <div class="kpi"><span>Spread vs highest</span><strong data-output="quoteSpread">-</strong></div>
+                <div class="kpi"><span>Best cash tied up</span><strong data-output="quoteBestCash">-</strong></div>
+                <div class="kpi"><span>Best margin at target sale</span><strong data-output="quoteBestMargin">-</strong></div>
+                <div class="kpi"><span>Sell price for target margin</span><strong data-output="quoteTargetPrice">-</strong></div>
+              </div>
+              <div class="formula-line" data-output="quoteFormulaLine"></div>
+              <ul class="insights-list" data-output="quoteInsights"></ul>
+              <div class="hero-actions">
+                <button type="button" data-output="copyQuoteSummary">Copy quote comparison</button>
+                <a class="button ghost" href="import-margin-calculator.html">Check resale margin</a>
+              </div>
+            </aside>
+          </div>
+
+          <div class="content-grid">
+            <div class="content-panel">
+              <h3>Supplier comparison table</h3>
+              <div class="table-wrap">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Rank</th>
+                      <th>Supplier</th>
+                      <th>Factory/unit</th>
+                      <th>Landed/sellable unit</th>
+                      <th>Total landed</th>
+                      <th>Margin</th>
+                      <th>Lead time</th>
+                      <th>Readout</th>
+                    </tr>
+                  </thead>
+                  <tbody data-output="quoteRows"></tbody>
+                </table>
+              </div>
+            </div>
+            <div class="content-panel">
+              <h3>Use this before</h3>
+              <ul class="checklist">
+                <li>Choosing between RFQ replies where one supplier looks cheaper on unit cost alone.</li>
+                <li>Approving a high-MOQ quote that ties up more cash than the margin can justify.</li>
+                <li>Sending a quote back to a buyer before freight, inspection, and defect assumptions are visible.</li>
+              </ul>
+            </div>
+          </div>
+        </section>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        <span>Preset assumptions reviewed <span data-review-date></span>. Planning tool only, not legal advice.</span>
+        <span><a href="about.html">About</a> · <a href="contact.html">Contact</a> · <a href="privacy.html">Privacy</a> · <a href="terms.html">Terms</a></span>
+      </div>
+    </footer>
+
+    <script src="app.js"></script>
+  </body>
+</html>
