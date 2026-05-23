@@ -737,6 +737,53 @@ textarea {
   background: oklch(97.5% 0.012 85 / 0.92);
 }
 
+.comparison-table-shell {
+  overflow-x: auto;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: oklch(98.5% 0.006 85);
+  box-shadow: var(--shadow);
+}
+
+.comparison-table {
+  width: 100%;
+  min-width: 760px;
+  border-collapse: collapse;
+}
+
+.comparison-table caption {
+  padding: 18px 20px 0;
+  text-align: left;
+  color: var(--muted);
+  font-size: 0.92rem;
+}
+
+.comparison-table th,
+.comparison-table td {
+  padding: 16px 20px;
+  border-top: 1px solid var(--line);
+  text-align: left;
+  vertical-align: top;
+}
+
+.comparison-table thead th {
+  border-top: 0;
+  background: oklch(95.8% 0.017 85);
+  color: var(--navy);
+  font-size: 0.92rem;
+}
+
+.comparison-table tbody th {
+  width: 16%;
+  color: var(--ink);
+  font-size: 1rem;
+  font-family: "Newsreader", "Iowan Old Style", "Palatino Linotype", Georgia, serif;
+}
+
+.comparison-table tbody td {
+  color: var(--muted);
+}
+
 .note-box ul,
 .source-box ul,
 .text-grid ul,
