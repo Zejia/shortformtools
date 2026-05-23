@@ -733,6 +733,79 @@ function initContentBriefGenerator() {
   build();
 }
 
+function initCreatorHookGenerator() {
+  const shell = document.querySelector("[data-tool='creator-hook']");
+  if (!shell) return;
+
+  const platform = document.getElementById("hookPlatform");
+  const format = document.getElementById("hookFormat");
+  const topic = document.getElementById("hookTopic");
+  const audience = document.getElementById("hookAudience");
+  const pain = document.getElementById("hookPain");
+  const outcome = document.getElementById("hookOutcome");
+  const rows = document.getElementById("hookRows");
+  const copy = document.getElementById("copyHooks");
+  let lastHooks = "";
+
+  function clean(value, fallback) {
+    return (value || "").trim() || fallback;
+  }
+
+  function buildHooks() {
+    const platformName = platform.value;
+    const formatName = format.value;
+    const subject = clean(topic.value, "your next content idea");
+    const viewer = clean(audience.value, "your audience");
+    const problem = clean(pain.value, "getting attention in the first three seconds");
+    const promise = clean(outcome.value, "make the next post easier to watch");
+    const hooks = [
+      `If ${viewer} keep struggling with ${problem}, start here.`,
+      `The fastest way to improve ${subject}: fix this before anything else.`,
+      `Most ${viewer} miss this part of ${subject}.`,
+      `Stop doing ${subject} like this if you want to ${promise}.`,
+      `Here is the tiny ${formatName.toLowerCase()} change that helps ${viewer} ${promise}.`,
+      `Before you post about ${subject}, check this one thing.`,
+      `I would not publish another ${platformName} video about ${subject} until this is clear.`,
+      `${viewer} do not need more ideas. They need a sharper way to ${promise}.`,
+      `This is why your ${subject} content may feel useful but still gets skipped.`,
+      `Try this ${platformName} opener when the topic is ${subject}.`,
+      `The boring version is "${subject}". The better hook is the pain behind it: ${problem}.`,
+      `In the next ${formatName.toLowerCase()}, show ${viewer} how to ${promise} without overexplaining.`
+    ];
+    const uniqueHooks = [...new Set(hooks)];
+    const strength = Math.min(100, 45 + (subject.length > 18 ? 15 : 0) + (viewer.length > 5 ? 15 : 0) + (problem.length > 14 ? 15 : 0) + (promise.length > 14 ? 10 : 0));
+
+    rows.innerHTML = uniqueHooks.map((hook, index) => `
+      <div class="status-item">
+        <span>Hook ${index + 1}</span>
+        <strong>${hook}</strong>
+      </div>
+    `).join("");
+    setText("hookScore", strength >= 85 ? "Strong hook set" : strength >= 70 ? "Ready hook set" : "Add more detail");
+    setText("hookPreview", uniqueHooks[0]);
+    setText("hookMeta", `${platformName} · ${formatName} · ${viewer}`);
+    setMeter("hookMeter", strength);
+    lastHooks = [
+      `${platformName} ${formatName} hook set`,
+      `Topic: ${subject}`,
+      `Audience: ${viewer}`,
+      "",
+      ...uniqueHooks.map((hook, index) => `${index + 1}. ${hook}`)
+    ].join("\n");
+  }
+
+  shell.querySelectorAll("input, select").forEach((input) => {
+    input.addEventListener("input", buildHooks);
+    input.addEventListener("change", buildHooks);
+  });
+  copy?.addEventListener("click", async () => {
+    await navigator.clipboard.writeText(lastHooks);
+    copy.textContent = "Copied hooks";
+    setTimeout(() => (copy.textContent = "Copy hooks"), 1200);
+  });
+  buildHooks();
+}
+
 initTikTok();
 initLineBreaks();
 initTitleChecker();
@@ -746,3 +819,4 @@ initShortsTitleGenerator();
 initBioGenerator();
 initChannelNameGenerator();
 initContentBriefGenerator();
+initCreatorHookGenerator();
