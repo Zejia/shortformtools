@@ -666,6 +666,73 @@ function initChannelNameGenerator() {
   build();
 }
 
+function initContentBriefGenerator() {
+  const shell = document.querySelector("[data-tool='content-brief']");
+  if (!shell) return;
+
+  const platform = document.getElementById("briefPlatform");
+  const tone = document.getElementById("briefTone");
+  const topic = document.getElementById("briefTopic");
+  const audience = document.getElementById("briefAudience");
+  const outcome = document.getElementById("briefOutcome");
+  const copy = document.getElementById("copyBrief");
+  let lastBrief = "";
+
+  function build() {
+    const subject = topic.value.trim() || "your next content idea";
+    const viewer = audience.value.trim() || "your audience";
+    const promise = outcome.value.trim() || "get a clearer result";
+    const selectedTone = tone.value;
+    const platformName = platform.value;
+    const hookStart = {
+      practical: "Before you post, check this:",
+      curious: "Most creators miss this tiny step:",
+      contrarian: "Your first idea probably is not the best one:",
+      friendly: "Try this simple content check:"
+    }[selectedTone] || "Before you post, check this:";
+    const hook = `${hookStart} ${subject} can help ${viewer} ${promise}.`;
+    const shots = [
+      `1. Open with the problem: ${viewer} struggle to ${promise}.`,
+      `2. Show the quick example or mistake around ${subject}.`,
+      "3. Give the simple fix in one visual step.",
+      "4. End with a specific next action."
+    ];
+    const caption = `${subject}: a quick way for ${viewer} to ${promise}. Save this before your next post.`;
+    const tags = [
+      `#${platformName.toLowerCase().replace(/[^a-z]/g, "")}`,
+      "#creatortips",
+      "#contentstrategy",
+      ...subject.toLowerCase().replace(/[^a-z0-9 ]/g, "").split(/\s+/).filter((word) => word.length > 3).slice(0, 3).map((word) => `#${word}`)
+    ];
+    const score = Math.min(100, 55 + (subject.length > 20 ? 15 : 0) + (viewer.length > 5 ? 15 : 0) + (promise.length > 12 ? 15 : 0));
+
+    setText("briefPlatformLabel", platformName);
+    setText("briefHook", hook);
+    setText("briefMeta", `${selectedTone} tone · ${viewer}`);
+    setText("briefShots", shots.join(" "));
+    setText("briefCaption", caption);
+    setText("briefHashtags", [...new Set(tags)].slice(0, 8).join(" "));
+    setText("briefScore", score >= 85 ? "Strong" : score >= 70 ? "Ready" : "Needs detail");
+    setMeter("briefMeter", score);
+    lastBrief = [
+      `${platformName} content brief`,
+      `Hook: ${hook}`,
+      `Shot list:\n${shots.join("\n")}`,
+      `Caption: ${caption}`,
+      `Hashtags: ${[...new Set(tags)].slice(0, 8).join(" ")}`
+    ].join("\n\n");
+  }
+
+  shell.querySelectorAll("input, select").forEach((input) => input.addEventListener("input", build));
+  shell.querySelectorAll("select").forEach((input) => input.addEventListener("change", build));
+  copy?.addEventListener("click", async () => {
+    await navigator.clipboard.writeText(lastBrief);
+    copy.textContent = "Copied brief";
+    setTimeout(() => (copy.textContent = "Copy brief"), 1200);
+  });
+  build();
+}
+
 initTikTok();
 initLineBreaks();
 initTitleChecker();
@@ -678,3 +745,4 @@ initDescriptionGenerator();
 initShortsTitleGenerator();
 initBioGenerator();
 initChannelNameGenerator();
+initContentBriefGenerator();
