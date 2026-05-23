@@ -15,6 +15,8 @@
     <link rel="stylesheet" href="styles.css">
     <script type="application/ld+json">{"@context":"https://schema.org","@type":"WebPage","name":"Import Supplier Quote Comparison Calculator","url":"https://crossborderkit.com/import-supplier-quote-comparison-calculator.html","description":"Compare three import supplier quotes by landed cost per unit, duty, VAT, freight, brokerage, inspection, defect allowance, and cash tied up.","dateModified":"2026-05-23","isPartOf":{"@type":"WebSite","name":"Import Duty Toolkit","url":"https://crossborderkit.com/"}}</script>
     <script type="application/ld+json">{"@context":"https://schema.org","@type":"SoftwareApplication","name":"Import Supplier Quote Comparison Calculator","applicationCategory":"BusinessApplication","operatingSystem":"Web","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"},"url":"https://crossborderkit.com/import-supplier-quote-comparison-calculator.html"}</script>
+    <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Import Duty Toolkit","item":"https://crossborderkit.com/"},{"@type":"ListItem","position":2,"name":"Import Supplier Quote Comparison Calculator","item":"https://crossborderkit.com/import-supplier-quote-comparison-calculator.html"}]}</script>
+    <script type="application/ld+json">{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[{"@type":"Question","name":"How do you compare supplier quotes for imports fairly?","acceptedAnswer":{"@type":"Answer","text":"Put every quote into the same landed-cost model with the same duty rate, tax logic, brokerage, freight treatment, inspection cost, defect allowance, and target selling price. Then compare landed cost per sellable unit, cash tied up, margin, and lead time instead of unit price alone."}},{"@type":"Question","name":"Why can the cheapest factory quote lose after import costs?","acceptedAnswer":{"@type":"Answer","text":"A low unit quote can still become the worst option if it carries higher freight, bigger minimum order quantities, more defects, longer lead times, or extra compliance cost. Those factors change both landed cost and working-capital risk."}},{"@type":"Question","name":"What inputs matter most when comparing import suppliers?","acceptedAnswer":{"@type":"Answer","text":"The highest-impact inputs are unit cost, MOQ, freight, duty and tax treatment, brokerage, inspection or tooling cost, defect allowance, lead time, and the selling price or target margin you need to protect."}},{"@type":"Question","name":"When should I use this quote comparison tool instead of a landed-cost calculator?","acceptedAnswer":{"@type":"Answer","text":"Use the quote comparison tool when you need to rank multiple suppliers under the same customs assumptions. Use the landed-cost calculator when you are modeling one shipment or one supplier scenario in more detail."}}]}</script>
   </head>
   <body>
     <header class="site-header">
@@ -212,6 +214,90 @@
                 <li>Approving a high-MOQ quote that ties up more cash than the margin can justify.</li>
                 <li>Sending a quote back to a buyer before freight, inspection, and defect assumptions are visible.</li>
               </ul>
+            </div>
+          </div>
+
+          <div class="content-grid">
+            <div class="content-panel">
+              <h2>How to compare import supplier quotes without missing hidden cost</h2>
+              <p>Use the same customs, tax, and selling assumptions across every quote. The winning supplier is usually the one with the best landed cost per sellable unit after defects, not the one with the lowest headline factory price.</p>
+              <div class="table-wrap">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Decision question</th>
+                      <th>What to compare</th>
+                      <th>Why it matters</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>Which quote is really cheapest?</td>
+                      <td>Landed cost per sellable unit</td>
+                      <td>Normalizes freight, duty, tax, brokerage, and defect assumptions across suppliers.</td>
+                    </tr>
+                    <tr>
+                      <td>Which quote creates the most cash pressure?</td>
+                      <td>MOQ units and total cash tied up</td>
+                      <td>A lower unit quote can still force too much cash into inventory before sales happen.</td>
+                    </tr>
+                    <tr>
+                      <td>Which supplier best protects margin?</td>
+                      <td>Margin at target sell price</td>
+                      <td>Shows whether the quote still works after import friction and operational buffers.</td>
+                    </tr>
+                    <tr>
+                      <td>Which supplier is operationally safer?</td>
+                      <td>Defect allowance and lead time</td>
+                      <td>Late or inconsistent supply can erase the savings from a lower factory quote.</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+            <div class="content-panel">
+              <h3>Method used in this calculator</h3>
+              <p>The tool starts with product value, then layers in freight, insurance, brokerage, duty, tax or VAT, inspection or tooling cost, and an optional FX or compliance buffer. It converts the result into landed cost per sellable unit by accounting for defect allowance rather than assuming every ordered unit is usable.</p>
+              <p>That makes the output easier to trust for RFQ reviews, pre-PO approvals, and reseller margin checks because the formula reflects the real trade-off between quote price, customs cost, working capital, and fulfillment risk.</p>
+              <ul class="checklist">
+                <li>Use a recent supplier quote and the destination market you actually plan to ship into.</li>
+                <li>Keep HS code, origin treatment, and de minimis assumptions consistent across suppliers.</li>
+                <li>Stress-test at least one conservative defect and freight scenario before locking a vendor.</li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="content-grid">
+            <div class="content-panel">
+              <h3>Related import planning tools</h3>
+              <p>Use the supporting tools below when the supplier decision depends on customs treatment, shipment-level economics, or resale margin.</p>
+              <ul class="checklist">
+                <li><a href="landed-cost-calculator.html">Landed cost calculator</a> for modeling one shipment or supplier in more detail.</li>
+                <li><a href="import-margin-calculator.html">Import margin calculator</a> for checking wholesale or resale economics after the quote is chosen.</li>
+                <li><a href="de-minimis-calculator.html">De minimis calculator</a> for testing low-value threshold assumptions before comparing small orders.</li>
+                <li><a href="hs-code-lookup-guide.html">HS code lookup guide</a> for tightening classification assumptions that affect duty rate accuracy.</li>
+              </ul>
+            </div>
+            <div class="content-panel">
+              <h3>Supplier quote comparison FAQ</h3>
+              <div class="faq-stack">
+                <details class="faq-item">
+                  <summary>How do you compare supplier quotes for imports fairly?</summary>
+                  <p>Hold the customs and selling assumptions constant, then compare landed cost per sellable unit, total cash tied up, lead time, and margin. That prevents one quote from looking better only because it omits freight or hides MOQ pressure.</p>
+                </details>
+                <details class="faq-item">
+                  <summary>Why can the cheapest supplier quote still lose?</summary>
+                  <p>Freight, brokerage, tax treatment, defects, and slow lead times can offset the lower factory price. The cheapest quote on paper often becomes the most expensive option once the order lands and becomes saleable inventory.</p>
+                </details>
+                <details class="faq-item">
+                  <summary>What inputs should I verify before choosing a vendor?</summary>
+                  <p>Check the unit quote, MOQ, freight method, inspection cost, defect rate, lead time, HS code assumptions, and whether duty or VAT relief is actually available in the destination market.</p>
+                </details>
+                <details class="faq-item">
+                  <summary>When should I switch to a landed-cost calculator instead?</summary>
+                  <p>Use the landed-cost calculator when you already know the supplier and need to model one shipment deeply. Use this page when the decision is which supplier to shortlist or approve.</p>
+                </details>
+              </div>
             </div>
           </div>
         </section>
