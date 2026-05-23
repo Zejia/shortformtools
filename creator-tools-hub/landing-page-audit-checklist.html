@@ -1,0 +1,153 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Landing Page Audit Checklist: Score Your Hero, CTA and Proof</title>
+    <meta name="description" content="Free landing page audit checklist for small teams. Score your hero, offer clarity, CTA, proof, mobile layout, speed, and trust signals before you launch.">
+    <link rel="canonical" href="https://shortformtools.com/landing-page-audit-checklist">
+    <meta property="og:title" content="Landing Page Audit Checklist">
+    <meta property="og:description" content="Score the landing page basics before sending paid traffic, cold outreach, or a launch announcement.">
+    <meta property="og:type" content="website">
+    <meta property="og:image" content="https://shortformtools.com/assets/creator-analytics-workspace.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+    <link rel="manifest" href="site.webmanifest">
+    <link rel="stylesheet" href="styles.css">
+    <script type="application/ld+json">[{"@context":"https://schema.org","@type":"SoftwareApplication","name":"Landing Page Audit Checklist","applicationCategory":"BusinessApplication","operatingSystem":"Web","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"},"url":"https://shortformtools.com/landing-page-audit-checklist"},{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Creator Tools Hub","item":"https://shortformtools.com/"},{"@type":"ListItem","position":2,"name":"Landing Page Audit Checklist","item":"https://shortformtools.com/landing-page-audit-checklist"}]}]</script>
+  </head>
+  <body>
+    <header class="site-header">
+      <nav class="nav" aria-label="Primary">
+        <a class="brand" href="index.html"><img class="brand-logo" src="assets/logo.svg" alt="Creator Tools Hub"></a>
+        <div class="nav-links">
+          <a href="index.html">Home</a>
+          <a href="landing-page-sprint.html">Landing Page Sprint</a>
+          <a href="tool-methodology.html">Methodology</a>
+          <a href="contact.html">Contact</a>
+        </div>
+      </nav>
+    </header>
+
+    <main>
+      <section class="tool-hero">
+        <p class="eyebrow">Landing page audit checklist</p>
+        <h1>Score the landing page basics before you send traffic to it.</h1>
+        <p class="lede">Use this checklist for creator offers, service pages, waitlists, mini SaaS pages, and small-team launches. It turns page quality into a clear score, weakest-section diagnosis, and copy-ready punch list.</p>
+      </section>
+
+      <section class="tool-shell" data-tool="landing-audit">
+        <div class="tool-head">
+          <div>
+            <h2>Landing page scorecard</h2>
+            <p>Rate each area from 1 to 5, then copy the action list into your launch notes.</p>
+          </div>
+        </div>
+        <div class="tool-grid">
+          <div class="form-panel">
+            <div class="field-grid">
+              <div class="field">
+                <label for="auditPageType">Page type</label>
+                <select id="auditPageType">
+                  <option>Service page</option>
+                  <option>Creator offer</option>
+                  <option>Waitlist page</option>
+                  <option>Mini SaaS page</option>
+                  <option>Newsletter or lead magnet</option>
+                </select>
+              </div>
+              <div class="field">
+                <label for="auditGoal">Primary goal</label>
+                <input id="auditGoal" value="Book a call or send an inquiry">
+              </div>
+              <div class="field">
+                <label for="auditHero">Hero clarity</label>
+                <input id="auditHero" type="range" min="1" max="5" value="3">
+              </div>
+              <div class="field">
+                <label for="auditOffer">Offer specificity</label>
+                <input id="auditOffer" type="range" min="1" max="5" value="3">
+              </div>
+              <div class="field">
+                <label for="auditCta">CTA strength</label>
+                <input id="auditCta" type="range" min="1" max="5" value="3">
+              </div>
+              <div class="field">
+                <label for="auditProof">Proof and trust</label>
+                <input id="auditProof" type="range" min="1" max="5" value="2">
+              </div>
+              <div class="field">
+                <label for="auditMobile">Mobile readability</label>
+                <input id="auditMobile" type="range" min="1" max="5" value="3">
+              </div>
+              <div class="field">
+                <label for="auditSpeed">Speed and friction</label>
+                <input id="auditSpeed" type="range" min="1" max="5" value="4">
+              </div>
+              <div class="field">
+                <label for="auditObjection">Objection handling</label>
+                <input id="auditObjection" type="range" min="1" max="5" value="2">
+              </div>
+              <div class="field">
+                <label for="auditSeo">Search intent fit</label>
+                <input id="auditSeo" type="range" min="1" max="5" value="3">
+              </div>
+              <div class="field full-span">
+                <label for="auditNotes">What feels weak right now?</label>
+                <textarea id="auditNotes">The page explains the service, but the first screen and CTA could be sharper.</textarea>
+              </div>
+            </div>
+            <div class="actions">
+              <button type="button" id="copyAuditPlan">Copy audit plan</button>
+            </div>
+          </div>
+
+          <aside class="result-panel" aria-live="polite">
+            <div class="metric">
+              <span class="label">Landing page score</span>
+              <strong id="auditScore">0/100</strong>
+              <div class="meter"><span id="auditMeter"></span></div>
+            </div>
+            <div class="metric"><span class="label">Readiness</span><span id="auditReadiness" class="badge">Needs work</span></div>
+            <div class="metric"><span class="label">Weakest area</span><strong id="auditWeakest">Proof</strong></div>
+            <div class="metric"><span class="label">Next best fix</span><strong id="auditNextFix">Tighten proof</strong></div>
+            <div class="status-list" id="auditRows"></div>
+            <p class="inline-note" id="auditSummary">Rate the page to generate a focused punch list.</p>
+          </aside>
+        </div>
+      </section>
+
+      <section class="section">
+        <div class="content-grid">
+          <article class="content-card">
+            <h3>Hero</h3>
+            <p>The first screen should say who it is for, what outcome it creates, and what action the visitor should take.</p>
+          </article>
+          <article class="content-card">
+            <h3>Proof</h3>
+            <p>Use examples, screenshots, founder credibility, client snippets, numbers, or process detail instead of vague confidence.</p>
+          </article>
+          <article class="content-card">
+            <h3>Friction</h3>
+            <p>Make the CTA obvious, remove competing actions, keep mobile paragraphs short, and explain what happens after the click.</p>
+          </article>
+        </div>
+      </section>
+
+      <section class="section">
+        <div class="creator-crosslink">
+          <div>
+            <h3>Want someone to fix the page fast?</h3>
+            <p>The 48-hour landing page sprint is built for small teams that already have an offer but need a sharper page, better CTA, or a deploy-ready static build.</p>
+          </div>
+          <a class="button primary" href="landing-page-sprint.html">See the landing page sprint</a>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer"><div><a href="about.html">About</a> · <a href="tool-methodology.html">Methodology</a> · <a href="landing-page-sprint.html">Landing Page Sprint</a> · <a href="contact.html">Contact</a> · <a href="privacy.html">Privacy</a> · <a href="terms.html">Terms</a></div></footer>
+    <script src="app.js"></script>
+  </body>
+</html>

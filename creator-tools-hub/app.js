@@ -891,6 +891,84 @@ function initCreatorScriptTimer() {
   render();
 }
 
+function initLandingAuditChecklist() {
+  const shell = document.querySelector("[data-tool='landing-audit']");
+  if (!shell) return;
+
+  const fields = [
+    ["auditHero", "Hero clarity", "Rewrite the first screen so the audience, offer, and outcome are obvious within five seconds."],
+    ["auditOffer", "Offer specificity", "Make the deliverable, timeline, price, or promise more concrete."],
+    ["auditCta", "CTA strength", "Use one primary CTA above the fold and explain what happens after the click."],
+    ["auditProof", "Proof and trust", "Add examples, screenshots, client notes, metrics, or process detail to reduce belief risk."],
+    ["auditMobile", "Mobile readability", "Shorten mobile paragraphs, tighten spacing, and make the CTA easy to tap."],
+    ["auditSpeed", "Speed and friction", "Remove heavy embeds, unnecessary popups, and any form field that does not qualify the lead."],
+    ["auditObjection", "Objection handling", "Answer the biggest reason someone would hesitate before buying or booking."],
+    ["auditSeo", "Search intent fit", "Match the title, H1, intro, and sections to the exact problem people search for."]
+  ];
+  const copy = document.getElementById("copyAuditPlan");
+  let lastPlan = "";
+
+  function render() {
+    const scores = fields.map(([id, label, fix]) => ({
+      id,
+      label,
+      fix,
+      score: Math.max(1, Math.min(5, num(id) || 1))
+    }));
+    const total = scores.reduce((sum, item) => sum + item.score, 0);
+    const score = Math.round((total / (scores.length * 5)) * 100);
+    const sorted = [...scores].sort((a, b) => a.score - b.score);
+    const weakest = sorted[0];
+    const pageType = document.getElementById("auditPageType")?.value || "Landing page";
+    const goal = document.getElementById("auditGoal")?.value.trim() || "primary conversion";
+    const notes = document.getElementById("auditNotes")?.value.trim();
+    const readiness = score >= 82 ? "Ready to send" : score >= 65 ? "Tighten before traffic" : "Needs a focused pass";
+
+    setText("auditScore", `${score}/100`);
+    setText("auditReadiness", readiness);
+    setText("auditWeakest", weakest.label);
+    setText("auditNextFix", weakest.fix);
+    setText("auditSummary", `${pageType} goal: ${goal}. ${score >= 82 ? "The page is close enough to test with real traffic." : "Fix the weakest areas before spending more on distribution."}`);
+    setMeter("auditMeter", score);
+
+    const readinessNode = document.getElementById("auditReadiness");
+    if (readinessNode) {
+      readinessNode.className = `badge ${score >= 82 ? "good" : score >= 65 ? "warn" : "bad"}`;
+    }
+
+    const rows = document.getElementById("auditRows");
+    if (rows) {
+      rows.innerHTML = scores
+        .map((item) => `<div class="status-item"><span>${item.label}</span><strong>${item.score}/5</strong></div>`)
+        .join("");
+    }
+
+    const topFixes = sorted.slice(0, 4).map((item) => `- ${item.fix}`);
+    lastPlan = [
+      `${pageType} landing page audit`,
+      `Primary goal: ${goal}`,
+      `Score: ${score}/100`,
+      `Readiness: ${readiness}`,
+      `Weakest area: ${weakest.label}`,
+      notes ? `Notes: ${notes}` : "",
+      "",
+      "Next fixes:",
+      ...topFixes
+    ].filter(Boolean).join("\n");
+  }
+
+  shell.querySelectorAll("input, select, textarea").forEach((input) => {
+    input.addEventListener("input", render);
+    input.addEventListener("change", render);
+  });
+  copy?.addEventListener("click", async () => {
+    await navigator.clipboard.writeText(lastPlan);
+    copy.textContent = "Copied audit";
+    setTimeout(() => (copy.textContent = "Copy audit plan"), 1200);
+  });
+  render();
+}
+
 initTikTok();
 initLineBreaks();
 initTitleChecker();
@@ -906,3 +984,4 @@ initChannelNameGenerator();
 initContentBriefGenerator();
 initCreatorHookGenerator();
 initCreatorScriptTimer();
+initLandingAuditChecklist();
