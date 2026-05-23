@@ -726,6 +726,202 @@ function initImportMarginTools() {
   });
 }
 
+function readQuoteInputs(scope) {
+  const baseInputs = readToolInputs(scope);
+  return {
+    ...baseInputs,
+    targetSellPrice: safeNumber(byField(scope, "targetSellPrice")?.value),
+    targetMargin: safeNumber(byField(scope, "targetMargin")?.value) / 100,
+    quotes: ["A", "B", "C"].map((key) => ({
+      key,
+      name: byField(scope, `supplier${key}Name`)?.value?.trim() || `Supplier ${key}`,
+      unitCost: safeNumber(byField(scope, `supplier${key}UnitCost`)?.value),
+      units: Math.max(1, safeNumber(byField(scope, `supplier${key}Units`)?.value || 1)),
+      freight: safeNumber(byField(scope, `supplier${key}Freight`)?.value),
+      insurance: safeNumber(byField(scope, `supplier${key}Insurance`)?.value),
+      extra: safeNumber(byField(scope, `supplier${key}Extra`)?.value),
+      defectRate: clamp(safeNumber(byField(scope, `supplier${key}DefectRate`)?.value), 0, 60) / 100,
+      leadDays: safeNumber(byField(scope, `supplier${key}LeadDays`)?.value)
+    }))
+  };
+}
+
+function calculateSupplierQuote(inputs, quote) {
+  const productValue = quote.unitCost * quote.units;
+  const landedInputs = {
+    ...inputs,
+    productValue,
+    shippingCost: quote.freight,
+    insuranceCost: quote.insurance,
+    misc: inputs.misc + quote.extra,
+    units: quote.units
+  };
+  const landed = calculateLandedCost(landedInputs);
+  const sellableUnits = Math.max(1, quote.units * (1 - quote.defectRate));
+  const landedPerSellableUnit = landed.totalLanded / sellableUnits;
+  const grossProfitAtTarget = inputs.targetSellPrice - landedPerSellableUnit;
+  const marginAtTarget = inputs.targetSellPrice > 0 ? (grossProfitAtTarget / inputs.targetSellPrice) * 100 : 0;
+  const denominator = 1 - inputs.targetMargin;
+  const targetPrice = denominator > 0 ? landedPerSellableUnit / denominator : Infinity;
+
+  return {
+    ...quote,
+    productValue,
+    landed,
+    sellableUnits,
+    landedPerSellableUnit,
+    grossProfitAtTarget,
+    marginAtTarget,
+    targetPrice
+  };
+}
+
+function quoteReadout(result, best) {
+  if (result === best && result.marginAtTarget >= 30) return "Best cost and healthy margin";
+  if (result === best) return "Best landed cost";
+  if (result.leadDays < best.leadDays && result.landedPerSellableUnit <= best.landedPerSellableUnit * 1.08) {
+    return "Faster, close-cost backup";
+  }
+  if (result.marginAtTarget < 0) return "Loses money at target sale price";
+  if (result.defectRate >= 0.05) return "Defect allowance is pressuring sellable cost";
+  return "Viable alternate";
+}
+
+function renderSupplierQuoteRows(scope, results, inputs) {
+  const body = byOutput(scope, "quoteRows");
+  if (!body) return;
+  const best = results[0];
+  body.innerHTML = results
+    .map((result, index) => `<tr>
+      <td>${index + 1}</td>
+      <td>${result.name}</td>
+      <td>${formatCurrency(result.unitCost, inputs.currency)}</td>
+      <td>${formatCurrency(result.landedPerSellableUnit, inputs.currency)}</td>
+      <td>${formatCurrency(result.landed.totalLanded, inputs.currency)}</td>
+      <td>${formatPercent(result.marginAtTarget)}</td>
+      <td>${compactNumber.format(result.leadDays)} days</td>
+      <td>${quoteReadout(result, best)}</td>
+    </tr>`)
+    .join("");
+}
+
+function buildSupplierQuoteInsights(results, inputs) {
+  const best = results[0];
+  const highest = results[results.length - 1];
+  const factoryCheapest = [...results].sort((a, b) => a.unitCost - b.unitCost)[0];
+  const notes = [];
+  if (factoryCheapest.name !== best.name) {
+    notes.push(`${factoryCheapest.name} has the lowest factory unit quote, but ${best.name} wins after freight, duty, tax, inspection, and defect allowance.`);
+  } else {
+    notes.push(`${best.name} is also the cheapest on landed cost, not just factory unit quote.`);
+  }
+  if (best.marginAtTarget < inputs.targetMargin * 100) {
+    notes.push(`At the target sale price, the best quote misses the ${formatPercent(inputs.targetMargin * 100)} margin target. It needs about ${formatCurrency(best.targetPrice, inputs.currency)} per unit.`);
+  }
+  if (highest.landedPerSellableUnit > best.landedPerSellableUnit * 1.15) {
+    notes.push(`The landed spread is meaningful: the most expensive quote is ${formatCurrency(highest.landedPerSellableUnit - best.landedPerSellableUnit, inputs.currency)} higher per sellable unit.`);
+  }
+  if (best.defectRate >= 0.04) {
+    notes.push("The winning quote still has a high defect allowance. Ask for inspection evidence or tighten acceptance criteria before issuing the PO.");
+  }
+  if (best.landed.upliftPercent >= 35) {
+    notes.push("Import overhead is high relative to product value, so freight consolidation and brokerage terms may matter as much as supplier negotiation.");
+  }
+  return notes;
+}
+
+function renderSupplierQuoteTool(scope) {
+  const inputs = readQuoteInputs(scope);
+  const results = inputs.quotes
+    .map((quote) => calculateSupplierQuote(inputs, quote))
+    .sort((a, b) => a.landedPerSellableUnit - b.landedPerSellableUnit);
+  const best = results[0];
+  const highest = results[results.length - 1];
+  const spread = highest.landedPerSellableUnit - best.landedPerSellableUnit;
+  const [status, tone] = best.marginAtTarget >= inputs.targetMargin * 100
+    ? ["Best quote clears target", "good"]
+    : best.marginAtTarget >= 0
+      ? ["Best quote needs price work", "warn"]
+      : ["Best quote loses money", "bad"];
+
+  setText(scope, "thresholdNote", inputs.preset.thresholdNote);
+  setText(scope, "assumptionNote", inputs.preset.basisNote);
+  setText(scope, "quoteBestPerUnit", formatCurrency(best.landedPerSellableUnit, inputs.currency));
+  setText(scope, "quoteBestName", best.name);
+  setText(scope, "quoteSpread", formatCurrency(spread, inputs.currency));
+  setText(scope, "quoteBestCash", formatCurrency(best.landed.totalLanded, inputs.currency));
+  setText(scope, "quoteBestMargin", formatPercent(best.marginAtTarget));
+  setText(scope, "quoteTargetPrice", Number.isFinite(best.targetPrice) ? formatCurrency(best.targetPrice, inputs.currency) : "No safe price");
+  setText(scope, "quoteStatus", status);
+  setText(
+    scope,
+    "quoteFormulaLine",
+    `${best.name}: landed cost per sellable unit = ${formatCurrency(best.landed.totalLanded, inputs.currency)} total landed / ${compactNumber.format(best.sellableUnits)} sellable units = ${formatCurrency(best.landedPerSellableUnit, inputs.currency)}.`
+  );
+
+  const statusNode = byOutput(scope, "quoteStatusTone");
+  if (statusNode) statusNode.className = `status-pill ${tone}`;
+  const meter = byOutput(scope, "quoteMeter");
+  if (meter) meter.style.setProperty("--value", `${clamp(best.marginAtTarget, 0, 45) / 45 * 100}%`);
+
+  renderSupplierQuoteRows(scope, results, inputs);
+  const insightList = byOutput(scope, "quoteInsights");
+  if (insightList) {
+    insightList.innerHTML = buildSupplierQuoteInsights(results, inputs)
+      .map((item) => `<li>${item}</li>`)
+      .join("");
+  }
+
+  window.currentSupplierQuoteReport = { inputs, results };
+}
+
+function initSupplierQuoteTools() {
+  document.querySelectorAll("[data-supplier-quote-tool]").forEach((scope) => {
+    const marketField = byField(scope, "market");
+    if (marketField) {
+      applyPreset(scope, marketField.value || "US");
+      marketField.addEventListener("change", () => {
+        applyPreset(scope, marketField.value);
+        renderSupplierQuoteTool(scope);
+      });
+    }
+
+    scope.querySelectorAll("input, select").forEach((field) => {
+      field.addEventListener("input", () => renderSupplierQuoteTool(scope));
+      field.addEventListener("change", () => renderSupplierQuoteTool(scope));
+    });
+
+    const copyButton = byOutput(scope, "copyQuoteSummary");
+    copyButton?.addEventListener("click", async () => {
+      const report = window.currentSupplierQuoteReport;
+      if (!report) return;
+      const best = report.results[0];
+      const lines = [
+        "Import supplier quote comparison",
+        `Recommended supplier: ${best.name}`,
+        `Best landed cost per sellable unit: ${formatCurrency(best.landedPerSellableUnit, report.inputs.currency)}`,
+        `Total landed cash tied up: ${formatCurrency(best.landed.totalLanded, report.inputs.currency)}`,
+        `Margin at target sale price: ${formatPercent(best.marginAtTarget)}`,
+        `Sell price for target margin: ${Number.isFinite(best.targetPrice) ? formatCurrency(best.targetPrice, report.inputs.currency) : "No safe price"}`
+      ];
+      try {
+        await navigator.clipboard.writeText(lines.join("\n"));
+        copyButton.textContent = "Copied";
+        window.setTimeout(() => {
+          copyButton.textContent = "Copy quote comparison";
+        }, 1200);
+      } catch (_error) {
+        copyButton.textContent = "Copy failed";
+        window.setTimeout(() => {
+          copyButton.textContent = "Copy quote comparison";
+        }, 1200);
+      }
+    });
+
+    renderSupplierQuoteTool(scope);
+  });
+}
+
 function initLandedCostTools() {
   const tools = document.querySelectorAll("[data-landed-cost-tool]");
   tools.forEach((scope) => {
@@ -941,5 +1137,6 @@ document.addEventListener("DOMContentLoaded", () => {
   initConsentAndAds();
   initLandedCostTools();
   initImportMarginTools();
+  initSupplierQuoteTools();
   initHsBriefBuilder();
 });
