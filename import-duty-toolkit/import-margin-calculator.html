@@ -1,0 +1,231 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Import Margin Calculator: Landed Cost to Resale Price</title>
+    <meta name="description" content="Use this import margin calculator to turn landed cost, duty, VAT, freight, marketplace fees, fulfillment cost, and target margin into a resale price.">
+    <meta name="google-adsense-account" content="ca-pub-4259477754165351">
+    <link rel="canonical" href="https://crossborderkit.com/import-margin-calculator.html">
+    <meta property="og:title" content="Import Margin Calculator">
+    <meta property="og:description" content="Estimate resale margin and target sale price after landed cost, duty, VAT, freight, and channel fees.">
+    <meta property="og:type" content="article">
+    <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+    <link rel="manifest" href="site.webmanifest">
+    <link rel="stylesheet" href="styles.css">
+    <script type="application/ld+json">{"@context":"https://schema.org","@type":"WebPage","name":"Import Margin Calculator","url":"https://crossborderkit.com/import-margin-calculator.html","description":"Estimate resale margin and target sale price after landed cost, duty, VAT, freight, and channel fees.","dateModified":"2026-05-23","isPartOf":{"@type":"WebSite","name":"Import Duty Toolkit","url":"https://crossborderkit.com/"}}</script>
+    <script type="application/ld+json">{"@context":"https://schema.org","@type":"SoftwareApplication","name":"Import Margin Calculator","applicationCategory":"BusinessApplication","operatingSystem":"Web","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"},"url":"https://crossborderkit.com/import-margin-calculator.html"}</script>
+  </head>
+  <body>
+    <header class="site-header">
+      <nav class="nav" aria-label="Primary">
+        <a class="brand" href="index.html">
+          <span class="brand-mark">ID</span>
+          <span class="brand-lockup">
+            <strong>Import Duty Toolkit</strong>
+            <span>Landed-cost planning for trade operators</span>
+          </span>
+        </a>
+        <div class="nav-links">
+          <a href="import-duty-calculator.html">Duty calculator</a>
+          <a href="landed-cost-calculator.html">Landed cost</a>
+          <a href="import-margin-calculator.html">Margin</a>
+          <a href="how-to-estimate-import-duty.html">How to estimate</a>
+          <a href="hs-code-lookup-guide.html">HS code guide</a>
+        </div>
+      </nav>
+    </header>
+
+    <main>
+      <section class="page-hero">
+        <div class="page-copy">
+          <p class="eyebrow">Import margin calculator</p>
+          <h1>Turn landed cost into the resale price your margin actually needs.</h1>
+          <p class="lede">Estimate per-unit landed cost first, then add marketplace fees, fulfillment costs, return allowance, and target margin. Use it before quoting an imported SKU, launching a marketplace listing, or approving a reorder.</p>
+          <div class="inline-actions">
+            <a class="button primary" href="#margin-tool">Open margin calculator</a>
+            <a class="button ghost" href="landed-cost-calculator.html">Start with landed cost</a>
+          </div>
+        </div>
+        <aside class="rail-card">
+          <span class="stamp">Best after the landed-cost pass</span>
+          <div class="data-stack">
+            <div class="data-row"><span>Use for</span><strong>Resale price floors</strong></div>
+            <div class="data-row"><span>Compares</span><strong>Freight, duty, and channel pressure</strong></div>
+            <div class="data-row"><span>Reviewed</span><strong><span data-review-date></span></strong></div>
+          </div>
+        </aside>
+      </section>
+
+      <section class="section" id="margin-tool">
+        <section class="tool-shell" data-import-margin-tool>
+          <div class="tool-head">
+            <div>
+              <h2>Import resale margin planner</h2>
+              <p>Use the left side to model landed cost and the channel section to convert that into a resale-margin decision.</p>
+            </div>
+            <span class="status-pill" data-output="marginStatusTone"><span data-output="marginStatus">Workable</span></span>
+          </div>
+
+          <div class="tool-grid">
+            <div class="form-panel">
+              <div class="field-grid">
+                <div class="field full">
+                  <label for="marginMarket">Destination market preset</label>
+                  <select id="marginMarket" data-field="market">
+                    <option value="US">United States</option>
+                    <option value="UK">United Kingdom</option>
+                    <option value="EU">EU-like VAT mode</option>
+                    <option value="CUSTOM">Custom</option>
+                  </select>
+                  <span class="hint" data-output="thresholdNote"></span>
+                </div>
+                <div class="field">
+                  <label for="marginProductValue">Product value</label>
+                  <input id="marginProductValue" data-field="productValue" type="number" min="0" step="0.01" value="4200">
+                </div>
+                <div class="field">
+                  <label for="marginUnits">Units in shipment</label>
+                  <input id="marginUnits" data-field="units" type="number" min="1" step="1" value="700">
+                </div>
+                <div class="field">
+                  <label for="marginShipping">Shipping cost</label>
+                  <input id="marginShipping" data-field="shippingCost" type="number" min="0" step="0.01" value="360">
+                </div>
+                <div class="field">
+                  <label for="marginInsurance">Insurance cost</label>
+                  <input id="marginInsurance" data-field="insuranceCost" type="number" min="0" step="0.01" value="42">
+                </div>
+                <div class="field">
+                  <label for="marginDutyRate">Duty rate</label>
+                  <input id="marginDutyRate" data-field="dutyRate" type="number" min="0" step="0.1" value="6">
+                </div>
+                <div class="field">
+                  <label for="marginTaxRate">Additional tax or VAT rate</label>
+                  <input id="marginTaxRate" data-field="taxRate" type="number" min="0" step="0.1" value="20">
+                </div>
+                <div class="field">
+                  <label for="marginBrokerage">Brokerage or customs fees</label>
+                  <input id="marginBrokerage" data-field="brokerage" type="number" min="0" step="0.01" value="58">
+                </div>
+                <div class="field">
+                  <label for="marginMisc">Misc landed cost</label>
+                  <input id="marginMisc" data-field="misc" type="number" min="0" step="0.01" value="22">
+                </div>
+                <div class="field">
+                  <label for="marginBuffer">FX or compliance buffer %</label>
+                  <input id="marginBuffer" data-field="bufferRate" type="number" min="0" step="0.1" value="2.5">
+                </div>
+                <div class="field">
+                  <label for="marginThreshold">Low-value threshold</label>
+                  <input id="marginThreshold" data-field="threshold" type="number" min="0" step="0.01" value="150">
+                </div>
+                <label class="check-row span-2"><input data-field="useDeMinimis" type="checkbox" checked> <span>Apply low-value relief when eligible</span></label>
+
+                <div class="group-title span-2">Resale channel assumptions</div>
+                <div class="field">
+                  <label for="salePrice">Current sale price per unit</label>
+                  <input id="salePrice" data-field="salePrice" type="number" min="0" step="0.01" value="14.99">
+                </div>
+                <div class="field">
+                  <label for="marketplaceFeeRate">Marketplace or payment fee %</label>
+                  <input id="marketplaceFeeRate" data-field="marketplaceFeeRate" type="number" min="0" step="0.1" value="12">
+                </div>
+                <div class="field">
+                  <label for="fulfillmentCost">Fulfillment cost per unit</label>
+                  <input id="fulfillmentCost" data-field="fulfillmentCost" type="number" min="0" step="0.01" value="1.75">
+                </div>
+                <div class="field">
+                  <label for="returnAllowanceRate">Return or shrink allowance %</label>
+                  <input id="returnAllowanceRate" data-field="returnAllowanceRate" type="number" min="0" step="0.1" value="3">
+                </div>
+                <div class="field">
+                  <label for="targetMargin">Target gross margin %</label>
+                  <input id="targetMargin" data-field="targetMargin" type="number" min="0" max="80" step="0.1" value="30">
+                </div>
+              </div>
+
+              <details class="details-block">
+                <summary>Advanced customs assumptions</summary>
+                <div class="details-grid">
+                  <div class="field">
+                    <label for="marginRelief">Threshold treatment</label>
+                    <select id="marginRelief" data-field="reliefMode">
+                      <option value="none">No automatic relief</option>
+                      <option value="duty-only">Waive duty only</option>
+                      <option value="duty-and-tax">Waive duty and tax</option>
+                    </select>
+                  </div>
+                  <label class="check-row"><input data-field="includeShippingInDuty" type="checkbox" checked> <span>Include shipping in duty base</span></label>
+                  <label class="check-row"><input data-field="includeInsuranceInDuty" type="checkbox" checked> <span>Include insurance in duty base</span></label>
+                  <label class="check-row"><input data-field="taxIncludesDuty" type="checkbox" checked> <span>Apply tax on top of duty</span></label>
+                  <label class="check-row"><input data-field="taxIncludesBrokerage" type="checkbox" checked> <span>Include brokerage in tax base</span></label>
+                </div>
+                <p class="inline-note" data-output="assumptionNote"></p>
+              </details>
+            </div>
+
+            <aside class="result-panel" aria-live="polite">
+              <div class="metric-large">
+                <span>Profit per unit</span>
+                <strong data-output="resaleProfit">-</strong>
+                <div class="meter" data-output="marginMeter"></div>
+              </div>
+              <div class="kpi-grid">
+                <div class="kpi"><span>Landed cost per unit</span><strong data-output="landedPerUnit">-</strong></div>
+                <div class="kpi"><span>Gross margin</span><strong data-output="resaleMargin">-</strong></div>
+                <div class="kpi"><span>Target resale price</span><strong data-output="targetResalePrice">-</strong></div>
+                <div class="kpi"><span>Break-even resale price</span><strong data-output="breakEvenResalePrice">-</strong></div>
+                <div class="kpi"><span>Channel costs</span><strong data-output="channelCosts">-</strong></div>
+              </div>
+              <div class="formula-line" data-output="marginFormulaLine"></div>
+              <ul class="insights-list" data-output="marginInsights"></ul>
+              <div class="hero-actions">
+                <button type="button" data-output="copyMarginSummary">Copy margin plan</button>
+                <a class="button ghost" href="landed-cost-calculator.html">Open landed-cost page</a>
+              </div>
+            </aside>
+          </div>
+
+          <div class="content-grid">
+            <div class="content-panel">
+              <h3>Margin pressure table</h3>
+              <div class="table-wrap">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Scenario</th>
+                      <th>Landed/unit</th>
+                      <th>Sale price</th>
+                      <th>Profit/unit</th>
+                      <th>Margin</th>
+                      <th>Status</th>
+                    </tr>
+                  </thead>
+                  <tbody data-output="marginScenarioRows"></tbody>
+                </table>
+              </div>
+            </div>
+            <div class="content-panel">
+              <h3>Use this before</h3>
+              <ul class="checklist">
+                <li>Publishing a marketplace listing for imported inventory.</li>
+                <li>Quoting wholesale buyers with a landed-cost-sensitive SKU.</li>
+                <li>Approving a reorder when freight, duty, or channel fees have moved.</li>
+              </ul>
+            </div>
+          </div>
+        </section>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        <span>Preset assumptions reviewed <span data-review-date></span>. Planning tool only, not legal or tax advice.</span>
+        <span><a href="about.html">About</a> · <a href="contact.html">Contact</a> · <a href="privacy.html">Privacy</a> · <a href="terms.html">Terms</a></span>
+      </div>
+    </footer>
+
+    <script src="app.js"></script>
+  </body>
+</html>
