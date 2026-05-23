@@ -1274,9 +1274,12 @@ function initAddressGenerator() {
   const previewContact = shell.querySelector(".address-preview-contact");
   const feedback = shell.querySelector(".copy-feedback");
   const copyButtons = shell.querySelectorAll("[data-copy-address]");
+  const downloadButton = shell.querySelector("[data-download-address-card]");
+  const printButton = shell.querySelector("[data-print-address-card]");
 
   let activePreset = "taxi";
   let payloads = { zh: "", en: "", full: "" };
+  let hasCoreDetails = false;
 
   function evaluate() {
     const preset = addressCardPresets[activePreset] || addressCardPresets.taxi;
@@ -1291,6 +1294,7 @@ function initAddressGenerator() {
     const noteEn = (noteEnField?.value || "").trim() || preset.defaultNoteEn;
     const noteZh = (noteZhField?.value || "").trim() || preset.defaultNoteZh;
     const hasCore = [placeEn, placeZh, lineEn, lineZh].some(Boolean);
+    hasCoreDetails = hasCore;
 
     requestEnNode.textContent = preset.requestEn;
     requestZhNode.textContent = preset.requestZh;
@@ -1315,9 +1319,11 @@ function initAddressGenerator() {
     copyButtons.forEach((button) => {
       button.disabled = !hasCore;
     });
+    if (downloadButton) downloadButton.disabled = !hasCore;
+    if (printButton) printButton.disabled = !hasCore;
     if (feedback) {
       feedback.textContent = hasCore
-        ? "Copy the version that fits the moment: Chinese only for quick showing, or bilingual if someone wants both."
+        ? "Copy, save, or print the version that fits the moment: Chinese only for quick showing, or bilingual if someone wants both."
         : "Add at least a place name or address to generate a copy-ready card.";
     }
   }
@@ -1338,6 +1344,19 @@ function initAddressGenerator() {
         feedback.textContent = ok ? "Copied. Keep the card in your notes or photo favorites before the trip." : "Copy failed in the browser. Try selecting the text manually.";
       }
     });
+  });
+
+  downloadButton?.addEventListener("click", () => {
+    const ok = downloadTextFile("china-address-card.txt", payloads.full);
+    if (feedback) {
+      feedback.textContent = ok ? "Saved as a text file. Keep it available offline with your booking or map screenshot." : "Add a place name or address before saving the card.";
+    }
+  });
+
+  printButton?.addEventListener("click", () => {
+    if (!hasCoreDetails) return;
+    if (feedback) feedback.textContent = "Opening print dialog for the card area.";
+    printTravelCard(shell);
   });
 
   [
@@ -1659,8 +1678,11 @@ function initAllergyGenerator() {
   const previewContact = shell.querySelector(".allergy-preview-contact");
   const feedback = shell.querySelector(".copy-feedback");
   const copyButtons = shell.querySelectorAll("[data-copy-allergy]");
+  const downloadButton = shell.querySelector("[data-download-allergy-card]");
+  const printButton = shell.querySelector("[data-print-allergy-card]");
 
   let payloads = { zh: "", en: "", full: "" };
+  let hasCoreDetails = false;
 
   function evaluate() {
     const severity = severityField?.value || "severe";
@@ -1674,6 +1696,7 @@ function initAllergyGenerator() {
     const contactName = (contactNameField?.value || "").trim();
     const contactPhone = (contactPhoneField?.value || "").trim();
     const hasCore = selected.length > 0 || Boolean(diet);
+    hasCoreDetails = hasCore;
 
     if (!hasCore) {
       replaceLines(previewZh, ["请选择至少一种过敏原，或加入饮食限制说明。"]);
@@ -1683,6 +1706,8 @@ function initAllergyGenerator() {
       copyButtons.forEach((button) => {
         button.disabled = true;
       });
+      if (downloadButton) downloadButton.disabled = true;
+      if (printButton) printButton.disabled = true;
       if (feedback) {
         feedback.textContent = "Choose at least one allergy or a diet note to build the card.";
       }
@@ -1743,8 +1768,10 @@ function initAllergyGenerator() {
     copyButtons.forEach((button) => {
       button.disabled = false;
     });
+    if (downloadButton) downloadButton.disabled = false;
+    if (printButton) printButton.disabled = false;
     if (feedback) {
-      feedback.textContent = "Show the Chinese card before ordering, and keep the English backup if someone wants to double-check.";
+      feedback.textContent = "Show the Chinese card before ordering, and keep an offline or printed backup if someone wants to double-check.";
     }
   }
 
@@ -1768,6 +1795,19 @@ function initAllergyGenerator() {
         feedback.textContent = ok ? "Copied. Keep the card open before you order." : "Copy failed in the browser. Try selecting the card text manually.";
       }
     });
+  });
+
+  downloadButton?.addEventListener("click", () => {
+    const ok = downloadTextFile("china-allergy-card.txt", payloads.full);
+    if (feedback) {
+      feedback.textContent = ok ? "Saved as a text file. Keep it reachable before restaurant, cafe, or hotel breakfast ordering." : "Choose an allergy or diet note before saving the card.";
+    }
+  });
+
+  printButton?.addEventListener("click", () => {
+    if (!hasCoreDetails) return;
+    if (feedback) feedback.textContent = "Opening print dialog for the card area.";
+    printTravelCard(shell);
   });
 
   evaluate();
