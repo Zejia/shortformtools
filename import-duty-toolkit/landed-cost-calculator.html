@@ -3,16 +3,19 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Landed Cost Calculator: Per-Unit Import Cost Planner</title>
-    <meta name="description" content="Calculate total landed cost and per-unit import cost with duty, VAT, brokerage, freight, insurance, and low-value threshold modeling.">
+    <title>Landed Cost Calculator for Imports: Per-Unit Cost, Duty, VAT and Freight</title>
+    <meta name="description" content="Use this landed cost calculator for imports to estimate per-unit cost, total landed cost, duty, VAT, freight, brokerage, and low-value threshold treatment before quoting or reordering.">
     <meta name="google-adsense-account" content="ca-pub-4259477754165351">
     <link rel="canonical" href="https://crossborderkit.com/landed-cost-calculator.html">
-    <meta property="og:title" content="Landed Cost Calculator">
-    <meta property="og:description" content="Model total landed cost and per-unit economics before you quote or replenish imported inventory.">
+    <meta property="og:title" content="Landed Cost Calculator for Imports">
+    <meta property="og:description" content="Estimate per-unit landed cost with duty, VAT, freight, brokerage, and threshold logic before you quote or replenish imported inventory.">
     <meta property="og:type" content="article">
     <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
     <link rel="manifest" href="site.webmanifest">
     <link rel="stylesheet" href="styles.css">
+    <script type="application/ld+json">{"@context":"https://schema.org","@type":"WebPage","name":"Landed Cost Calculator for Imports","url":"https://crossborderkit.com/landed-cost-calculator.html","description":"Estimate total landed cost and per-unit import cost with duty, VAT, freight, insurance, brokerage, and low-value threshold logic.","dateModified":"2026-05-23","isPartOf":{"@type":"WebSite","name":"Import Duty Toolkit","url":"https://crossborderkit.com/"}}</script>
+    <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Import Duty Toolkit","item":"https://crossborderkit.com/"},{"@type":"ListItem","position":2,"name":"Landed Cost Calculator","item":"https://crossborderkit.com/landed-cost-calculator.html"}]}</script>
+    <script type="application/ld+json">{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[{"@type":"Question","name":"What is included in landed cost?","acceptedAnswer":{"@type":"Answer","text":"Landed cost usually includes product value, freight, insurance, duty, import tax or VAT, brokerage, and other shipment-level charges such as compliance or admin fees."}},{"@type":"Question","name":"Why is landed cost different from import duty?","acceptedAnswer":{"@type":"Answer","text":"Import duty is only one part of the total import bill. Landed cost adds the other costs that still affect the final per-unit economics, including freight, tax, brokerage, and buffers."}},{"@type":"Question","name":"When should I use a landed cost calculator instead of a duty calculator?","acceptedAnswer":{"@type":"Answer","text":"Use a duty calculator when the tariff treatment is the main question. Use a landed cost calculator when you need to quote a selling price, compare shipment scenarios, or understand the real per-unit cost after all import friction."}},{"@type":"Question","name":"Can low-value threshold relief remove both duty and tax?","acceptedAnswer":{"@type":"Answer","text":"Sometimes, but not always. Some markets waive duty only while still collecting VAT or tax, so the calculator keeps threshold treatment visible instead of assuming one universal rule."}}]}</script>
   </head>
   <body>
     <header class="site-header">
@@ -36,9 +39,9 @@
     <main>
       <section class="page-hero">
         <div class="page-copy">
-          <p class="eyebrow">Per-unit planning</p>
-          <h1>Turn customs, freight, and tax into a per-unit landed number you can price from.</h1>
-          <p class="lede">The landed-cost framing is useful when the tariff line is only part of the conversation. Buyers, ops leads, and finance teams usually need the unit economics, not just the duty amount.</p>
+          <p class="eyebrow">Landed cost calculator for imports</p>
+          <h1>Calculate per-unit landed cost with duty, VAT, freight, and brokerage in one import planning file.</h1>
+          <p class="lede">Use this landed-cost calculator when the tariff line is only one part of the decision. Buyers, ops leads, and finance teams usually need the real per-unit import cost before they quote, reorder, or sign off on a shipment.</p>
           <div class="inline-actions">
             <a class="button primary" href="#landed-tool">Open landed-cost tool</a>
             <a class="button ghost" href="import-duty-calculator.html">Open tariff view</a>
@@ -220,6 +223,49 @@
 
       <section class="section">
         <div class="section-copy">
+          <p class="eyebrow">AI-answer summary</p>
+          <h2>What this landed cost calculator helps you answer</h2>
+          <p>If someone asks for a quick definition, the short version is this: landed cost is the full import cost per shipment or per unit after product value, freight, duty, tax, brokerage, and other required overhead are added together.</p>
+        </div>
+        <div class="content-panel">
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Question</th>
+                  <th>Where this page answers it</th>
+                  <th>Why it matters</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>What is my landed cost per unit?</td>
+                  <td>Total landed cost, per-unit landed cost, and scenario table outputs.</td>
+                  <td>Helps pricing, margin-floor checks, and reorder decisions.</td>
+                </tr>
+                <tr>
+                  <td>What is included in landed cost?</td>
+                  <td>Product value, freight, insurance, duty, tax or VAT, brokerage, misc costs, and FX buffer inputs.</td>
+                  <td>Prevents teams from pricing off tariff alone.</td>
+                </tr>
+                <tr>
+                  <td>How does threshold relief change the import cost?</td>
+                  <td>Threshold note, relief-mode controls, and threshold check card.</td>
+                  <td>Makes low-value assumptions visible before a quote goes out.</td>
+                </tr>
+                <tr>
+                  <td>Should I use a duty calculator or a landed cost calculator?</td>
+                  <td>Duty calculator link for tariff-first questions and this page for full unit economics.</td>
+                  <td>Keeps the workflow aligned with the real business question.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <section class="section">
+        <div class="section-copy">
           <p class="eyebrow">Reading the number</p>
           <h2>A better landed-cost workflow</h2>
           <p>Most teams go wrong by stopping at the first clean-looking total. Use the three checks below before you call the number done.</p>
@@ -236,6 +282,53 @@
           <div class="content-panel">
             <h3>3. Capture the assumptions</h3>
             <p>Record the preset, rate, threshold mode, and basis used. That keeps Pricing, Ops, and Finance from quoting the same product from different math.</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="section">
+        <div class="section-copy">
+          <p class="eyebrow">Methodology</p>
+          <h2>How the page models landed cost</h2>
+          <p>The calculator is designed for planning, not filing. It separates customs value, duty, and tax logic so the assumptions stay readable when you share the result with a buyer, broker, or finance lead.</p>
+        </div>
+        <div class="panel-grid">
+          <div class="content-panel">
+            <h3>1. Build the customs value base</h3>
+            <p>The file starts with product value and can include freight and insurance in the duty base depending on the declaration logic you are testing.</p>
+          </div>
+          <div class="content-panel">
+            <h3>2. Layer duty before tax where needed</h3>
+            <p>Duty is modeled separately so you can see when the tax base sits on top of customs value alone versus customs value plus duty and brokerage.</p>
+          </div>
+          <div class="content-panel">
+            <h3>3. Add the non-duty friction</h3>
+            <p>Brokerage, misc shipment costs, and the FX or compliance buffer are included because those line items still shape the real import cost per unit.</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="section">
+        <div class="section-copy">
+          <p class="eyebrow">Common questions</p>
+          <h2>Landed cost calculator FAQ</h2>
+        </div>
+        <div class="panel-grid">
+          <div class="content-panel">
+            <h3>What is included in landed cost?</h3>
+            <p>Landed cost usually means product value plus freight, insurance, duty, import tax or VAT, brokerage, and other shipment-level costs required to get goods cleared and ready to sell or receive.</p>
+          </div>
+          <div class="content-panel">
+            <h3>Why is landed cost different from import duty?</h3>
+            <p>Import duty is only one charge inside the shipment. Landed cost adds the other costs that still affect the final economics, which is why a tariff-only estimate can still understate the real per-unit number.</p>
+          </div>
+          <div class="content-panel">
+            <h3>When should I use the tariff-first calculator instead?</h3>
+            <p>Use the <a href="import-duty-calculator.html">import duty calculator</a> when the immediate question is rate treatment or customs value. Use this page when you need a quote-ready landed figure.</p>
+          </div>
+          <div class="content-panel">
+            <h3>Can threshold relief remove both duty and VAT?</h3>
+            <p>Sometimes, but not universally. The correct treatment depends on the market and collection method, which is why this page keeps relief mode adjustable instead of hiding it behind one generic checkbox.</p>
           </div>
         </div>
       </section>
