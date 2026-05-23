@@ -1,0 +1,181 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>China Hotel Check-In Card Generator for Foreign Travelers</title>
+    <meta name="description" content="Create a bilingual China hotel check-in card with guest name, reservation number, arrival time, phone, and front-desk requests.">
+    <meta name="google-adsense-account" content="ca-pub-4259477754165351">
+    <link rel="canonical" href="https://chinaentrytoolkit.com/china-hotel-check-in-card-generator.html">
+    <meta property="og:title" content="China Hotel Check-In Card Generator">
+    <meta property="og:description" content="Build a Chinese-English hotel check-in card you can show at the front desk after arrival in China.">
+    <meta property="og:type" content="website">
+    <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+    <link rel="manifest" href="site.webmanifest">
+    <link rel="stylesheet" href="styles.css">
+  </head>
+  <body>
+    <header class="site-header">
+      <nav class="nav" aria-label="Primary">
+        <a class="brand" href="index.html"><img src="assets/logo.svg" alt="China Entry Toolkit"></a>
+        <div class="nav-links">
+          <a href="china-visa-free-checker.html">Visa-Free Checker</a>
+          <a href="china-transit-without-visa-checker.html">Transit Checker</a>
+          <a href="china-arrival-checklist.html">Arrival Checklist</a>
+          <a href="china-payment-setup-for-foreigners.html">Payment Setup</a>
+          <a href="china-stay-length-calculator.html">Stay Calculator</a>
+        </div>
+      </nav>
+    </header>
+
+    <main>
+      <section class="page-hero">
+        <div class="hero-copy">
+          <p class="eyebrow">Arrival support tool</p>
+          <h1>Make a China hotel check-in card before the front-desk conversation starts.</h1>
+          <p class="lede">Use this generator for late arrivals, reservation lookups, deposit questions, Wi-Fi help, or any moment where you need a clean Chinese-first card at the hotel desk.</p>
+          <div class="hero-actions">
+            <a class="button primary" href="#hotel-card">Build the hotel card</a>
+            <a class="button ghost" href="china-arrival-checklist.html">Review arrival checklist</a>
+          </div>
+        </div>
+        <aside class="detail-shell">
+          <span class="stamp">Best before landing</span>
+          <div class="fact-strip">
+            <div class="fact"><strong>Front desk</strong><span>Chinese-first check-in wording with English backup</span></div>
+            <div class="fact"><strong>Copy-ready</strong><span>Save the card in notes or screenshots before arrival</span></div>
+            <div class="fact"><strong>Low risk</strong><span>No machine translation of names or addresses</span></div>
+          </div>
+        </aside>
+      </section>
+
+      <section class="section" id="hotel-card">
+        <div class="tool-shell" data-hotel-card-generator>
+          <div class="tool-head">
+            <div>
+              <h2>Hotel check-in card builder</h2>
+              <p>Choose the scenario, then add only the details you are comfortable showing to front-desk staff.</p>
+            </div>
+          </div>
+
+          <div class="tool-body">
+            <div class="form-panel">
+              <div class="field">
+                <label>Card type</label>
+                <div class="toggle-group">
+                  <button type="button" data-hotel-card-preset="checkin" aria-pressed="true">Check-in</button>
+                  <button type="button" data-hotel-card-preset="late" aria-pressed="false">Late arrival</button>
+                  <button type="button" data-hotel-card-preset="help" aria-pressed="false">Need help</button>
+                </div>
+              </div>
+
+              <div class="field-grid">
+                <div class="field">
+                  <label for="hotelNameEn">Hotel name in English</label>
+                  <input id="hotelNameEn" class="hotel-name-en" type="text" placeholder="Example: Grand Hyatt Beijing">
+                </div>
+                <div class="field">
+                  <label for="hotelNameZh">Hotel name in Chinese</label>
+                  <input id="hotelNameZh" class="hotel-name-zh" type="text" placeholder="例：北京东方君悦大酒店">
+                </div>
+                <div class="field">
+                  <label for="hotelGuestName">Guest name</label>
+                  <input id="hotelGuestName" class="hotel-guest-name" type="text" placeholder="Name on the booking">
+                </div>
+                <div class="field">
+                  <label for="hotelBookingCode">Reservation or booking number</label>
+                  <input id="hotelBookingCode" class="hotel-booking-code" type="text" placeholder="Booking reference">
+                </div>
+                <div class="field">
+                  <label for="hotelArrivalTime">Expected arrival time</label>
+                  <input id="hotelArrivalTime" class="hotel-arrival-time" type="text" placeholder="Example: tonight around 23:30">
+                </div>
+                <div class="field">
+                  <label for="hotelPhone">Phone or WeChat ID</label>
+                  <input id="hotelPhone" class="hotel-phone" type="text" placeholder="Optional contact number">
+                </div>
+                <div class="field full-span">
+                  <label for="hotelRoomNeed">Room or check-in request</label>
+                  <input id="hotelRoomNeed" class="hotel-room-need" type="text" placeholder="Example: non-smoking room, one bed, help with Wi-Fi">
+                </div>
+                <div class="field full-span">
+                  <label for="hotelNoteEn">Extra note in English</label>
+                  <input id="hotelNoteEn" class="hotel-note-en" type="text" placeholder="Optional English note">
+                </div>
+                <div class="field full-span">
+                  <label for="hotelNoteZh">Extra note in Chinese</label>
+                  <input id="hotelNoteZh" class="hotel-note-zh" type="text" placeholder="可选中文补充说明">
+                </div>
+              </div>
+
+              <div class="note-box">
+                <h3>Privacy note</h3>
+                <p>This tool runs in your browser. Still, only add details you are comfortable showing at the front desk. You can leave phone, arrival time, and booking number blank if not needed.</p>
+              </div>
+            </div>
+
+            <div class="result-panel">
+              <span class="status-pill good">Ready to show</span>
+              <div class="copy-row">
+                <button type="button" class="primary" data-copy-hotel-card="full">Copy bilingual card</button>
+                <button type="button" data-copy-hotel-card="zh">Copy Chinese only</button>
+                <button type="button" data-copy-hotel-card="en">Copy English only</button>
+              </div>
+              <p class="copy-feedback" aria-live="polite">Add the hotel name, guest name, or booking code to generate a copy-ready card.</p>
+
+              <article class="preview-card preview-card-zh">
+                <span class="preview-eyebrow hotel-preview-title-zh">酒店入住</span>
+                <p class="preview-kicker hotel-request-zh">您好，我有预订，想办理入住。</p>
+                <div class="preview-lines hotel-preview-zh"></div>
+              </article>
+
+              <article class="preview-card">
+                <span class="preview-eyebrow hotel-preview-title-en">Hotel check-in</span>
+                <p class="preview-kicker hotel-request-en">Hello, I have a reservation and would like to check in.</p>
+                <div class="preview-lines hotel-preview-en"></div>
+              </article>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="section">
+        <div class="split-grid">
+          <div class="source-box">
+            <h2>Good use cases</h2>
+            <p>Late-night arrivals, front-desk reservation lookup, deposit questions, Wi-Fi help, room-card problems, or showing a booking detail when mobile translation is slow.</p>
+          </div>
+          <div class="source-box">
+            <h2>What to prepare too</h2>
+            <p>Keep your passport, booking confirmation, hotel address in Chinese, payment backup, and a screenshot of this card available offline before leaving the airport or station.</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="section">
+        <div class="tool-grid">
+          <a class="utility-tile" href="china-address-card-generator.html">
+            <h3>Build an address card</h3>
+            <p>Use this if the bigger problem is getting to the hotel, not checking in once you arrive.</p>
+          </a>
+          <a class="utility-tile" href="china-arrival-checklist.html">
+            <h3>Arrival checklist</h3>
+            <p>Check payment, data, ride-hailing, hotel address, and food communication before the flight.</p>
+          </a>
+          <a class="utility-tile" href="china-payment-setup-for-foreigners.html">
+            <h3>Payment setup</h3>
+            <p>Review payment backups before a deposit, vending machine, or first convenience-store purchase.</p>
+          </a>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <div class="foot">
+        <div><a href="about.html">About</a> · <a href="contact.html">Contact</a> · <a href="privacy.html">Privacy</a> · <a href="terms.html">Terms</a></div>
+        <div>Reviewed against official sources on <span data-policy-review></span>.</div>
+      </div>
+    </footer>
+    <script src="app.js"></script>
+  </body>
+</html>
