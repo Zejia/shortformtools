@@ -144,6 +144,33 @@ const addressCardPresets = {
   }
 };
 
+const taxiRideCardPresets = {
+  airport: {
+    titleEn: "Airport or station pickup",
+    titleZh: "机场或车站上车",
+    requestEn: "Hello, I am waiting at this pickup point. Please contact me if you cannot find me.",
+    requestZh: "您好，我在这个上车点等车。如果找不到我，请联系我。",
+    noteEn: "I have luggage. Please go to the pickup area if possible.",
+    noteZh: "我有行李。如可以，请到上车区接我。"
+  },
+  hotel: {
+    titleEn: "Ride to hotel",
+    titleZh: "前往酒店",
+    requestEn: "Please take me to this hotel or address.",
+    requestZh: "请带我去这个酒店或地址。",
+    noteEn: "Please stop near the main entrance.",
+    noteZh: "请在正门附近停车。"
+  },
+  driver: {
+    titleEn: "Driver help",
+    titleZh: "司机沟通",
+    requestEn: "I do not speak Chinese well. Please use the address and notes below.",
+    requestZh: "我中文不太好，请参考下面的地址和说明。",
+    noteEn: "If needed, please call the contact person.",
+    noteZh: "如有需要，请联系联系人。"
+  }
+};
+
 const allergyItems = {
   peanuts: { en: "peanuts", zh: "花生" },
   "tree-nuts": { en: "tree nuts", zh: "坚果" },
@@ -1427,6 +1454,132 @@ function initHotelCardGenerator() {
   evaluate();
 }
 
+function initTaxiRideCardGenerator() {
+  const shell = document.querySelector("[data-taxi-ride-card-generator]");
+  if (!shell) return;
+
+  const presetButtons = shell.querySelectorAll("[data-taxi-card-preset]");
+  const pickupEnField = shell.querySelector(".taxi-pickup-en");
+  const pickupZhField = shell.querySelector(".taxi-pickup-zh");
+  const destinationEnField = shell.querySelector(".taxi-destination-en");
+  const destinationZhField = shell.querySelector(".taxi-destination-zh");
+  const gateField = shell.querySelector(".taxi-gate-note");
+  const luggageField = shell.querySelector(".taxi-luggage-note");
+  const contactNameField = shell.querySelector(".taxi-contact-name");
+  const contactPhoneField = shell.querySelector(".taxi-contact-phone");
+  const carPlateField = shell.querySelector(".taxi-car-plate");
+  const noteEnField = shell.querySelector(".taxi-note-en");
+  const noteZhField = shell.querySelector(".taxi-note-zh");
+  const titleEnNode = shell.querySelector(".taxi-preview-title-en");
+  const titleZhNode = shell.querySelector(".taxi-preview-title-zh");
+  const requestEnNode = shell.querySelector(".taxi-request-en");
+  const requestZhNode = shell.querySelector(".taxi-request-zh");
+  const previewZh = shell.querySelector(".taxi-preview-zh");
+  const previewEn = shell.querySelector(".taxi-preview-en");
+  const feedback = shell.querySelector(".copy-feedback");
+  const copyButtons = shell.querySelectorAll("[data-copy-taxi-card]");
+
+  let activePreset = "airport";
+  let payloads = { zh: "", en: "", full: "" };
+
+  function evaluate() {
+    const preset = taxiRideCardPresets[activePreset] || taxiRideCardPresets.airport;
+    const pickupEn = (pickupEnField?.value || "").trim();
+    const pickupZh = (pickupZhField?.value || "").trim();
+    const destinationEn = (destinationEnField?.value || "").trim();
+    const destinationZh = (destinationZhField?.value || "").trim();
+    const gate = (gateField?.value || "").trim();
+    const luggage = (luggageField?.value || "").trim();
+    const contactName = (contactNameField?.value || "").trim();
+    const contactPhone = (contactPhoneField?.value || "").trim();
+    const carPlate = (carPlateField?.value || "").trim();
+    const noteEn = (noteEnField?.value || "").trim() || preset.noteEn;
+    const noteZh = (noteZhField?.value || "").trim() || preset.noteZh;
+    const hasCore = [pickupEn, pickupZh, destinationEn, destinationZh, contactPhone].some(Boolean);
+
+    titleEnNode.textContent = preset.titleEn;
+    titleZhNode.textContent = preset.titleZh;
+    requestEnNode.textContent = preset.requestEn;
+    requestZhNode.textContent = preset.requestZh;
+
+    const zhLines = nonEmpty([
+      preset.requestZh,
+      pickupZh ? `上车点：${pickupZh}` : "",
+      destinationZh ? `目的地：${destinationZh}` : "",
+      gate ? `出口 / 门 / 站台：${gate}` : "",
+      luggage ? `行李说明：${luggage}` : "",
+      carPlate ? `车牌或车辆信息：${carPlate}` : "",
+      [contactName, contactPhone].filter(Boolean).length ? `联系人：${[contactName, contactPhone].filter(Boolean).join(" / ")}` : "",
+      noteZh
+    ]);
+    const enLines = nonEmpty([
+      preset.requestEn,
+      pickupEn ? `Pickup point: ${pickupEn}` : "",
+      destinationEn ? `Destination: ${destinationEn}` : "",
+      gate ? `Gate / exit / platform: ${gate}` : "",
+      luggage ? `Luggage note: ${luggage}` : "",
+      carPlate ? `Car plate or vehicle info: ${carPlate}` : "",
+      [contactName, contactPhone].filter(Boolean).length ? `Contact: ${[contactName, contactPhone].filter(Boolean).join(" / ")}` : "",
+      noteEn
+    ]);
+
+    replaceLines(previewZh, zhLines.length ? zhLines : ["填写上车点、目的地或联系方式后，这里会生成中文打车卡。"]);
+    replaceLines(previewEn, enLines.length ? enLines : ["Add a pickup point, destination, or phone number to build the English backup card."]);
+
+    payloads = {
+      zh: zhLines.join("\n"),
+      en: enLines.join("\n"),
+      full: [...zhLines, "", ...enLines].join("\n")
+    };
+
+    copyButtons.forEach((button) => {
+      button.disabled = !hasCore;
+    });
+    if (feedback) {
+      feedback.textContent = hasCore
+        ? "Copy the Chinese card for a driver, or keep the bilingual version in notes for pickup confusion."
+        : "Add a pickup point, destination, or phone number to generate a ride card.";
+    }
+  }
+
+  presetButtons.forEach((button) => {
+    button.addEventListener("click", () => {
+      activePreset = button.dataset.taxiCardPreset || "airport";
+      presetButtons.forEach((item) => item.setAttribute("aria-pressed", String(item === button)));
+      evaluate();
+    });
+  });
+
+  [
+    pickupEnField,
+    pickupZhField,
+    destinationEnField,
+    destinationZhField,
+    gateField,
+    luggageField,
+    contactNameField,
+    contactPhoneField,
+    carPlateField,
+    noteEnField,
+    noteZhField
+  ].filter(Boolean).forEach((field) => {
+    field.addEventListener("input", evaluate);
+    field.addEventListener("change", evaluate);
+  });
+
+  copyButtons.forEach((button) => {
+    button.addEventListener("click", async () => {
+      const key = button.dataset.copyTaxiCard;
+      const ok = await copyText(payloads[key]);
+      if (feedback) {
+        feedback.textContent = ok ? "Copied. Save it before you leave the airport, station, or hotel Wi-Fi." : "Copy failed in the browser. Try selecting the card text manually.";
+      }
+    });
+  });
+
+  evaluate();
+}
+
 function initAllergyGenerator() {
   const shell = document.querySelector("[data-allergy-generator]");
   if (!shell) return;
@@ -1887,6 +2040,7 @@ document.addEventListener("DOMContentLoaded", () => {
   initStayCalculator();
   initAddressGenerator();
   initHotelCardGenerator();
+  initTaxiRideCardGenerator();
   initAllergyGenerator();
   initArrivalChecklistBuilder();
 });
