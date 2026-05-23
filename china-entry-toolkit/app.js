@@ -637,6 +637,27 @@ function routeName(code) {
   return point ? point.name : "";
 }
 
+function transitScript(input, result) {
+  const origin = routeName(input.origin) || "my origin before mainland China";
+  const destination = routeName(input.destination) || "my onward destination after mainland China";
+  const hours = input.hours && input.hours > 0 ? `${formatNumber(input.hours, 1)} hours` : "within the permitted time window";
+  const countryName = input.country?.name || "my passport nationality";
+
+  if (!input.country) {
+    return "I am checking whether my route can use China's 240-hour visa-free transit policy. I will confirm nationality, origin, onward destination, entry port, stay area, and confirmed onward booking before relying on it.";
+  }
+
+  if (result.status === "Eligible") {
+    return `I am traveling on an ordinary ${countryName} passport from ${origin} to mainland China, then onward to ${destination}. My planned mainland stay is ${hours}. I have a confirmed onward departure and have checked that my entry port and stay area match the 240-hour transit requirements.`;
+  }
+
+  if (result.status === "Check carefully") {
+    return `My route is ${origin} to mainland China, then onward to ${destination}, using a ${countryName} passport. The route may need extra verification: ${result.headline} I should confirm the onward booking, designated port, permitted stay area, and timing before check-in.`;
+  }
+
+  return `This route should not be treated as confirmed 240-hour visa-free transit yet. The checker flagged: ${result.headline} I should verify another legal entry basis, adjust the itinerary, or plan for a visa before travel.`;
+}
+
 function formatList(items, locale = "en-US") {
   return new Intl.ListFormat(locale, { style: "long", type: "conjunction" }).format(items);
 }
@@ -994,6 +1015,7 @@ function initTransitChecker() {
   const onwardField = shell.querySelector(".onward-field");
   const portField = shell.querySelector(".port-field");
   const areaField = shell.querySelector(".area-field");
+  const copyScriptButton = shell.querySelector(".copy-airline-script");
 
   populateCountrySelect(countryField, true);
   populateRouteSelect(originField, "Choose where the trip starts");
@@ -1024,7 +1046,7 @@ function initTransitChecker() {
       return;
     }
 
-    const output = transitEligibility({
+    const transitInput = {
       country,
       purpose: purposeField?.value || "tourism",
       hours,
@@ -1035,7 +1057,8 @@ function initTransitChecker() {
       zoneCode: zoneField?.value || "",
       enteringEligiblePort: portField?.checked ?? false,
       stayingInArea: areaField?.checked ?? false
-    });
+    };
+    const output = transitEligibility(transitInput);
 
     renderStatus(shell, output);
 
@@ -1048,6 +1071,11 @@ function initTransitChecker() {
     if (rawHours) {
       rawHours.textContent = hours && hours > 0 ? `${formatNumber(hours, 1)} hours in mainland China` : "Enter valid arrival and departure times";
     }
+
+    const airlineScript = shell.querySelector(".airline-script");
+    if (airlineScript) {
+      airlineScript.textContent = transitScript(transitInput, output);
+    }
   }
 
   [countryField, purposeField, ordinaryField, originField, destinationField, arrivalField, departureField, zoneField, onwardField, portField, areaField]
@@ -1056,6 +1084,16 @@ function initTransitChecker() {
       field.addEventListener("input", evaluate);
       field.addEventListener("change", evaluate);
     });
+
+  copyScriptButton?.addEventListener("click", async () => {
+    const script = shell.querySelector(".airline-script")?.textContent || "";
+    if (!script) return;
+    await navigator.clipboard.writeText(script);
+    copyScriptButton.textContent = "Copied";
+    setTimeout(() => {
+      copyScriptButton.textContent = "Copy script";
+    }, 1200);
+  });
 
   evaluate();
 }
