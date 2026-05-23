@@ -1,0 +1,212 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>China Taxi Card Generator: DiDi Pickup and Destination Card</title>
+    <meta name="description" content="Create a bilingual China taxi or DiDi ride card with pickup point, destination, airport gate, luggage note, contact number, and driver instructions in Chinese and English.">
+    <meta name="google-adsense-account" content="ca-pub-4259477754165351">
+    <link rel="canonical" href="https://chinaentrytoolkit.com/china-taxi-card-generator.html">
+    <meta property="og:title" content="China Taxi Card Generator">
+    <meta property="og:description" content="Build a Chinese-English taxi or DiDi card for airport pickups, station rides, hotel transfers, and driver communication in China.">
+    <meta property="og:type" content="website">
+    <script type="application/ld+json">{"@context":"https://schema.org","@type":"WebPage","name":"China Taxi Card Generator","url":"https://chinaentrytoolkit.com/china-taxi-card-generator.html","description":"Create a bilingual Chinese-English taxi or DiDi ride card with pickup point, destination, gate or exit, luggage note, contact number, and driver instructions.","isPartOf":{"@type":"WebSite","name":"China Entry Toolkit","url":"https://chinaentrytoolkit.com/"}}</script>
+    <script type="application/ld+json">{"@context":"https://schema.org","@type":"HowTo","name":"How to make a China taxi card","description":"Build a bilingual taxi or DiDi ride card for pickups and destinations in China.","step":[{"@type":"HowToStep","name":"Choose the ride scenario","text":"Pick airport or station pickup, ride to hotel, or driver help depending on the moment."},{"@type":"HowToStep","name":"Add pickup and destination details","text":"Paste the exact Chinese pickup point and destination from your booking, map pin, hotel, or station sign."},{"@type":"HowToStep","name":"Add contact and luggage notes","text":"Include gate, exit, phone number, luggage, or car plate details only when they help the driver find you."},{"@type":"HowToStep","name":"Save the card offline","text":"Copy or screenshot the Chinese card before leaving airport, station, or hotel Wi-Fi."}]}</script>
+    <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+    <link rel="manifest" href="site.webmanifest">
+    <link rel="stylesheet" href="styles.css">
+  </head>
+  <body>
+    <header class="site-header">
+      <nav class="nav" aria-label="Primary">
+        <a class="brand" href="index.html"><img src="assets/logo.svg" alt="China Entry Toolkit"></a>
+        <div class="nav-links">
+          <a href="china-visa-free-checker.html">Visa-Free Checker</a>
+          <a href="china-transit-without-visa-checker.html">Transit Checker</a>
+          <a href="china-arrival-checklist.html">Arrival Checklist</a>
+          <a href="china-payment-setup-for-foreigners.html">Payment Setup</a>
+          <a href="china-stay-length-calculator.html">Stay Calculator</a>
+        </div>
+      </nav>
+    </header>
+
+    <main>
+      <section class="page-hero">
+        <div class="hero-copy">
+          <p class="eyebrow">Taxi and DiDi support tool</p>
+          <h1>Make a China taxi card for pickup points, hotel rides, and driver messages.</h1>
+          <p class="lede">Use this before airport pickups, train-station transfers, hotel rides, or DiDi driver calls. Add the exact Chinese pickup and destination lines, then copy a clean card you can show or paste into chat.</p>
+          <div class="hero-actions">
+            <a class="button primary" href="#taxi-card">Build the taxi card</a>
+            <a class="button ghost" href="how-to-use-didi-in-china-as-a-foreigner.html">Read the DiDi guide</a>
+          </div>
+        </div>
+        <aside class="detail-shell">
+          <span class="stamp">Best before pickup</span>
+          <div class="fact-strip">
+            <div class="fact"><strong>Pickup point</strong><span>Gate, exit, terminal, or hotel lobby notes</span></div>
+            <div class="fact"><strong>Destination</strong><span>Chinese-first destination and English backup</span></div>
+            <div class="fact"><strong>Driver note</strong><span>Luggage, phone, car plate, and contact details</span></div>
+          </div>
+        </aside>
+      </section>
+
+      <section class="section" id="taxi-card">
+        <div class="tool-shell" data-taxi-ride-card-generator>
+          <div class="tool-head">
+            <div>
+              <h2>Taxi or DiDi ride card builder</h2>
+              <p>Choose the scenario, then add the pickup and destination details you want a driver or station helper to see.</p>
+            </div>
+          </div>
+
+          <div class="tool-body">
+            <div class="form-panel">
+              <div class="field">
+                <label>Ride card type</label>
+                <div class="toggle-group">
+                  <button type="button" data-taxi-card-preset="airport" aria-pressed="true">Airport / station pickup</button>
+                  <button type="button" data-taxi-card-preset="hotel" aria-pressed="false">Ride to hotel</button>
+                  <button type="button" data-taxi-card-preset="driver" aria-pressed="false">Driver help</button>
+                </div>
+              </div>
+
+              <div class="field-grid">
+                <div class="field">
+                  <label for="taxiPickupEn">Pickup point in English</label>
+                  <input id="taxiPickupEn" class="taxi-pickup-en" type="text" placeholder="Example: Beijing Capital Airport T3, Door 5">
+                </div>
+                <div class="field">
+                  <label for="taxiPickupZh">Pickup point in Chinese</label>
+                  <input id="taxiPickupZh" class="taxi-pickup-zh" type="text" placeholder="例：北京首都机场 T3 航站楼 5号门">
+                </div>
+                <div class="field">
+                  <label for="taxiDestinationEn">Destination in English</label>
+                  <input id="taxiDestinationEn" class="taxi-destination-en" type="text" placeholder="Example: Grand Hyatt Beijing">
+                </div>
+                <div class="field">
+                  <label for="taxiDestinationZh">Destination in Chinese</label>
+                  <input id="taxiDestinationZh" class="taxi-destination-zh" type="text" placeholder="例：北京东方君悦大酒店">
+                </div>
+                <div class="field">
+                  <label for="taxiGateNote">Gate, exit, platform, or landmark</label>
+                  <input id="taxiGateNote" class="taxi-gate-note" type="text" placeholder="Example: I am near Exit B / near Starbucks">
+                </div>
+                <div class="field">
+                  <label for="taxiLuggageNote">Luggage or pickup note</label>
+                  <input id="taxiLuggageNote" class="taxi-luggage-note" type="text" placeholder="Example: I have two suitcases">
+                </div>
+                <div class="field">
+                  <label for="taxiContactName">Contact name</label>
+                  <input id="taxiContactName" class="taxi-contact-name" type="text" placeholder="Optional contact name">
+                </div>
+                <div class="field">
+                  <label for="taxiContactPhone">Phone or WeChat ID</label>
+                  <input id="taxiContactPhone" class="taxi-contact-phone" type="text" placeholder="Example: +86 138 0000 0000">
+                </div>
+                <div class="field">
+                  <label for="taxiCarPlate">Car plate or vehicle info</label>
+                  <input id="taxiCarPlate" class="taxi-car-plate" type="text" placeholder="Optional: plate, car color, or driver name">
+                </div>
+                <div class="field">
+                  <label for="taxiNoteEn">Extra note in English</label>
+                  <input id="taxiNoteEn" class="taxi-note-en" type="text" placeholder="Optional driver note">
+                </div>
+                <div class="field full-span">
+                  <label for="taxiNoteZh">Extra note in Chinese</label>
+                  <input id="taxiNoteZh" class="taxi-note-zh" type="text" placeholder="可选中文补充说明">
+                </div>
+              </div>
+
+              <div class="note-box">
+                <h3>Use exact Chinese place names</h3>
+                <p>This tool does not translate addresses. Paste the exact Chinese pickup point and destination from your hotel, map pin, train station sign, airport sign, or ride-hailing app.</p>
+              </div>
+            </div>
+
+            <div class="result-panel">
+              <span class="status-pill good">Ready for pickup</span>
+              <div class="copy-row">
+                <button type="button" class="primary" data-copy-taxi-card="full">Copy bilingual card</button>
+                <button type="button" data-copy-taxi-card="zh">Copy Chinese only</button>
+                <button type="button" data-copy-taxi-card="en">Copy English only</button>
+              </div>
+              <p class="copy-feedback" aria-live="polite">Add a pickup point, destination, or phone number to generate a ride card.</p>
+
+              <article class="preview-card preview-card-zh">
+                <span class="preview-eyebrow taxi-preview-title-zh">机场或车站上车</span>
+                <p class="preview-kicker taxi-request-zh">您好，我在这个上车点等车。如果找不到我，请联系我。</p>
+                <div class="preview-lines taxi-preview-zh"></div>
+              </article>
+
+              <article class="preview-card">
+                <span class="preview-eyebrow taxi-preview-title-en">Airport or station pickup</span>
+                <p class="preview-kicker taxi-request-en">Hello, I am waiting at this pickup point. Please contact me if you cannot find me.</p>
+                <div class="preview-lines taxi-preview-en"></div>
+              </article>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="section">
+        <div class="split-grid">
+          <div class="source-box">
+            <h2>Good use cases</h2>
+            <p>Airport pickup, train-station exit confusion, hotel transfer, DiDi driver chat, taxi driver destination confirmation, or asking a station helper where the pickup point is.</p>
+          </div>
+          <div class="source-box">
+            <h2>What to save offline</h2>
+            <p>Keep the Chinese card, hotel address, phone number, payment backup, and one screenshot of the pickup area before leaving reliable Wi-Fi.</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="section">
+        <div class="faq-stack">
+          <details class="faq-item">
+            <summary>What should I show a taxi driver in China?</summary>
+            <p>Show the exact Chinese destination name and address first. If pickup is confusing, add your gate, exit, landmark, phone number, and luggage note.</p>
+          </details>
+          <details class="faq-item">
+            <summary>Can I use this with DiDi?</summary>
+            <p>Yes. You can paste the Chinese-only card into driver chat or keep the bilingual version available if a helper, hotel desk, or pickup staff member is involved.</p>
+          </details>
+          <details class="faq-item">
+            <summary>Should I rely on English destination names?</summary>
+            <p>No. English names are useful backup, but the Chinese destination line is usually the most important part of a reliable taxi card.</p>
+          </details>
+        </div>
+      </section>
+
+      <section class="section">
+        <div class="tool-grid">
+          <a class="utility-tile" href="how-to-use-didi-in-china-as-a-foreigner.html">
+            <h3>Use DiDi in China</h3>
+            <p>Review ride-hailing setup, payment, pickup, and backup steps before arrival.</p>
+          </a>
+          <a class="utility-tile" href="china-address-card-generator.html">
+            <h3>Build an address card</h3>
+            <p>Use this when the destination card matters more than pickup coordination.</p>
+          </a>
+          <a class="utility-tile" href="china-hotel-check-in-card-generator.html">
+            <h3>Build a hotel check-in card</h3>
+            <p>Use this once you reach the front desk and need reservation or room help.</p>
+          </a>
+          <a class="utility-tile" href="china-arrival-checklist.html">
+            <h3>Review arrival checklist</h3>
+            <p>Connect ride setup with payment, data, hotel, and backup planning.</p>
+          </a>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <div class="foot">
+        <div><a href="about.html">About</a> · <a href="contact.html">Contact</a> · <a href="privacy.html">Privacy</a> · <a href="terms.html">Terms</a></div>
+        <div>Reviewed against official sources on <span data-policy-review></span>.</div>
+      </div>
+    </footer>
+    <script src="app.js"></script>
+  </body>
+</html>
