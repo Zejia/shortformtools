@@ -368,6 +368,16 @@ function toCsv(rows) {
     .join("\n");
 }
 
+function downloadCsvFile(filename, rows) {
+  const blob = new Blob([toCsv(rows)], { type: "text/csv;charset=utf-8" });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = filename;
+  link.click();
+  URL.revokeObjectURL(url);
+}
+
 function readLandedHistory() {
   try {
     return JSON.parse(localStorage.getItem(LANDED_HISTORY_KEY) || "[]");
@@ -454,13 +464,7 @@ function attachCsvAndHistory(scope) {
   downloadButton?.addEventListener("click", () => {
     const inputs = readToolInputs(scope);
     const result = calculateLandedCost(inputs);
-    const blob = new Blob([toCsv(landedCsvRows(inputs, result))], { type: "text/csv" });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement("a");
-    link.href = url;
-    link.download = "landed-cost-scenario.csv";
-    link.click();
-    URL.revokeObjectURL(url);
+    downloadCsvFile("landed-cost-scenario.csv", landedCsvRows(inputs, result));
   });
 
   saveButton?.addEventListener("click", () => {
@@ -830,6 +834,51 @@ function buildSupplierQuoteInsights(results, inputs) {
   return notes;
 }
 
+function supplierQuoteCsvRows(inputs, results) {
+  const best = results[0];
+  const rows = [
+    ["Metric", "Value"],
+    ["Destination market", inputs.preset.label],
+    ["Currency", inputs.currency],
+    ["Recommended supplier", best.name],
+    ["Best landed cost per sellable unit", best.landedPerSellableUnit],
+    ["Best total landed cash tied up", best.landed.totalLanded],
+    ["Best margin at target sale price", best.marginAtTarget],
+    ["Sell price for target margin", Number.isFinite(best.targetPrice) ? best.targetPrice : "No safe price"],
+    ["Duty rate percent", inputs.dutyRate * 100],
+    ["Tax or VAT rate percent", inputs.taxRate * 100],
+    ["Target sell price", inputs.targetSellPrice],
+    ["Target margin percent", inputs.targetMargin * 100],
+    [],
+    ["Rank", "Supplier", "Factory unit quote", "Order units / MOQ", "Sellable units after defects", "Freight", "Insurance", "Inspection/tooling/sample", "Defect allowance percent", "Lead time days", "Total landed cash", "Landed cost per sellable unit", "Margin at target sale price", "Target price for margin", "Readout"]
+  ];
+
+  results.forEach((result, index) => {
+    rows.push([
+      index + 1,
+      result.name,
+      result.unitCost,
+      result.units,
+      result.sellableUnits,
+      result.freight,
+      result.insurance,
+      result.extra,
+      result.defectRate * 100,
+      result.leadDays,
+      result.landed.totalLanded,
+      result.landedPerSellableUnit,
+      result.marginAtTarget,
+      Number.isFinite(result.targetPrice) ? result.targetPrice : "No safe price",
+      quoteReadout(result, best)
+    ]);
+  });
+
+  rows.push([]);
+  rows.push(["Insight", "Detail"]);
+  buildSupplierQuoteInsights(results, inputs).forEach((item) => rows.push(["Note", item]));
+  return rows;
+}
+
 function renderSupplierQuoteTool(scope) {
   const inputs = readQuoteInputs(scope);
   const results = inputs.quotes
@@ -892,6 +941,7 @@ function initSupplierQuoteTools() {
     });
 
     const copyButton = byOutput(scope, "copyQuoteSummary");
+    const downloadButton = byOutput(scope, "downloadQuoteCsv");
     copyButton?.addEventListener("click", async () => {
       const report = window.currentSupplierQuoteReport;
       if (!report) return;
@@ -916,6 +966,14 @@ function initSupplierQuoteTools() {
           copyButton.textContent = "Copy quote comparison";
         }, 1200);
       }
+    });
+
+    downloadButton?.addEventListener("click", () => {
+      const inputs = readQuoteInputs(scope);
+      const results = inputs.quotes
+        .map((quote) => calculateSupplierQuote(inputs, quote))
+        .sort((a, b) => a.landedPerSellableUnit - b.landedPerSellableUnit);
+      downloadCsvFile("import-supplier-quote-comparison.csv", supplierQuoteCsvRows(inputs, results));
     });
 
     renderSupplierQuoteTool(scope);
