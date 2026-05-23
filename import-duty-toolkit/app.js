@@ -2,6 +2,7 @@ const SITE_REVIEW_DATE = "May 21, 2026";
 const US_DE_MINIMIS_NOTE_DATE = "August 29, 2025";
 const ADSENSE_CLIENT = "ca-pub-4259477754165351";
 const CONSENT_STORAGE_KEY = "crossborderkit-consent-v1";
+const LANDED_HISTORY_KEY = "crossborderkit-landed-history-v1";
 
 const marketPresets = {
   US: {
@@ -328,6 +329,78 @@ function renderScenarioTable(scope, inputs) {
   body.innerHTML = rows;
 }
 
+function landedCsvRows(inputs, result) {
+  return [
+    ["Metric", "Value"],
+    ["Market", inputs.preset.label],
+    ["Currency", inputs.currency],
+    ["Product value", inputs.productValue],
+    ["Units", inputs.units],
+    ["Shipping cost", inputs.shippingCost],
+    ["Insurance cost", inputs.insuranceCost],
+    ["Duty rate percent", inputs.dutyRate * 100],
+    ["Tax or VAT rate percent", inputs.taxRate * 100],
+    ["Brokerage", inputs.brokerage],
+    ["Misc cost", inputs.misc],
+    ["FX or compliance buffer percent", inputs.bufferRate * 100],
+    ["Customs value", result.customsValue],
+    ["Duty", result.duty],
+    ["Tax or VAT", result.tax],
+    ["Buffer cost", result.bufferCost],
+    ["Total landed cost", result.totalLanded],
+    ["Per-unit landed cost", result.perUnit],
+    ["Landed uplift percent", result.upliftPercent],
+    ["Duty and tax share percent", result.rateBurden],
+    ["Threshold applied", result.thresholdEligible ? "yes" : "no"]
+  ];
+}
+
+function toCsv(rows) {
+  return rows
+    .map((row) =>
+      row
+        .map((value) => {
+          const text = String(value ?? "");
+          return /[",\n]/.test(text) ? `"${text.replaceAll('"', '""')}"` : text;
+        })
+        .join(",")
+    )
+    .join("\n");
+}
+
+function readLandedHistory() {
+  try {
+    return JSON.parse(localStorage.getItem(LANDED_HISTORY_KEY) || "[]");
+  } catch (_error) {
+    return [];
+  }
+}
+
+function writeLandedHistory(items) {
+  try {
+    localStorage.setItem(LANDED_HISTORY_KEY, JSON.stringify(items.slice(0, 6)));
+  } catch (_error) {
+    // Ignore storage failures in privacy-restricted browsers.
+  }
+}
+
+function historyLabel(item) {
+  return `${item.market}: ${formatCurrency(item.totalLanded, item.currency)} total / ${formatCurrency(item.perUnit, item.currency)} per unit`;
+}
+
+function renderLandedHistory(scope) {
+  const list = byOutput(scope, "historyRows");
+  if (!list) return;
+  const history = readLandedHistory();
+  if (!history.length) {
+    list.innerHTML = "<li>No saved scenarios yet.</li>";
+    return;
+  }
+  list.innerHTML = history
+    .map((item) => `<li><strong>${historyLabel(item)}</strong><span>${item.savedAt}</span></li>`)
+    .join("");
+}
+
 function renderTool(scope) {
   const inputs = readToolInputs(scope);
   const result = calculateLandedCost(inputs);
@@ -364,11 +437,83 @@ function renderTool(scope) {
   }
 
   renderScenarioTable(scope, inputs);
+  renderLandedHistory(scope);
 
   const thresholdFlag = byOutput(scope, "thresholdFlag");
   if (thresholdFlag) {
     thresholdFlag.textContent = result.thresholdEligible ? "Eligible in this model" : "Not triggered";
   }
+}
+
+function attachCsvAndHistory(scope) {
+  const downloadButton = byOutput(scope, "downloadCsv");
+  const saveButton = byOutput(scope, "saveScenario");
+  const copyHistoryButton = byOutput(scope, "copyHistory");
+  const clearHistoryButton = byOutput(scope, "clearHistory");
+
+  downloadButton?.addEventListener("click", () => {
+    const inputs = readToolInputs(scope);
+    const result = calculateLandedCost(inputs);
+    const blob = new Blob([toCsv(landedCsvRows(inputs, result))], { type: "text/csv" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = "landed-cost-scenario.csv";
+    link.click();
+    URL.revokeObjectURL(url);
+  });
+
+  saveButton?.addEventListener("click", () => {
+    const inputs = readToolInputs(scope);
+    const result = calculateLandedCost(inputs);
+    const savedAt = new Intl.DateTimeFormat("en-US", {
+      month: "short",
+      day: "numeric",
+      hour: "numeric",
+      minute: "2-digit"
+    }).format(new Date());
+    const item = {
+      savedAt,
+      market: inputs.preset.label,
+      currency: inputs.currency,
+      productValue: inputs.productValue,
+      totalLanded: result.totalLanded,
+      perUnit: result.perUnit,
+      duty: result.duty,
+      tax: result.tax,
+      upliftPercent: result.upliftPercent
+    };
+    writeLandedHistory([item, ...readLandedHistory()]);
+    renderLandedHistory(scope);
+    saveButton.textContent = "Saved";
+    window.setTimeout(() => {
+      saveButton.textContent = "Save scenario";
+    }, 1200);
+  });
+
+  copyHistoryButton?.addEventListener("click", async () => {
+    const history = readLandedHistory();
+    const text = history.length
+      ? history.map((item) => `${item.savedAt} - ${historyLabel(item)}`).join("\n")
+      : "No saved landed-cost scenarios yet.";
+    try {
+      await navigator.clipboard.writeText(text);
+      copyHistoryButton.textContent = "Copied";
+      window.setTimeout(() => {
+        copyHistoryButton.textContent = "Copy history";
+      }, 1200);
+    } catch (_error) {
+      copyHistoryButton.textContent = "Copy failed";
+      window.setTimeout(() => {
+        copyHistoryButton.textContent = "Copy history";
+      }, 1200);
+    }
+  });
+
+  clearHistoryButton?.addEventListener("click", () => {
+    writeLandedHistory([]);
+    renderLandedHistory(scope);
+  });
 }
 
 function attachCopySummary(scope) {
@@ -419,6 +564,7 @@ function initLandedCostTools() {
     });
 
     attachCopySummary(scope);
+    attachCsvAndHistory(scope);
     renderTool(scope);
   });
 }
