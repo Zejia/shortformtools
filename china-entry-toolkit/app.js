@@ -177,6 +177,33 @@ const dietNotes = {
   }
 };
 
+const hotelCardPresets = {
+  checkin: {
+    titleEn: "Hotel check-in",
+    titleZh: "酒店入住",
+    requestEn: "Hello, I have a reservation and would like to check in.",
+    requestZh: "您好，我有预订，想办理入住。",
+    noteEn: "Please let me know if you need my passport, booking confirmation, or phone number.",
+    noteZh: "如果需要我的护照、预订确认单或手机号码，请告诉我。"
+  },
+  late: {
+    titleEn: "Late arrival",
+    titleZh: "晚到入住",
+    requestEn: "Hello, I will arrive late, but I still need to check in tonight.",
+    requestZh: "您好，我会比较晚到，但今晚仍需要办理入住。",
+    noteEn: "Please keep the reservation if possible. I will show my booking confirmation when I arrive.",
+    noteZh: "如可以，请帮我保留预订。我到达时会出示预订确认单。"
+  },
+  help: {
+    titleEn: "Need front-desk help",
+    titleZh: "需要前台帮助",
+    requestEn: "Hello, could you please help me with this hotel or reservation question?",
+    requestZh: "您好，可以请您帮我处理这个酒店或预订问题吗？",
+    noteEn: "I may need help with the address, payment, deposit, Wi-Fi, or room access.",
+    noteZh: "我可能需要帮助确认地址、付款、押金、无线网络或房间门卡。"
+  }
+};
+
 const allowedVisitPurposes = new Set(["tourism", "business", "family", "exchange", "transit"]);
 const allowedTransitPurposes = new Set(["tourism", "business", "family", "exchange"]);
 
@@ -1280,6 +1307,126 @@ function initAddressGenerator() {
   evaluate();
 }
 
+function initHotelCardGenerator() {
+  const shell = document.querySelector("[data-hotel-card-generator]");
+  if (!shell) return;
+
+  const presetButtons = shell.querySelectorAll("[data-hotel-card-preset]");
+  const hotelEnField = shell.querySelector(".hotel-name-en");
+  const hotelZhField = shell.querySelector(".hotel-name-zh");
+  const guestNameField = shell.querySelector(".hotel-guest-name");
+  const bookingField = shell.querySelector(".hotel-booking-code");
+  const arrivalField = shell.querySelector(".hotel-arrival-time");
+  const phoneField = shell.querySelector(".hotel-phone");
+  const roomNeedField = shell.querySelector(".hotel-room-need");
+  const noteEnField = shell.querySelector(".hotel-note-en");
+  const noteZhField = shell.querySelector(".hotel-note-zh");
+  const titleEnNode = shell.querySelector(".hotel-preview-title-en");
+  const titleZhNode = shell.querySelector(".hotel-preview-title-zh");
+  const requestEnNode = shell.querySelector(".hotel-request-en");
+  const requestZhNode = shell.querySelector(".hotel-request-zh");
+  const previewZh = shell.querySelector(".hotel-preview-zh");
+  const previewEn = shell.querySelector(".hotel-preview-en");
+  const feedback = shell.querySelector(".copy-feedback");
+  const copyButtons = shell.querySelectorAll("[data-copy-hotel-card]");
+
+  let activePreset = "checkin";
+  let payloads = { zh: "", en: "", full: "" };
+
+  function evaluate() {
+    const preset = hotelCardPresets[activePreset] || hotelCardPresets.checkin;
+    const hotelEn = (hotelEnField?.value || "").trim();
+    const hotelZh = (hotelZhField?.value || "").trim();
+    const guestName = (guestNameField?.value || "").trim();
+    const booking = (bookingField?.value || "").trim();
+    const arrival = (arrivalField?.value || "").trim();
+    const phone = (phoneField?.value || "").trim();
+    const roomNeed = (roomNeedField?.value || "").trim();
+    const noteEn = (noteEnField?.value || "").trim() || preset.noteEn;
+    const noteZh = (noteZhField?.value || "").trim() || preset.noteZh;
+    const hasCore = [hotelEn, hotelZh, guestName, booking].some(Boolean);
+
+    titleEnNode.textContent = preset.titleEn;
+    titleZhNode.textContent = preset.titleZh;
+    requestEnNode.textContent = preset.requestEn;
+    requestZhNode.textContent = preset.requestZh;
+
+    const zhLines = nonEmpty([
+      preset.requestZh,
+      hotelZh ? `酒店：${hotelZh}` : "",
+      guestName ? `住客姓名：${guestName}` : "",
+      booking ? `预订号：${booking}` : "",
+      arrival ? `预计到达时间：${arrival}` : "",
+      phone ? `联系电话：${phone}` : "",
+      roomNeed ? `房间或入住需求：${roomNeed}` : "",
+      noteZh
+    ]);
+    const enLines = nonEmpty([
+      preset.requestEn,
+      hotelEn ? `Hotel: ${hotelEn}` : "",
+      guestName ? `Guest name: ${guestName}` : "",
+      booking ? `Booking number: ${booking}` : "",
+      arrival ? `Expected arrival: ${arrival}` : "",
+      phone ? `Phone or WeChat: ${phone}` : "",
+      roomNeed ? `Room or check-in request: ${roomNeed}` : "",
+      noteEn
+    ]);
+
+    replaceLines(previewZh, zhLines.length ? zhLines : ["填写酒店名称、住客姓名或预订号后，这里会生成中文入住卡。"]);
+    replaceLines(previewEn, enLines.length ? enLines : ["Add a hotel name, guest name, or booking code to build the English backup card."]);
+
+    payloads = {
+      zh: zhLines.join("\n"),
+      en: enLines.join("\n"),
+      full: [...zhLines, "", ...enLines].join("\n")
+    };
+
+    copyButtons.forEach((button) => {
+      button.disabled = !hasCore;
+    });
+    if (feedback) {
+      feedback.textContent = hasCore
+        ? "Copy the Chinese card for the front desk, or keep the bilingual version in your notes before arrival."
+        : "Add the hotel name, guest name, or booking code to generate a copy-ready card.";
+    }
+  }
+
+  presetButtons.forEach((button) => {
+    button.addEventListener("click", () => {
+      activePreset = button.dataset.hotelCardPreset || "checkin";
+      presetButtons.forEach((item) => item.setAttribute("aria-pressed", String(item === button)));
+      evaluate();
+    });
+  });
+
+  [
+    hotelEnField,
+    hotelZhField,
+    guestNameField,
+    bookingField,
+    arrivalField,
+    phoneField,
+    roomNeedField,
+    noteEnField,
+    noteZhField
+  ].filter(Boolean).forEach((field) => {
+    field.addEventListener("input", evaluate);
+    field.addEventListener("change", evaluate);
+  });
+
+  copyButtons.forEach((button) => {
+    button.addEventListener("click", async () => {
+      const key = button.dataset.copyHotelCard;
+      const ok = await copyText(payloads[key]);
+      if (feedback) {
+        feedback.textContent = ok ? "Copied. Save it somewhere reachable before you reach the desk." : "Copy failed in the browser. Try selecting the card text manually.";
+      }
+    });
+  });
+
+  evaluate();
+}
+
 function initAllergyGenerator() {
   const shell = document.querySelector("[data-allergy-generator]");
   if (!shell) return;
@@ -1739,6 +1886,7 @@ document.addEventListener("DOMContentLoaded", () => {
   initTransitChecker();
   initStayCalculator();
   initAddressGenerator();
+  initHotelCardGenerator();
   initAllergyGenerator();
   initArrivalChecklistBuilder();
 });
