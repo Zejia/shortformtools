@@ -27,6 +27,11 @@
       "permanent": true
     },
     {
+      "source": "/etsy-ads-roas-calculator.html",
+      "destination": "/etsy-ads-roas-calculator",
+      "permanent": true
+    },
+    {
       "source": "/etsy-offsite-ads-calculator.html",
       "destination": "/etsy-offsite-ads-calculator",
       "permanent": true
@@ -93,6 +98,10 @@
     {
       "source": "/etsy-bundle-pricing-calculator",
       "destination": "/etsy-bundle-pricing-calculator.html"
+    },
+    {
+      "source": "/etsy-ads-roas-calculator",
+      "destination": "/etsy-ads-roas-calculator.html"
     },
     {
       "source": "/etsy-offsite-ads-calculator",

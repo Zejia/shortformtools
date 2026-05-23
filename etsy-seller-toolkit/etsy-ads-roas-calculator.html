@@ -1,0 +1,222 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Etsy Ads ROAS Calculator: Break-Even CPC and Ad Spend</title>
+    <meta name="description" content="Free Etsy Ads ROAS calculator for break-even ad spend, target ROAS, maximum CPC, conversion rate scenarios, profit after ads and monthly budget planning.">
+    <link rel="canonical" href="https://etsy.shortformtools.com/etsy-ads-roas-calculator">
+    <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+    <link rel="stylesheet" href="styles.css">
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4259477754165351" crossorigin="anonymous"></script>
+    <script type="application/ld+json">
+      [{"@context":"https://schema.org","@type":"WebSite","name":"Etsy Seller Profit Toolkit","url":"https://etsy.shortformtools.com/"},{"@context":"https://schema.org","@type":"SoftwareApplication","name":"Etsy Ads ROAS Calculator","applicationCategory":"BusinessApplication","operatingSystem":"Web","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"}}]
+    </script>
+  </head>
+  <body>
+    <header class="site-header">
+      <nav class="nav" aria-label="Primary navigation">
+        <a class="brand" href="/"><span class="mark">E</span><span>Etsy Seller Toolkit</span></a>
+        <div class="nav-links">
+          <a href="/etsy-fee-calculator">Fee calculator</a>
+          <a href="/etsy-profit-calculator">Profit calculator</a>
+          <a href="/etsy-price-target-calculator">Price target</a>
+          <a href="/etsy-bundle-pricing-calculator">Bundle pricing</a>
+          <a href="/etsy-ads-roas-calculator">Etsy Ads ROAS</a>
+          <a href="/etsy-offsite-ads-calculator">Offsite Ads</a>
+          <a href="/free-etsy-pricing-spreadsheet">Spreadsheet</a>
+        </div>
+      </nav>
+    </header>
+
+    <main>
+      <section class="hero wrap">
+        <div>
+          <p class="eyebrow">Etsy Ads ROAS calculator</p>
+          <h1>Find the Etsy Ads ROAS and CPC your listing can actually afford.</h1>
+          <p class="lead">Turn listing profit, conversion rate and ad clicks into break-even ad spend, target ROAS, max CPC, monthly budget outcomes and stress-test scenarios before you scale a campaign.</p>
+          <div class="hero-actions">
+            <a class="button primary" href="#calculator">Calculate Etsy Ads ROAS</a>
+            <a class="button" href="/etsy-offsite-ads-calculator">Compare Offsite Ads</a>
+          </div>
+        </div>
+        <aside class="hero-panel" aria-label="Example Etsy Ads plan">
+          <div class="mini-ledger">
+            <div class="ledger-line"><span>Revenue per order</span><strong>$34.99</strong></div>
+            <div class="ledger-line"><span>Break-even ad spend</span><strong>$13.97</strong></div>
+            <div class="ledger-line"><span>Break-even ROAS</span><strong>2.5x</strong></div>
+            <div class="ledger-line"><span>Max CPC at 3%</span><strong>$0.42</strong></div>
+          </div>
+        </aside>
+      </section>
+
+      <section class="tool-shell wrap" id="calculator" data-tool="etsy-ads-roas">
+        <div class="tool-grid">
+          <section class="tool-panel">
+            <div class="section-head">
+              <div>
+                <h2>Etsy Ads break-even planner</h2>
+                <p>Use your real listing economics first, then layer on CPC and conversion assumptions.</p>
+              </div>
+              <span class="status ok" id="currencyLabel">USD</span>
+            </div>
+            <div class="preset-row">
+              <button type="button" data-ads-preset="handmade">Handmade physical</button>
+              <button type="button" data-ads-preset="digital">Digital download</button>
+              <button type="button" data-ads-preset="thin">Thin-margin stress</button>
+            </div>
+
+            <div class="field-grid">
+              <div class="group-title">Listing economics</div>
+              <div class="field"><label for="adsItemPrice">Item price</label><input id="adsItemPrice" type="number" min="0" step="0.01" value="32"></div>
+              <div class="field"><label for="adsQuantity">Quantity sold per order</label><input id="adsQuantity" type="number" min="1" step="1" value="1"></div>
+              <div class="field"><label for="adsShippingCharged">Shipping charged to buyer</label><input id="adsShippingCharged" type="number" min="0" step="0.01" value="4.99"></div>
+              <div class="field"><label for="adsItemCost">Item cost per unit</label><input id="adsItemCost" type="number" min="0" step="0.01" value="9.50"></div>
+              <div class="field"><label for="adsShippingCost">Shipping label cost</label><input id="adsShippingCost" type="number" min="0" step="0.01" value="4.50"></div>
+              <div class="field"><label for="adsPackagingCost">Packaging cost</label><input id="adsPackagingCost" type="number" min="0" step="0.01" value="0.90"></div>
+              <div class="field"><label for="adsLaborCost">Labor cost per order</label><input id="adsLaborCost" type="number" min="0" step="0.01" value="3.00"></div>
+              <div class="field"><label for="adsDiscountRate">Discount percent</label><input id="adsDiscountRate" type="number" min="0" max="100" step="0.1" value="0"></div>
+
+              <div class="group-title">Ad assumptions</div>
+              <div class="field"><label for="adsConversionRate">Conversion rate</label><input id="adsConversionRate" type="number" min="0.1" step="0.1" value="3"><span class="hint">Percent of ad clicks that become orders.</span></div>
+              <div class="field"><label for="adsAverageCpc">Average CPC</label><input id="adsAverageCpc" type="number" min="0" step="0.01" value="0.35"></div>
+              <div class="field"><label for="adsMonthlyBudget">Monthly Etsy Ads budget</label><input id="adsMonthlyBudget" type="number" min="0" step="1" value="150"></div>
+              <div class="field"><label for="adsTargetMargin">Target profit margin after ads</label><input id="adsTargetMargin" type="number" min="0" max="80" step="0.1" value="20"></div>
+
+              <div class="group-title">Fee assumptions</div>
+              <div class="field full">
+                <label for="countryPreset">Seller payment country</label>
+                <select id="countryPreset">
+                  <option value="US">United States</option>
+                  <option value="UK">United Kingdom</option>
+                  <option value="CA">Canada domestic / US orders</option>
+                  <option value="CA_INTL">Canada international</option>
+                  <option value="AU">Australia domestic</option>
+                  <option value="AU_INTL">Australia international</option>
+                  <option value="EU">EU common rate</option>
+                  <option value="CUSTOM">Custom processing rate</option>
+                </select>
+                <span class="hint" id="paymentPresetText">United States: 3% + $0.25</span>
+              </div>
+              <div class="field"><label for="adsListingUnits">Listing fee units</label><input id="adsListingUnits" type="number" min="0" step="1" value="1"></div>
+              <div class="field"><label for="paymentRate">Custom payment percent</label><input id="paymentRate" type="number" min="0" step="0.1" value="3"></div>
+              <div class="field"><label for="paymentFlat">Custom payment flat fee</label><input id="paymentFlat" type="number" min="0" step="0.01" value="0.25"></div>
+              <div class="field"><label for="adsOffsiteRate">Optional Offsite Ads percent</label><input id="adsOffsiteRate" type="number" min="0" step="0.1" value="0"><span class="hint">Usually 0 for Etsy Ads CPC campaigns.</span></div>
+              <div class="field"><label for="adsTaxCollected">Sales tax collected</label><input id="adsTaxCollected" type="number" min="0" step="0.01" value="0"></div>
+              <div class="field"><label for="adsRegulatoryRate">Regulatory operating fee percent</label><input id="adsRegulatoryRate" type="number" min="0" step="0.1" value="0"></div>
+              <div class="field check-row"><input id="adsCurrencyConversion" type="checkbox"><label for="adsCurrencyConversion">Apply 2.5% currency conversion fee</label></div>
+            </div>
+          </section>
+
+          <aside class="result-panel" aria-live="polite">
+            <div class="result-stack">
+              <div class="metric-large">
+                <span>Break-even ad spend per order</span>
+                <strong id="adsBreakEvenSpend">$0.00</strong>
+                <div class="meter" id="profitMeter"></div>
+              </div>
+              <div><span id="adsStatusLabel" class="status ok">Workable</span></div>
+              <div class="metric-grid">
+                <div class="metric"><span>Break-even ROAS</span><strong id="adsBreakEvenRoas">0x</strong></div>
+                <div class="metric"><span>Target ROAS</span><strong id="adsTargetRoas">0x</strong></div>
+                <div class="metric"><span>Max CPC</span><strong id="adsMaxCpc">$0.00</strong></div>
+                <div class="metric"><span>Ad spend per order</span><strong id="adsSpendPerOrder">$0.00</strong></div>
+                <div class="metric"><span>Profit after ads/order</span><strong id="adsProfitAfterAds">$0.00</strong></div>
+                <div class="metric"><span>Orders from budget</span><strong id="adsOrdersFromBudget">0</strong></div>
+                <div class="metric"><span>Revenue from budget</span><strong id="adsRevenueFromBudget">$0.00</strong></div>
+              </div>
+              <div class="formula" id="adsFormulaLine"></div>
+              <ul class="insights" id="adsInsights"></ul>
+              <div class="hero-actions">
+                <button type="button" id="copyAdsSummary">Copy ad plan</button>
+                <button type="button" id="downloadAdsCsv">Download CSV</button>
+              </div>
+            </div>
+          </aside>
+        </div>
+      </section>
+
+      <section class="content-band wrap">
+        <div class="plain-panel">
+          <div class="section-head">
+            <div>
+              <h2>ROAS and CPC scenarios</h2>
+              <p>Stress-test the same listing against lower conversion, higher CPC and target-margin bids.</p>
+            </div>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Scenario</th><th>CPC</th><th>Ad cost/order</th><th>ROAS</th><th>Profit/order</th><th>Status</th></tr></thead>
+              <tbody id="adsScenarioRows"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <section class="content-band wrap">
+        <div class="plain-panel">
+          <div class="section-head">
+            <div>
+              <h2>How to use Etsy Ads ROAS</h2>
+              <p>ROAS is only useful when it is tied to product margin and conversion rate.</p>
+            </div>
+          </div>
+          <div class="content-grid">
+            <div class="info-card">
+              <h3>Break-even ROAS</h3>
+              <p>The lowest ROAS that avoids losing money. If your listing needs a 4x break-even ROAS, a 2x campaign is not really working even if it brings sales.</p>
+            </div>
+            <div class="info-card">
+              <h3>Max CPC</h3>
+              <p>The highest click cost your conversion rate can support. Better photos, reviews and listing clarity can raise this number by improving conversion.</p>
+            </div>
+            <div class="info-card">
+              <h3>Target ROAS</h3>
+              <p>A safer benchmark that keeps profit after ads. Use it as the number to beat before raising budget.</p>
+            </div>
+          </div>
+          <div class="faq-stack">
+            <details class="faq-item">
+              <summary>Is this the same as the Offsite Ads calculator?</summary>
+              <p>No. Etsy Ads is usually CPC-based, so this calculator starts from clicks and conversion rate. Offsite Ads are attributed order fees, which are better modeled as a percentage of the order.</p>
+            </details>
+            <details class="faq-item">
+              <summary>What conversion rate should I enter?</summary>
+              <p>Use your listing or shop conversion rate if you know it. If not, test several scenarios such as 1.5%, 3%, and 5% to see how fragile the ad math is.</p>
+            </details>
+            <details class="faq-item">
+              <summary>When should I increase Etsy Ads budget?</summary>
+              <p>Raise budget only when the campaign clears target ROAS and still leaves acceptable profit per order. If it only clears break-even, improve the listing or pricing first.</p>
+            </details>
+          </div>
+        </div>
+      </section>
+
+      <section class="content-band wrap" id="tools">
+        <div class="section-head">
+          <div>
+            <h2>Focused Etsy seller tools</h2>
+            <p>Use Etsy Ads ROAS with fee, price target and Offsite Ads calculators before scaling paid traffic.</p>
+          </div>
+        </div>
+        <div class="tool-list">
+          <a class="tool-link" href="/etsy-fee-calculator"><strong>Etsy fee calculator</strong><span>Break down listing, transaction, processing and ad fees.</span></a>
+          <a class="tool-link" href="/etsy-profit-calculator"><strong>Etsy profit calculator</strong><span>Calculate margin, break-even price and product economics.</span></a>
+          <a class="tool-link" href="/etsy-price-target-calculator"><strong>Price target calculator</strong><span>Find the minimum item price for a target profit or margin.</span></a>
+          <a class="tool-link" href="/etsy-bundle-pricing-calculator"><strong>Bundle pricing calculator</strong><span>Price kits, sets and digital bundles without losing margin.</span></a>
+          <a class="tool-link" href="/etsy-ads-roas-calculator"><strong>Etsy Ads ROAS calculator</strong><span>Find break-even ROAS, target ROAS and max CPC.</span></a>
+          <a class="tool-link" href="/etsy-offsite-ads-calculator"><strong>Offsite Ads calculator</strong><span>Compare 12% and 15% attributed ad orders.</span></a>
+          <a class="tool-link" href="/free-etsy-pricing-spreadsheet"><strong>Pricing spreadsheet</strong><span>Copy a starter CSV for shop pricing research.</span></a>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <div class="footer-inner">
+        <span>ROAS math is a planning aid, not accounting advice.</span>
+        <span><a href="/about">About</a> · <a href="/contact">Contact</a> · <a href="/privacy">Privacy</a> · <a href="/terms">Terms</a></span>
+      </div>
+    </footer>
+    <script src="app.js"></script>
+  </body>
+</html>

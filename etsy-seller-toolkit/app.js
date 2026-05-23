@@ -901,6 +901,284 @@ Max break-even discount: ${pct(report.maxDiscount)}`;
   calculateBundleAndRender();
 }
 
+function readAdsInputs() {
+  const preset = currentPreset();
+  const customPayment = byId("countryPreset")?.value === "CUSTOM";
+  return {
+    preset,
+    price: val("adsItemPrice"),
+    quantity: Math.max(1, val("adsQuantity") || 1),
+    shippingCharged: val("adsShippingCharged"),
+    giftWrapCharged: 0,
+    itemCost: val("adsItemCost"),
+    shippingCost: val("adsShippingCost"),
+    packagingCost: val("adsPackagingCost"),
+    laborCost: val("adsLaborCost"),
+    adSpend: 0,
+    discountRate: clamp(val("adsDiscountRate"), 0, 100) / 100,
+    discountFixed: 0,
+    taxCollected: val("adsTaxCollected"),
+    listingUnits: Math.max(0, val("adsListingUnits")),
+    paymentRate: (customPayment ? val("paymentRate") : preset.rate * 100) / 100,
+    paymentFlat: customPayment ? val("paymentFlat") : preset.flat,
+    offsiteRate: val("adsOffsiteRate") / 100,
+    currencyConversion: bool("adsCurrencyConversion"),
+    regulatoryRate: val("adsRegulatoryRate") / 100,
+    digitalMode: false,
+    conversionRate: Math.max(0.1, val("adsConversionRate")) / 100,
+    averageCpc: Math.max(0, val("adsAverageCpc")),
+    monthlyBudget: Math.max(0, val("adsMonthlyBudget")),
+    targetMargin: clamp(val("adsTargetMargin"), 0, 80)
+  };
+}
+
+function roasLabel(value) {
+  if (!Number.isFinite(value) || value <= 0) return "N/A";
+  return `${compact.format(value)}x`;
+}
+
+function calculateAdsPlan(inputs) {
+  const baseResult = calculate(inputs);
+  const clicksPerOrder = inputs.conversionRate > 0 ? 1 / inputs.conversionRate : Infinity;
+  const currentAdSpendPerOrder = inputs.averageCpc * clicksPerOrder;
+  const profitAfterAds = baseResult.profit - currentAdSpendPerOrder;
+  const breakEvenSpend = Math.max(0, baseResult.profit);
+  const targetProfit = baseResult.sellerRevenue * (inputs.targetMargin / 100);
+  const targetAdSpend = Math.max(0, baseResult.profit - targetProfit);
+  const maxCpc = Number.isFinite(clicksPerOrder) && clicksPerOrder > 0 ? breakEvenSpend / clicksPerOrder : 0;
+  const targetCpc = Number.isFinite(clicksPerOrder) && clicksPerOrder > 0 ? targetAdSpend / clicksPerOrder : 0;
+  const breakEvenRoas = breakEvenSpend > 0 ? baseResult.sellerRevenue / breakEvenSpend : Infinity;
+  const targetRoas = targetAdSpend > 0 ? baseResult.sellerRevenue / targetAdSpend : Infinity;
+  const currentRoas = currentAdSpendPerOrder > 0 ? baseResult.sellerRevenue / currentAdSpendPerOrder : Infinity;
+  const ordersFromBudget = currentAdSpendPerOrder > 0 ? inputs.monthlyBudget / currentAdSpendPerOrder : 0;
+  const revenueFromBudget = ordersFromBudget * baseResult.sellerRevenue;
+  const profitFromBudget = ordersFromBudget * profitAfterAds;
+
+  return {
+    baseResult,
+    clicksPerOrder,
+    currentAdSpendPerOrder,
+    profitAfterAds,
+    breakEvenSpend,
+    targetProfit,
+    targetAdSpend,
+    maxCpc,
+    targetCpc,
+    breakEvenRoas,
+    targetRoas,
+    currentRoas,
+    ordersFromBudget,
+    revenueFromBudget,
+    profitFromBudget
+  };
+}
+
+function adsStatus(profitAfterAds, targetProfit) {
+  if (profitAfterAds < 0) return ["Losing money", "bad"];
+  if (profitAfterAds < targetProfit) return ["Below target", "warn"];
+  return ["Ad-safe", "good"];
+}
+
+function renderAdsScenarios(inputs, plan, fmt) {
+  const rows = [
+    ["Current CPC", inputs.averageCpc, inputs.conversionRate],
+    ["Conversion down 20%", inputs.averageCpc, inputs.conversionRate * 0.8],
+    ["CPC up 20%", inputs.averageCpc * 1.2, inputs.conversionRate],
+    ["Target-margin CPC", plan.targetCpc, inputs.conversionRate],
+    ["Break-even CPC", plan.maxCpc, inputs.conversionRate]
+  ];
+  const container = byId("adsScenarioRows");
+  if (!container) return;
+  container.innerHTML = rows
+    .map(([label, cpc, conversionRate]) => {
+      const clicksPerOrder = conversionRate > 0 ? 1 / conversionRate : Infinity;
+      const adSpendPerOrder = cpc * clicksPerOrder;
+      const profitAfterAds = plan.baseResult.profit - adSpendPerOrder;
+      const roas = adSpendPerOrder > 0 ? plan.baseResult.sellerRevenue / adSpendPerOrder : Infinity;
+      const [status, tone] = adsStatus(profitAfterAds, plan.targetProfit);
+      return `<tr>
+        <td>${label}</td>
+        <td>${fmt.format(cpc)}</td>
+        <td>${fmt.format(adSpendPerOrder)}</td>
+        <td>${roasLabel(roas)}</td>
+        <td>${fmt.format(profitAfterAds)}</td>
+        <td><span class="status ${tone}">${status}</span></td>
+      </tr>`;
+    })
+    .join("");
+}
+
+function renderAdsInsights(inputs, plan, fmt) {
+  const notes = [];
+  if (plan.baseResult.profit <= 0) {
+    notes.push("This listing has no profit cushion before ads. Fix price, costs or fees before buying traffic.");
+  } else if (plan.profitAfterAds < 0) {
+    notes.push(`The current CPC implies ${fmt.format(plan.currentAdSpendPerOrder)} ad cost per order, which is above the ${fmt.format(plan.breakEvenSpend)} break-even allowance.`);
+  } else if (plan.profitAfterAds < plan.targetProfit) {
+    notes.push(`Current ads are profitable but below the ${pct(inputs.targetMargin)} target margin. Try to get CPC near ${fmt.format(plan.targetCpc)} or improve conversion.`);
+  } else {
+    notes.push("The current CPC and conversion assumptions clear the target profit margin. This is a safer setup to budget-test.");
+  }
+  if (inputs.conversionRate < 0.02) {
+    notes.push("Conversion is under 2%. Listing improvements may raise max CPC faster than lowering bids alone.");
+  }
+  if (plan.breakEvenRoas > 4) {
+    notes.push("Break-even ROAS is high, so the listing needs unusually efficient traffic. Watch campaign search terms and pause weak clicks quickly.");
+  }
+  if (inputs.offsiteRate > 0) {
+    notes.push("Optional Offsite Ads are included, making this a conservative combined-ad stress test.");
+  }
+  notes.push(`At the current CPC, ${fmt.format(inputs.monthlyBudget)} budget implies about ${compact.format(plan.ordersFromBudget)} orders and ${fmt.format(plan.profitFromBudget)} profit after ads.`);
+
+  const list = byId("adsInsights");
+  if (list) list.innerHTML = notes.map((item) => `<li>${item}</li>`).join("");
+}
+
+function exportAdsCsv(inputs, plan) {
+  const rows = [
+    ["Metric", "Value"],
+    ["Item price", inputs.price],
+    ["Seller revenue per order", plan.baseResult.sellerRevenue],
+    ["Profit before Etsy Ads", plan.baseResult.profit],
+    ["Conversion rate percent", inputs.conversionRate * 100],
+    ["Average CPC", inputs.averageCpc],
+    ["Ad spend per order", plan.currentAdSpendPerOrder],
+    ["Profit after ads per order", plan.profitAfterAds],
+    ["Break-even ad spend per order", plan.breakEvenSpend],
+    ["Break-even ROAS", Number.isFinite(plan.breakEvenRoas) ? plan.breakEvenRoas : "N/A"],
+    ["Target ROAS", Number.isFinite(plan.targetRoas) ? plan.targetRoas : "N/A"],
+    ["Maximum break-even CPC", plan.maxCpc],
+    ["Target-margin CPC", plan.targetCpc],
+    ["Monthly budget", inputs.monthlyBudget],
+    ["Estimated orders from budget", plan.ordersFromBudget],
+    ["Estimated revenue from budget", plan.revenueFromBudget],
+    ["Estimated profit from budget", plan.profitFromBudget]
+  ];
+  return rows.map((row) => row.join(",")).join("\n");
+}
+
+function calculateAdsAndRender() {
+  const inputs = readAdsInputs();
+  const fmt = currencyFormatter(inputs.preset.currency);
+  const plan = calculateAdsPlan(inputs);
+  const [status, tone] = adsStatus(plan.profitAfterAds, plan.targetProfit);
+
+  text("currencyLabel", inputs.preset.currency);
+  text("paymentPresetText", `${inputs.preset.label}: ${pct(inputs.paymentRate * 100)} + ${fmt.format(inputs.paymentFlat)}`);
+  text("adsBreakEvenSpend", fmt.format(plan.breakEvenSpend));
+  text("adsBreakEvenRoas", roasLabel(plan.breakEvenRoas));
+  text("adsTargetRoas", roasLabel(plan.targetRoas));
+  text("adsMaxCpc", fmt.format(plan.maxCpc));
+  text("adsSpendPerOrder", fmt.format(plan.currentAdSpendPerOrder));
+  text("adsProfitAfterAds", fmt.format(plan.profitAfterAds));
+  text("adsOrdersFromBudget", compact.format(plan.ordersFromBudget));
+  text("adsRevenueFromBudget", fmt.format(plan.revenueFromBudget));
+  text("adsStatusLabel", status);
+
+  const statusEl = byId("adsStatusLabel");
+  if (statusEl) statusEl.className = `status ${tone}`;
+  const meter = byId("profitMeter");
+  if (meter) meter.style.setProperty("--value", `${clamp(plan.profitAfterAds / Math.max(plan.baseResult.sellerRevenue, 1) * 100, 0, 45) / 45 * 100}%`);
+
+  text("adsFormulaLine", `Before ads, this listing keeps ${fmt.format(plan.baseResult.profit)} profit. At ${pct(inputs.conversionRate * 100)} conversion and ${fmt.format(inputs.averageCpc)} CPC, ad cost is ${fmt.format(plan.currentAdSpendPerOrder)} per order, leaving ${fmt.format(plan.profitAfterAds)} profit after ads.`);
+  renderAdsScenarios(inputs, plan, fmt);
+  renderAdsInsights(inputs, plan, fmt);
+
+  window.currentAdsReport = {
+    inputs,
+    plan,
+    csv: exportAdsCsv(inputs, plan),
+    fmtCurrency: inputs.preset.currency
+  };
+}
+
+function bindAdsRoas() {
+  const tool = document.querySelector("[data-tool='etsy-ads-roas']");
+  if (!tool) return;
+
+  tool.querySelectorAll("input, select").forEach((input) => {
+    input.addEventListener("input", calculateAdsAndRender);
+    input.addEventListener("change", calculateAdsAndRender);
+  });
+
+  byId("countryPreset")?.addEventListener("change", () => {
+    const preset = currentPreset();
+    if (byId("countryPreset").value !== "CUSTOM") {
+      byId("paymentRate").value = compact.format(preset.rate * 100);
+      byId("paymentFlat").value = preset.flat;
+    }
+    calculateAdsAndRender();
+  });
+
+  document.querySelectorAll("[data-ads-preset]").forEach((button) => {
+    button.addEventListener("click", () => {
+      const type = button.dataset.adsPreset;
+      if (type === "handmade") {
+        byId("adsItemPrice").value = 32;
+        byId("adsShippingCharged").value = 4.99;
+        byId("adsItemCost").value = 9.5;
+        byId("adsShippingCost").value = 4.5;
+        byId("adsPackagingCost").value = 0.9;
+        byId("adsLaborCost").value = 3;
+        byId("adsConversionRate").value = 3;
+        byId("adsAverageCpc").value = 0.35;
+      }
+      if (type === "digital") {
+        byId("adsItemPrice").value = 12;
+        byId("adsShippingCharged").value = 0;
+        byId("adsItemCost").value = 0.4;
+        byId("adsShippingCost").value = 0;
+        byId("adsPackagingCost").value = 0;
+        byId("adsLaborCost").value = 1.5;
+        byId("adsConversionRate").value = 4;
+        byId("adsAverageCpc").value = 0.22;
+      }
+      if (type === "thin") {
+        byId("adsItemPrice").value = 21;
+        byId("adsShippingCharged").value = 0;
+        byId("adsItemCost").value = 11.5;
+        byId("adsShippingCost").value = 4.75;
+        byId("adsPackagingCost").value = 0.85;
+        byId("adsLaborCost").value = 2.5;
+        byId("adsConversionRate").value = 2;
+        byId("adsAverageCpc").value = 0.4;
+      }
+      calculateAdsAndRender();
+    });
+  });
+
+  byId("copyAdsSummary")?.addEventListener("click", async () => {
+    const report = window.currentAdsReport;
+    if (!report) return;
+    const fmt = currencyFormatter(report.fmtCurrency);
+    const summary = `Etsy Ads ROAS plan
+Revenue per order: ${fmt.format(report.plan.baseResult.sellerRevenue)}
+Profit before ads: ${fmt.format(report.plan.baseResult.profit)}
+Break-even ad spend/order: ${fmt.format(report.plan.breakEvenSpend)}
+Break-even ROAS: ${roasLabel(report.plan.breakEvenRoas)}
+Target ROAS: ${roasLabel(report.plan.targetRoas)}
+Max CPC: ${fmt.format(report.plan.maxCpc)}
+Profit after ads/order: ${fmt.format(report.plan.profitAfterAds)}`;
+    await navigator.clipboard.writeText(summary);
+    text("copyAdsSummary", "Copied");
+    setTimeout(() => text("copyAdsSummary", "Copy ad plan"), 1200);
+  });
+
+  byId("downloadAdsCsv")?.addEventListener("click", () => {
+    const report = window.currentAdsReport;
+    if (!report) return;
+    const blob = new Blob([report.csv], { type: "text/csv" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = "etsy-ads-roas-plan.csv";
+    link.click();
+    URL.revokeObjectURL(url);
+  });
+
+  calculateAdsAndRender();
+}
+
 function bindSpreadsheetBuilder() {
   const builder = document.querySelector("[data-tool='spreadsheet-builder']");
   if (!builder) return;
@@ -924,4 +1202,5 @@ function bindSpreadsheetBuilder() {
 bindCalculator();
 bindTargetPrice();
 bindBundlePricing();
+bindAdsRoas();
 bindSpreadsheetBuilder();
