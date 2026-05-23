@@ -806,6 +806,91 @@ function initCreatorHookGenerator() {
   buildHooks();
 }
 
+function initCreatorScriptTimer() {
+  const shell = document.querySelector("[data-tool='creator-script-timer']");
+  if (!shell) return;
+
+  const script = document.getElementById("scriptText");
+  const platform = document.getElementById("scriptPlatform");
+  const targetSeconds = document.getElementById("scriptTargetSeconds");
+  const wordsPerMinute = document.getElementById("scriptWpm");
+  const copy = document.getElementById("copyScriptPlan");
+  let lastPlan = "";
+
+  function words(text) {
+    return (text || "").trim().split(/\s+/).filter(Boolean);
+  }
+
+  function formatDuration(seconds) {
+    const safe = Math.max(0, Math.round(seconds));
+    const mins = Math.floor(safe / 60);
+    const secs = safe % 60;
+    return mins ? `${mins}m ${secs}s` : `${secs}s`;
+  }
+
+  function render() {
+    const text = script.value.trim();
+    const wordCount = words(text).length;
+    const target = Math.max(5, num("scriptTargetSeconds") || 30);
+    const wpm = Math.max(80, num("scriptWpm") || 150);
+    const duration = wordCount ? (wordCount / wpm) * 60 : 0;
+    const targetWords = Math.round((target / 60) * wpm);
+    const delta = wordCount - targetWords;
+    const fit = Math.abs(duration - target) <= 3 ? "On target" : duration > target ? "Too long" : "Room to add";
+    const platformName = platform.value;
+    const hookBudget = Math.max(4, Math.round(target * 0.18));
+    const proofBudget = Math.max(8, Math.round(target * 0.55));
+    const payoffBudget = Math.max(4, target - hookBudget - proofBudget);
+    const suggestions = [];
+
+    if (!wordCount) {
+      suggestions.push("Paste a draft script to estimate timing and pacing.");
+    } else if (duration > target) {
+      suggestions.push(`Cut about ${Math.max(1, delta)} words or split the idea into two posts.`);
+      suggestions.push("Remove setup, repeated qualifiers, and any sentence that does not move the viewer toward the payoff.");
+    } else if (duration < target * 0.72) {
+      suggestions.push(`You can add about ${Math.max(1, Math.abs(delta))} words, but only if they make the proof or example clearer.`);
+      suggestions.push("Use the extra room for one concrete example, not a longer intro.");
+    } else {
+      suggestions.push("The script is close to the target window. Tighten the hook and keep the payoff explicit.");
+    }
+
+    setText("scriptWordCount", numberFormat.format(wordCount));
+    setText("scriptDuration", formatDuration(duration));
+    setText("scriptTargetFit", fit);
+    setText("scriptDelta", delta === 0 ? "Exact target" : delta > 0 ? `${numberFormat.format(delta)} words over` : `${numberFormat.format(Math.abs(delta))} words under`);
+    setText("scriptPacing", `${platformName}: ${hookBudget}s hook · ${proofBudget}s proof · ${payoffBudget}s payoff`);
+    setText("scriptPreview", text ? text.split(/\n+/)[0].slice(0, 120) : "Paste a script draft to get timing.");
+    setText("scriptMeta", `${numberFormat.format(wpm)} wpm · ${formatDuration(target)} target`);
+    setMeter("scriptMeter", target ? Math.min(100, (duration / target) * 100) : 0);
+
+    const list = document.getElementById("scriptSuggestions");
+    if (list) list.innerHTML = suggestions.map((item) => `<li>${item}</li>`).join("");
+    lastPlan = [
+      `${platformName} script timing plan`,
+      `Words: ${wordCount}`,
+      `Estimated duration: ${formatDuration(duration)}`,
+      `Target: ${formatDuration(target)}`,
+      `Fit: ${fit}`,
+      `Pacing: ${hookBudget}s hook / ${proofBudget}s proof / ${payoffBudget}s payoff`,
+      "",
+      "Suggestions:",
+      ...suggestions.map((item) => `- ${item}`)
+    ].join("\n");
+  }
+
+  shell.querySelectorAll("textarea, input, select").forEach((input) => {
+    input.addEventListener("input", render);
+    input.addEventListener("change", render);
+  });
+  copy?.addEventListener("click", async () => {
+    await navigator.clipboard.writeText(lastPlan);
+    copy.textContent = "Copied plan";
+    setTimeout(() => (copy.textContent = "Copy timing plan"), 1200);
+  });
+  render();
+}
+
 initTikTok();
 initLineBreaks();
 initTitleChecker();
@@ -820,3 +905,4 @@ initBioGenerator();
 initChannelNameGenerator();
 initContentBriefGenerator();
 initCreatorHookGenerator();
+initCreatorScriptTimer();
