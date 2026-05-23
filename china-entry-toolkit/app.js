@@ -792,6 +792,31 @@ async function copyText(text) {
   return copied;
 }
 
+function downloadTextFile(filename, text) {
+  if (!text) return false;
+  const blob = new Blob([text], { type: "text/plain;charset=utf-8" });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = filename;
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  URL.revokeObjectURL(url);
+  return true;
+}
+
+function printTravelCard(shell) {
+  if (!shell) return;
+  shell.classList.add("print-target");
+  document.body.classList.add("print-travel-card");
+  window.print();
+  setTimeout(() => {
+    shell.classList.remove("print-target");
+    document.body.classList.remove("print-travel-card");
+  }, 400);
+}
+
 function initPolicyMeta() {
   document.querySelectorAll("[data-policy-review]").forEach((node) => {
     node.textContent = SITE_REVIEW_DATE;
@@ -1356,9 +1381,12 @@ function initHotelCardGenerator() {
   const previewEn = shell.querySelector(".hotel-preview-en");
   const feedback = shell.querySelector(".copy-feedback");
   const copyButtons = shell.querySelectorAll("[data-copy-hotel-card]");
+  const downloadButton = shell.querySelector("[data-download-hotel-card]");
+  const printButton = shell.querySelector("[data-print-hotel-card]");
 
   let activePreset = "checkin";
   let payloads = { zh: "", en: "", full: "" };
+  let hasCoreDetails = false;
 
   function evaluate() {
     const preset = hotelCardPresets[activePreset] || hotelCardPresets.checkin;
@@ -1372,6 +1400,7 @@ function initHotelCardGenerator() {
     const noteEn = (noteEnField?.value || "").trim() || preset.noteEn;
     const noteZh = (noteZhField?.value || "").trim() || preset.noteZh;
     const hasCore = [hotelEn, hotelZh, guestName, booking].some(Boolean);
+    hasCoreDetails = hasCore;
 
     titleEnNode.textContent = preset.titleEn;
     titleZhNode.textContent = preset.titleZh;
@@ -1411,6 +1440,8 @@ function initHotelCardGenerator() {
     copyButtons.forEach((button) => {
       button.disabled = !hasCore;
     });
+    if (downloadButton) downloadButton.disabled = !hasCore;
+    if (printButton) printButton.disabled = !hasCore;
     if (feedback) {
       feedback.textContent = hasCore
         ? "Copy the Chinese card for the front desk, or keep the bilingual version in your notes before arrival."
@@ -1451,6 +1482,19 @@ function initHotelCardGenerator() {
     });
   });
 
+  downloadButton?.addEventListener("click", () => {
+    const ok = downloadTextFile("china-hotel-check-in-card.txt", payloads.full);
+    if (feedback) {
+      feedback.textContent = ok ? "Saved as a text file. Keep it available offline with your booking screenshot." : "Add hotel details before saving the card.";
+    }
+  });
+
+  printButton?.addEventListener("click", () => {
+    if (!hasCoreDetails) return;
+    if (feedback) feedback.textContent = "Opening print dialog for the card area.";
+    printTravelCard(shell);
+  });
+
   evaluate();
 }
 
@@ -1478,9 +1522,12 @@ function initTaxiRideCardGenerator() {
   const previewEn = shell.querySelector(".taxi-preview-en");
   const feedback = shell.querySelector(".copy-feedback");
   const copyButtons = shell.querySelectorAll("[data-copy-taxi-card]");
+  const downloadButton = shell.querySelector("[data-download-taxi-card]");
+  const printButton = shell.querySelector("[data-print-taxi-card]");
 
   let activePreset = "airport";
   let payloads = { zh: "", en: "", full: "" };
+  let hasCoreDetails = false;
 
   function evaluate() {
     const preset = taxiRideCardPresets[activePreset] || taxiRideCardPresets.airport;
@@ -1496,6 +1543,7 @@ function initTaxiRideCardGenerator() {
     const noteEn = (noteEnField?.value || "").trim() || preset.noteEn;
     const noteZh = (noteZhField?.value || "").trim() || preset.noteZh;
     const hasCore = [pickupEn, pickupZh, destinationEn, destinationZh, contactPhone].some(Boolean);
+    hasCoreDetails = hasCore;
 
     titleEnNode.textContent = preset.titleEn;
     titleZhNode.textContent = preset.titleZh;
@@ -1535,6 +1583,8 @@ function initTaxiRideCardGenerator() {
     copyButtons.forEach((button) => {
       button.disabled = !hasCore;
     });
+    if (downloadButton) downloadButton.disabled = !hasCore;
+    if (printButton) printButton.disabled = !hasCore;
     if (feedback) {
       feedback.textContent = hasCore
         ? "Copy the Chinese card for a driver, or keep the bilingual version in notes for pickup confusion."
@@ -1575,6 +1625,19 @@ function initTaxiRideCardGenerator() {
         feedback.textContent = ok ? "Copied. Save it before you leave the airport, station, or hotel Wi-Fi." : "Copy failed in the browser. Try selecting the card text manually.";
       }
     });
+  });
+
+  downloadButton?.addEventListener("click", () => {
+    const ok = downloadTextFile("china-taxi-didi-card.txt", payloads.full);
+    if (feedback) {
+      feedback.textContent = ok ? "Saved as a text file. Keep it available before leaving reliable Wi-Fi." : "Add pickup, destination, or contact details before saving the card.";
+    }
+  });
+
+  printButton?.addEventListener("click", () => {
+    if (!hasCoreDetails) return;
+    if (feedback) feedback.textContent = "Opening print dialog for the card area.";
+    printTravelCard(shell);
   });
 
   evaluate();
