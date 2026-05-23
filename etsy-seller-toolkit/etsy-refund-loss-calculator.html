@@ -1,0 +1,230 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Etsy Refund Loss Calculator: Returns, Replacements and Resale</title>
+    <meta name="description" content="Calculate how much an Etsy refund, return shipping label, replacement order or resale recovery changes your real order profit.">
+    <link rel="canonical" href="https://etsy.shortformtools.com/etsy-refund-loss-calculator">
+    <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+    <link rel="stylesheet" href="styles.css">
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4259477754165351" crossorigin="anonymous"></script>
+    <script type="application/ld+json">
+      [{"@context":"https://schema.org","@type":"WebSite","name":"Etsy Seller Profit Toolkit","url":"https://etsy.shortformtools.com/"},{"@context":"https://schema.org","@type":"SoftwareApplication","name":"Etsy Refund Loss Calculator","applicationCategory":"BusinessApplication","operatingSystem":"Web","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"}}]
+    </script>
+  </head>
+  <body>
+    <header class="site-header">
+      <nav class="nav" aria-label="Primary navigation">
+        <a class="brand" href="/"><span class="mark">E</span><span>Etsy Seller Toolkit</span></a>
+        <div class="nav-links">
+          <a href="/etsy-fee-calculator">Fee calculator</a>
+          <a href="/etsy-profit-calculator">Profit calculator</a>
+          <a href="/etsy-price-target-calculator">Price target</a>
+          <a href="/etsy-bundle-pricing-calculator">Bundle pricing</a>
+          <a href="/etsy-ads-roas-calculator">Etsy Ads ROAS</a>
+          <a href="/etsy-refund-loss-calculator">Refund loss</a>
+          <a href="/free-etsy-pricing-spreadsheet">Spreadsheet</a>
+        </div>
+      </nav>
+    </header>
+
+    <main>
+      <section class="hero wrap">
+        <div>
+          <p class="eyebrow">Etsy refund loss calculator</p>
+          <h1>See the real cost of a refund, return, replacement or resale.</h1>
+          <p class="lead">Start from the original order profit, then model refunded revenue, fee credits, return shipping, replacement costs and resale recovery so customer service decisions do not quietly erase your margin.</p>
+          <div class="hero-actions">
+            <a class="button primary" href="#calculator">Calculate refund loss</a>
+            <a class="button" href="/etsy-discount-profit-calculator">Check discount margin</a>
+          </div>
+        </div>
+        <aside class="hero-panel" aria-label="Example refund impact">
+          <div class="mini-ledger">
+            <div class="ledger-line"><span>Original profit</span><strong>$13.97</strong></div>
+            <div class="ledger-line"><span>Refund impact</span><strong>-$18.20</strong></div>
+            <div class="ledger-line"><span>Return label</span><strong>-$4.50</strong></div>
+            <div class="ledger-line"><span>After return</span><strong>-$8.73</strong></div>
+          </div>
+        </aside>
+      </section>
+
+      <section class="tool-shell wrap" id="calculator" data-tool="etsy-refund-loss">
+        <div class="tool-grid">
+          <section class="tool-panel">
+            <div class="section-head">
+              <div>
+                <h2>Refund and replacement planner</h2>
+                <p>Enter the original order first, then choose how much you refund and what you spend to resolve it.</p>
+              </div>
+              <span class="status ok" id="currencyLabel">USD</span>
+            </div>
+            <div class="preset-row">
+              <button type="button" data-refund-preset="full">Full refund + return</button>
+              <button type="button" data-refund-preset="partial">Partial refund</button>
+              <button type="button" data-refund-preset="replacement">Replacement</button>
+            </div>
+
+            <div class="field-grid">
+              <div class="group-title">Original order</div>
+              <div class="field"><label for="refundItemPrice">Item price</label><input id="refundItemPrice" type="number" min="0" step="0.01" value="34"></div>
+              <div class="field"><label for="refundQuantity">Quantity sold</label><input id="refundQuantity" type="number" min="1" step="1" value="1"></div>
+              <div class="field"><label for="refundShippingCharged">Shipping charged to buyer</label><input id="refundShippingCharged" type="number" min="0" step="0.01" value="4.99"></div>
+              <div class="field"><label for="refundItemCost">Item cost per unit</label><input id="refundItemCost" type="number" min="0" step="0.01" value="9.50"></div>
+              <div class="field"><label for="refundOriginalShippingCost">Original shipping label cost</label><input id="refundOriginalShippingCost" type="number" min="0" step="0.01" value="4.50"></div>
+              <div class="field"><label for="refundPackagingCost">Original packaging cost</label><input id="refundPackagingCost" type="number" min="0" step="0.01" value="0.90"></div>
+              <div class="field"><label for="refundLaborCost">Original labor cost</label><input id="refundLaborCost" type="number" min="0" step="0.01" value="3.00"></div>
+              <div class="field"><label for="refundDiscountRate">Original discount percent</label><input id="refundDiscountRate" type="number" min="0" max="100" step="0.1" value="0"></div>
+
+              <div class="group-title">Resolution costs</div>
+              <div class="field"><label for="refundPercent">Item refund percent</label><input id="refundPercent" type="number" min="0" max="100" step="0.1" value="100"></div>
+              <div class="field"><label for="refundShippingAmount">Shipping amount refunded</label><input id="refundShippingAmount" type="number" min="0" step="0.01" value="4.99"></div>
+              <div class="field"><label for="refundReturnShippingCost">Return shipping paid by seller</label><input id="refundReturnShippingCost" type="number" min="0" step="0.01" value="4.50"></div>
+              <div class="field"><label for="refundResaleRecovery">Resale or salvage recovery</label><input id="refundResaleRecovery" type="number" min="0" step="0.01" value="12.00"><span class="hint">Expected profit/revenue recovery from a returned item.</span></div>
+              <div class="field"><label for="refundFeeCreditRate">Refunded fee credit percent</label><input id="refundFeeCreditRate" type="number" min="0" max="100" step="1" value="100"><span class="hint">Use 100 when Etsy credits eligible transaction/payment fees, lower for edge cases.</span></div>
+              <div class="field"><label for="refundRestockLaborCost">Restock or support labor</label><input id="refundRestockLaborCost" type="number" min="0" step="0.01" value="1.50"></div>
+
+              <div class="group-title">Replacement option</div>
+              <div class="field"><label for="refundReplacementItemCost">Replacement item cost</label><input id="refundReplacementItemCost" type="number" min="0" step="0.01" value="9.50"></div>
+              <div class="field"><label for="refundReplacementShippingCost">Replacement shipping cost</label><input id="refundReplacementShippingCost" type="number" min="0" step="0.01" value="4.50"></div>
+              <div class="field"><label for="refundReplacementPackagingCost">Replacement packaging</label><input id="refundReplacementPackagingCost" type="number" min="0" step="0.01" value="0.90"></div>
+              <div class="field"><label for="refundReplacementLaborCost">Replacement labor</label><input id="refundReplacementLaborCost" type="number" min="0" step="0.01" value="2.00"></div>
+
+              <div class="group-title">Fee assumptions</div>
+              <div class="field full">
+                <label for="countryPreset">Seller payment country</label>
+                <select id="countryPreset">
+                  <option value="US">United States</option>
+                  <option value="UK">United Kingdom</option>
+                  <option value="CA">Canada domestic / US orders</option>
+                  <option value="CA_INTL">Canada international</option>
+                  <option value="AU">Australia domestic</option>
+                  <option value="AU_INTL">Australia international</option>
+                  <option value="EU">EU common rate</option>
+                  <option value="CUSTOM">Custom processing rate</option>
+                </select>
+                <span class="hint" id="paymentPresetText">United States: 3% + $0.25</span>
+              </div>
+              <div class="field"><label for="refundListingUnits">Listing fee units</label><input id="refundListingUnits" type="number" min="0" step="1" value="1"></div>
+              <div class="field"><label for="paymentRate">Custom payment percent</label><input id="paymentRate" type="number" min="0" step="0.1" value="3"></div>
+              <div class="field"><label for="paymentFlat">Custom payment flat fee</label><input id="paymentFlat" type="number" min="0" step="0.01" value="0.25"></div>
+              <div class="field"><label for="refundOffsiteRate">Offsite Ads percent</label><input id="refundOffsiteRate" type="number" min="0" step="0.1" value="0"></div>
+              <div class="field"><label for="refundTaxCollected">Sales tax collected</label><input id="refundTaxCollected" type="number" min="0" step="0.01" value="0"></div>
+              <div class="field"><label for="refundRegulatoryRate">Regulatory operating fee percent</label><input id="refundRegulatoryRate" type="number" min="0" step="0.1" value="0"></div>
+              <div class="field check-row"><input id="refundCurrencyConversion" type="checkbox"><label for="refundCurrencyConversion">Apply 2.5% currency conversion fee</label></div>
+            </div>
+          </section>
+
+          <aside class="result-panel" aria-live="polite">
+            <div class="result-stack">
+              <div class="metric-large">
+                <span>Profit after refund/return</span>
+                <strong id="refundAfterReturnProfit">$0.00</strong>
+                <div class="meter" id="profitMeter"></div>
+              </div>
+              <div><span id="refundStatusLabel" class="status ok">Workable</span></div>
+              <div class="metric-grid">
+                <div class="metric"><span>Original profit</span><strong id="refundOriginalProfit">$0.00</strong></div>
+                <div class="metric"><span>Refund sent</span><strong id="refundAmountResult">$0.00</strong></div>
+                <div class="metric"><span>Estimated fee credit</span><strong id="refundFeeCredit">$0.00</strong></div>
+                <div class="metric"><span>Return scenario loss</span><strong id="refundReturnLoss">$0.00</strong></div>
+                <div class="metric"><span>Replacement profit</span><strong id="refundReplacementProfit">$0.00</strong></div>
+                <div class="metric"><span>Replacement loss</span><strong id="refundReplacementLoss">$0.00</strong></div>
+                <div class="metric"><span>Max refund to break even</span><strong id="refundMaxSafe">$0.00</strong></div>
+              </div>
+              <div class="formula" id="refundFormulaLine"></div>
+              <ul class="insights" id="refundInsights"></ul>
+              <div class="hero-actions">
+                <button type="button" id="copyRefundSummary">Copy resolution plan</button>
+                <button type="button" id="downloadRefundCsv">Download CSV</button>
+              </div>
+            </div>
+          </aside>
+        </div>
+      </section>
+
+      <section class="content-band wrap">
+        <div class="plain-panel">
+          <div class="section-head">
+            <div>
+              <h2>Resolution scenarios</h2>
+              <p>Compare full refund, partial refund, return with resale and replacement outcomes from the same order.</p>
+            </div>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Scenario</th><th>Refund</th><th>Extra cost</th><th>Fee credit</th><th>Final profit</th><th>Status</th></tr></thead>
+              <tbody id="refundScenarioRows"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <section class="content-band wrap">
+        <div class="plain-panel">
+          <div class="section-head">
+            <div>
+              <h2>How to use this before replying to a buyer</h2>
+              <p>The goal is not to avoid good customer service. It is to know the real cost before choosing the fairest resolution.</p>
+            </div>
+          </div>
+          <div class="content-grid">
+            <div class="info-card">
+              <h3>Separate sunk costs</h3>
+              <p>Product, original shipping, packaging and labor are already spent. A full refund can turn a profitable sale into a loss even when some fees are credited.</p>
+            </div>
+            <div class="info-card">
+              <h3>Compare replacement</h3>
+              <p>A replacement avoids refunding revenue, but it adds another unit, another label and more labor. For low-margin items, replacement can cost more than a partial refund.</p>
+            </div>
+            <div class="info-card">
+              <h3>Price for policy reality</h3>
+              <p>If returns are common in a category, build a refund reserve into the item price or shipping strategy instead of treating every return as a surprise.</p>
+            </div>
+          </div>
+          <div class="faq-stack">
+            <details class="faq-item">
+              <summary>Does Etsy refund seller fees when I refund a buyer?</summary>
+              <p>Etsy says transaction and processing fees for refunded transactions are automatically credited when the refund is issued through Shop Manager, while prepaid service fees such as listing fees are generally non-refundable. Use the fee credit percent field when your actual case differs.</p>
+            </details>
+            <details class="faq-item">
+              <summary>Should resale recovery be revenue or profit?</summary>
+              <p>Use the conservative value you expect to recover after extra handling. If you will relist and ship the item again, enter only the net recovery you trust, not the full list price.</p>
+            </details>
+            <details class="faq-item">
+              <summary>Can this decide my return policy?</summary>
+              <p>It is a planning aid, not legal or accounting advice. Use it to see whether your current prices can support the policy you already promise on your Etsy listings.</p>
+            </details>
+          </div>
+        </div>
+      </section>
+
+      <section class="content-band wrap" id="tools">
+        <div class="section-head">
+          <div>
+            <h2>Focused Etsy seller tools</h2>
+            <p>Use refund loss together with pricing, discount and ad calculators to keep service decisions profitable.</p>
+          </div>
+        </div>
+        <div class="tool-list">
+          <a class="tool-link" href="/etsy-fee-calculator"><strong>Etsy fee calculator</strong><span>Break down listing, transaction, processing and ad fees.</span></a>
+          <a class="tool-link" href="/etsy-profit-calculator"><strong>Etsy profit calculator</strong><span>Calculate margin, break-even price and product economics.</span></a>
+          <a class="tool-link" href="/etsy-price-target-calculator"><strong>Price target calculator</strong><span>Find the minimum item price for a target profit or margin.</span></a>
+          <a class="tool-link" href="/etsy-discount-profit-calculator"><strong>Discount profit</strong><span>Check coupons and sales before launching.</span></a>
+          <a class="tool-link" href="/etsy-ads-roas-calculator"><strong>Etsy Ads ROAS calculator</strong><span>Find break-even ROAS, target ROAS and max CPC.</span></a>
+          <a class="tool-link" href="/etsy-refund-loss-calculator"><strong>Refund loss calculator</strong><span>Compare refunds, returns, replacements and resale recovery.</span></a>
+          <a class="tool-link" href="/free-etsy-pricing-spreadsheet"><strong>Pricing spreadsheet</strong><span>Copy a starter CSV for shop pricing research.</span></a>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <div class="footer-inner">
+        <span>Refund math is a planning aid, not accounting or legal advice.</span>
+        <span><a href="/about">About</a> · <a href="/contact">Contact</a> · <a href="/privacy">Privacy</a> · <a href="/terms">Terms</a></span>
+      </div>
+    </footer>
+    <script src="app.js"></script>
+  </body>
+</html>

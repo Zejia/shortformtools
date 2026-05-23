@@ -1179,6 +1179,279 @@ Profit after ads/order: ${fmt.format(report.plan.profitAfterAds)}`;
   calculateAdsAndRender();
 }
 
+function readRefundInputs() {
+  const preset = currentPreset();
+  const customPayment = byId("countryPreset")?.value === "CUSTOM";
+  return {
+    preset,
+    price: val("refundItemPrice"),
+    quantity: Math.max(1, val("refundQuantity") || 1),
+    shippingCharged: val("refundShippingCharged"),
+    giftWrapCharged: 0,
+    itemCost: val("refundItemCost"),
+    shippingCost: val("refundOriginalShippingCost"),
+    packagingCost: val("refundPackagingCost"),
+    laborCost: val("refundLaborCost"),
+    adSpend: 0,
+    discountRate: clamp(val("refundDiscountRate"), 0, 100) / 100,
+    discountFixed: 0,
+    taxCollected: val("refundTaxCollected"),
+    listingUnits: Math.max(0, val("refundListingUnits")),
+    paymentRate: (customPayment ? val("paymentRate") : preset.rate * 100) / 100,
+    paymentFlat: customPayment ? val("paymentFlat") : preset.flat,
+    offsiteRate: val("refundOffsiteRate") / 100,
+    currencyConversion: bool("refundCurrencyConversion"),
+    regulatoryRate: val("refundRegulatoryRate") / 100,
+    digitalMode: false,
+    refundPercent: clamp(val("refundPercent"), 0, 100) / 100,
+    refundShippingAmount: val("refundShippingAmount"),
+    returnShippingCost: val("refundReturnShippingCost"),
+    resaleRecovery: val("refundResaleRecovery"),
+    feeCreditRate: clamp(val("refundFeeCreditRate"), 0, 100) / 100,
+    restockLaborCost: val("refundRestockLaborCost"),
+    replacementItemCost: val("refundReplacementItemCost"),
+    replacementShippingCost: val("refundReplacementShippingCost"),
+    replacementPackagingCost: val("refundReplacementPackagingCost"),
+    replacementLaborCost: val("refundReplacementLaborCost")
+  };
+}
+
+function calculateRefundPlan(inputs) {
+  const original = calculate(inputs);
+  const refundItemAmount = original.itemRevenue * inputs.refundPercent;
+  const refundAmount = clamp(refundItemAmount + inputs.refundShippingAmount, 0, original.sellerRevenue);
+  const refundShare = original.sellerRevenue > 0 ? clamp(refundAmount / original.sellerRevenue, 0, 1) : 0;
+  const eligibleFees = Math.max(0, original.platformFees - original.listingFee);
+  const feeCredit = eligibleFees * refundShare * inputs.feeCreditRate;
+  const returnExtraCost = inputs.returnShippingCost + inputs.restockLaborCost;
+  const afterReturnProfit = original.profit - refundAmount + feeCredit - returnExtraCost + inputs.resaleRecovery;
+  const replacementCost = inputs.replacementItemCost + inputs.replacementShippingCost + inputs.replacementPackagingCost + inputs.replacementLaborCost;
+  const replacementProfit = original.profit - replacementCost - inputs.restockLaborCost;
+  const replacementWithReturnProfit = replacementProfit - inputs.returnShippingCost + inputs.resaleRecovery;
+  let low = 0;
+  let high = original.sellerRevenue;
+  for (let i = 0; i < 50; i += 1) {
+    const mid = (low + high) / 2;
+    const midShare = original.sellerRevenue > 0 ? mid / original.sellerRevenue : 0;
+    const midCredit = eligibleFees * midShare * inputs.feeCreditRate;
+    const midProfit = original.profit - mid + midCredit - returnExtraCost + inputs.resaleRecovery;
+    if (midProfit >= 0) low = mid;
+    else high = mid;
+  }
+  const maxSafeRefund = Math.min(original.sellerRevenue, low);
+
+  return {
+    original,
+    refundItemAmount,
+    refundAmount,
+    refundShare,
+    eligibleFees,
+    feeCredit,
+    returnExtraCost,
+    afterReturnProfit,
+    returnLoss: original.profit - afterReturnProfit,
+    replacementCost,
+    replacementProfit,
+    replacementWithReturnProfit,
+    replacementLoss: original.profit - replacementProfit,
+    maxSafeRefund
+  };
+}
+
+function refundStatus(profit) {
+  if (profit < 0) return ["Creates loss", "bad"];
+  if (profit < 5) return ["Thin recovery", "warn"];
+  return ["Protected", "good"];
+}
+
+function refundScenario(label, finalProfit, refund, extraCost, feeCredit) {
+  return { label, finalProfit, refund, extraCost, feeCredit };
+}
+
+function renderRefundScenarios(inputs, plan, fmt) {
+  const halfRefund = plan.original.itemRevenue * 0.5;
+  const halfCredit = plan.eligibleFees * (plan.original.sellerRevenue > 0 ? halfRefund / plan.original.sellerRevenue : 0) * inputs.feeCreditRate;
+  const noReturnProfit = plan.original.profit - plan.refundAmount + plan.feeCredit;
+  const rows = [
+    refundScenario("Current refund + return", plan.afterReturnProfit, plan.refundAmount, plan.returnExtraCost - inputs.resaleRecovery, plan.feeCredit),
+    refundScenario("Refund only", noReturnProfit, plan.refundAmount, 0, plan.feeCredit),
+    refundScenario("50% item refund", plan.original.profit - halfRefund + halfCredit, halfRefund, 0, halfCredit),
+    refundScenario("Replacement only", plan.replacementProfit, 0, plan.replacementCost + inputs.restockLaborCost, 0),
+    refundScenario("Replacement + returned resale", plan.replacementWithReturnProfit, 0, plan.replacementCost + plan.returnExtraCost - inputs.resaleRecovery, 0)
+  ];
+  const container = byId("refundScenarioRows");
+  if (!container) return;
+  container.innerHTML = rows
+    .map((row) => {
+      const [status, tone] = refundStatus(row.finalProfit);
+      return `<tr>
+        <td>${row.label}</td>
+        <td>${fmt.format(row.refund)}</td>
+        <td>${fmt.format(row.extraCost)}</td>
+        <td>${fmt.format(row.feeCredit)}</td>
+        <td>${fmt.format(row.finalProfit)}</td>
+        <td><span class="status ${tone}">${status}</span></td>
+      </tr>`;
+    })
+    .join("");
+}
+
+function renderRefundInsights(inputs, plan, fmt) {
+  const notes = [];
+  if (plan.afterReturnProfit < 0) {
+    notes.push(`The current return plan turns the order negative. The maximum break-even refund is about ${fmt.format(plan.maxSafeRefund)} after fee credits, return cost and resale recovery.`);
+  } else if (plan.afterReturnProfit < plan.original.profit * 0.35) {
+    notes.push("This resolution preserves the relationship but gives up most of the original profit. Consider whether a partial refund would solve the same buyer problem.");
+  } else {
+    notes.push("This resolution still protects a reasonable amount of the original profit.");
+  }
+  if (inputs.returnShippingCost > 0 && inputs.resaleRecovery <= 0) {
+    notes.push("Seller-paid return shipping with no resale recovery is the hardest version of the math. Build that risk into pricing if it happens often.");
+  }
+  if (plan.replacementProfit < plan.afterReturnProfit) {
+    notes.push("The replacement option is more expensive than the refund/return path under these assumptions.");
+  } else {
+    notes.push("Replacement keeps more profit than the refund/return path here, assuming the buyer accepts it and no extra refund is needed.");
+  }
+  if (inputs.feeCreditRate < 1) {
+    notes.push("The fee credit field is below 100%, so the calculator is intentionally conservative about reimbursed fees.");
+  }
+
+  const list = byId("refundInsights");
+  if (list) list.innerHTML = notes.map((item) => `<li>${item}</li>`).join("");
+}
+
+function exportRefundCsv(inputs, plan) {
+  const rows = [
+    ["Metric", "Value"],
+    ["Original seller revenue", plan.original.sellerRevenue],
+    ["Original profit", plan.original.profit],
+    ["Refund amount", plan.refundAmount],
+    ["Estimated fee credit", plan.feeCredit],
+    ["Return shipping paid by seller", inputs.returnShippingCost],
+    ["Restock/support labor", inputs.restockLaborCost],
+    ["Resale recovery", inputs.resaleRecovery],
+    ["Profit after refund and return", plan.afterReturnProfit],
+    ["Return scenario loss", plan.returnLoss],
+    ["Replacement cost", plan.replacementCost],
+    ["Replacement profit", plan.replacementProfit],
+    ["Replacement loss", plan.replacementLoss],
+    ["Max refund to break even", plan.maxSafeRefund]
+  ];
+  return rows.map((row) => row.join(",")).join("\n");
+}
+
+function calculateRefundAndRender() {
+  const inputs = readRefundInputs();
+  const fmt = currencyFormatter(inputs.preset.currency);
+  const plan = calculateRefundPlan(inputs);
+  const [status, tone] = refundStatus(plan.afterReturnProfit);
+
+  text("currencyLabel", inputs.preset.currency);
+  text("paymentPresetText", `${inputs.preset.label}: ${pct(inputs.paymentRate * 100)} + ${fmt.format(inputs.paymentFlat)}`);
+  text("refundAfterReturnProfit", fmt.format(plan.afterReturnProfit));
+  text("refundOriginalProfit", fmt.format(plan.original.profit));
+  text("refundAmountResult", fmt.format(plan.refundAmount));
+  text("refundFeeCredit", fmt.format(plan.feeCredit));
+  text("refundReturnLoss", fmt.format(plan.returnLoss));
+  text("refundReplacementProfit", fmt.format(plan.replacementProfit));
+  text("refundReplacementLoss", fmt.format(plan.replacementLoss));
+  text("refundMaxSafe", fmt.format(plan.maxSafeRefund));
+  text("refundStatusLabel", status);
+
+  const statusEl = byId("refundStatusLabel");
+  if (statusEl) statusEl.className = `status ${tone}`;
+  const meter = byId("profitMeter");
+  if (meter) meter.style.setProperty("--value", `${clamp(plan.afterReturnProfit / Math.max(plan.original.sellerRevenue, 1) * 100, 0, 45) / 45 * 100}%`);
+
+  text("refundFormulaLine", `Refund result = ${fmt.format(plan.original.profit)} original profit - ${fmt.format(plan.refundAmount)} refund + ${fmt.format(plan.feeCredit)} fee credit - ${fmt.format(plan.returnExtraCost)} return/support cost + ${fmt.format(inputs.resaleRecovery)} resale recovery = ${fmt.format(plan.afterReturnProfit)}.`);
+  renderRefundScenarios(inputs, plan, fmt);
+  renderRefundInsights(inputs, plan, fmt);
+
+  window.currentRefundReport = {
+    inputs,
+    plan,
+    csv: exportRefundCsv(inputs, plan),
+    fmtCurrency: inputs.preset.currency
+  };
+}
+
+function bindRefundLoss() {
+  const tool = document.querySelector("[data-tool='etsy-refund-loss']");
+  if (!tool) return;
+
+  tool.querySelectorAll("input, select").forEach((input) => {
+    input.addEventListener("input", calculateRefundAndRender);
+    input.addEventListener("change", calculateRefundAndRender);
+  });
+
+  byId("countryPreset")?.addEventListener("change", () => {
+    const preset = currentPreset();
+    if (byId("countryPreset").value !== "CUSTOM") {
+      byId("paymentRate").value = compact.format(preset.rate * 100);
+      byId("paymentFlat").value = preset.flat;
+    }
+    calculateRefundAndRender();
+  });
+
+  document.querySelectorAll("[data-refund-preset]").forEach((button) => {
+    button.addEventListener("click", () => {
+      const type = button.dataset.refundPreset;
+      if (type === "full") {
+        byId("refundPercent").value = 100;
+        byId("refundShippingAmount").value = byId("refundShippingCharged")?.value || 0;
+        byId("refundReturnShippingCost").value = 4.5;
+        byId("refundResaleRecovery").value = 12;
+      }
+      if (type === "partial") {
+        byId("refundPercent").value = 30;
+        byId("refundShippingAmount").value = 0;
+        byId("refundReturnShippingCost").value = 0;
+        byId("refundResaleRecovery").value = 0;
+      }
+      if (type === "replacement") {
+        byId("refundPercent").value = 0;
+        byId("refundShippingAmount").value = 0;
+        byId("refundReturnShippingCost").value = 0;
+        byId("refundResaleRecovery").value = 0;
+        byId("refundReplacementItemCost").value = byId("refundItemCost")?.value || 0;
+        byId("refundReplacementShippingCost").value = byId("refundOriginalShippingCost")?.value || 0;
+      }
+      calculateRefundAndRender();
+    });
+  });
+
+  byId("copyRefundSummary")?.addEventListener("click", async () => {
+    const report = window.currentRefundReport;
+    if (!report) return;
+    const fmt = currencyFormatter(report.fmtCurrency);
+    const summary = `Etsy refund resolution plan
+Original profit: ${fmt.format(report.plan.original.profit)}
+Refund amount: ${fmt.format(report.plan.refundAmount)}
+Estimated fee credit: ${fmt.format(report.plan.feeCredit)}
+Profit after refund/return: ${fmt.format(report.plan.afterReturnProfit)}
+Replacement profit: ${fmt.format(report.plan.replacementProfit)}
+Max refund to break even: ${fmt.format(report.plan.maxSafeRefund)}`;
+    await navigator.clipboard.writeText(summary);
+    text("copyRefundSummary", "Copied");
+    setTimeout(() => text("copyRefundSummary", "Copy resolution plan"), 1200);
+  });
+
+  byId("downloadRefundCsv")?.addEventListener("click", () => {
+    const report = window.currentRefundReport;
+    if (!report) return;
+    const blob = new Blob([report.csv], { type: "text/csv" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = "etsy-refund-loss-plan.csv";
+    link.click();
+    URL.revokeObjectURL(url);
+  });
+
+  calculateRefundAndRender();
+}
+
 function bindSpreadsheetBuilder() {
   const builder = document.querySelector("[data-tool='spreadsheet-builder']");
   if (!builder) return;
@@ -1203,4 +1476,5 @@ bindCalculator();
 bindTargetPrice();
 bindBundlePricing();
 bindAdsRoas();
+bindRefundLoss();
 bindSpreadsheetBuilder();

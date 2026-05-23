@@ -57,6 +57,11 @@
       "permanent": true
     },
     {
+      "source": "/etsy-refund-loss-calculator.html",
+      "destination": "/etsy-refund-loss-calculator",
+      "permanent": true
+    },
+    {
       "source": "/free-etsy-pricing-spreadsheet.html",
       "destination": "/free-etsy-pricing-spreadsheet",
       "permanent": true
@@ -122,6 +127,10 @@
     {
       "source": "/etsy-discount-profit-calculator",
       "destination": "/etsy-discount-profit-calculator.html"
+    },
+    {
+      "source": "/etsy-refund-loss-calculator",
+      "destination": "/etsy-refund-loss-calculator.html"
     },
     {
       "source": "/free-etsy-pricing-spreadsheet",
