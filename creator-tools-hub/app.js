@@ -148,6 +148,85 @@ function initTitleChecker() {
   check();
 }
 
+function initTitleAbTester() {
+  const shell = document.querySelector("[data-tool='youtube-title-ab']");
+  if (!shell) return;
+
+  const keyword = document.getElementById("abKeyword");
+  const titles = [
+    document.getElementById("abTitleA"),
+    document.getElementById("abTitleB"),
+    document.getElementById("abTitleC")
+  ];
+  const rows = document.getElementById("abScoreRows");
+  const winner = document.getElementById("abWinner");
+  const meter = document.getElementById("abWinnerMeter");
+  const previewTitle = document.getElementById("abPreviewTitle");
+  const previewMeta = document.getElementById("abPreviewMeta");
+  const copy = document.getElementById("copyAbReport");
+  let lastReport = "";
+
+  function scoreTitle(text, key) {
+    const lower = text.toLowerCase();
+    const length = text.length;
+    const hasKeyword = key && lower.includes(key);
+    const earlyKeyword = key && lower.slice(0, 42).includes(key);
+    const hasNumber = /\d/.test(text);
+    const curiosity = /\b(secret|tested|why|stop|before|after|mistakes|actually|things|what|how)\b/i.test(text);
+    const specificity = /\b(\d+|checklist|framework|examples|case study|template|teardown|ideas|fixes)\b/i.test(text);
+    const mobileFit = length >= 42 && length <= 65;
+    const tooLong = length > 76;
+    const tooShort = length < 32;
+    const score = Math.max(0, Math.min(100,
+      24 +
+      (mobileFit ? 20 : 0) +
+      (hasKeyword ? 18 : 0) +
+      (earlyKeyword ? 10 : 0) +
+      (curiosity ? 14 : 0) +
+      (specificity || hasNumber ? 10 : 0) -
+      (tooLong ? 18 : 0) -
+      (tooShort ? 12 : 0)
+    ));
+    const notes = [
+      mobileFit ? "mobile-safe" : tooLong ? "likely long" : tooShort ? "thin promise" : "usable length",
+      hasKeyword ? "keyword present" : "keyword missing",
+      curiosity ? "curiosity hook" : "plain angle",
+      specificity || hasNumber ? "specific payoff" : "needs sharper payoff"
+    ];
+    return { score, notes };
+  }
+
+  function render() {
+    const key = keyword.value.trim().toLowerCase();
+    const variants = titles.map((field, index) => {
+      const text = field.value.trim();
+      return { label: `Title ${String.fromCharCode(65 + index)}`, text, ...scoreTitle(text, key) };
+    }).filter((item) => item.text);
+    const best = variants.slice().sort((a, b) => b.score - a.score)[0];
+    if (!best) return;
+
+    winner.textContent = `${best.label}: ${best.score}`;
+    if (meter) meter.style.setProperty("--value", `${best.score}%`);
+    if (previewTitle) previewTitle.textContent = best.text;
+    if (previewMeta) previewMeta.textContent = best.notes.join(" · ");
+    rows.innerHTML = variants.map((item) => `
+      <div class="status-item">
+        <span>${item.label}</span>
+        <strong>${item.score} · ${item.notes[0]}</strong>
+      </div>
+    `).join("");
+    lastReport = variants.map((item) => `${item.label}: ${item.score}/100 - ${item.text} (${item.notes.join(", ")})`).join("\n");
+  }
+
+  [keyword, ...titles].forEach((field) => field.addEventListener("input", render));
+  copy?.addEventListener("click", async () => {
+    await navigator.clipboard.writeText(lastReport);
+    copy.textContent = "Copied comparison";
+    setTimeout(() => (copy.textContent = "Copy comparison"), 1200);
+  });
+  render();
+}
+
 function initPackagingScorecard() {
   const shell = document.querySelector("[data-tool='youtube-packaging']");
   if (!shell) return;
@@ -590,6 +669,7 @@ function initChannelNameGenerator() {
 initTikTok();
 initLineBreaks();
 initTitleChecker();
+initTitleAbTester();
 initPackagingScorecard();
 initMoneyCalculator();
 initHashtagGenerator();
