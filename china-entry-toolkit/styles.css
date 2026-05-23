@@ -958,3 +958,42 @@ textarea {
     max-width: none;
   }
 }
+
+@media print {
+  body.print-travel-card * {
+    visibility: hidden;
+  }
+
+  body.print-travel-card {
+    background: white;
+  }
+
+  body.print-travel-card .print-target,
+  body.print-travel-card .print-target * {
+    visibility: visible;
+  }
+
+  body.print-travel-card .print-target {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    box-shadow: none;
+  }
+
+  body.print-travel-card .form-panel,
+  body.print-travel-card .tool-head,
+  body.print-travel-card .copy-row,
+  body.print-travel-card .copy-feedback {
+    display: none;
+  }
+
+  body.print-travel-card .tool-body {
+    display: block;
+  }
+
+  body.print-travel-card .result-panel,
+  body.print-travel-card .preview-card {
+    box-shadow: none;
+    break-inside: avoid;
+  }
+}
