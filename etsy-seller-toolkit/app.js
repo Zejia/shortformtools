@@ -602,6 +602,305 @@ Break-even item price: ${fmt.format(report.breakEven)}`;
   calculateTargetAndRender();
 }
 
+function readBundleInputs(overrides = {}) {
+  const preset = currentPreset();
+  const customPayment = byId("countryPreset")?.value === "CUSTOM";
+  const items = [1, 2, 3].map((index) => ({
+    name: byId(`bundleItem${index}Name`)?.value || `Item ${index}`,
+    price: val(`bundleItem${index}Price`),
+    cost: val(`bundleItem${index}Cost`),
+    units: Math.max(0, val(`bundleItem${index}Units`))
+  }));
+  const retailSubtotal = items.reduce((sum, item) => sum + item.price * item.units, 0);
+  const productCost = items.reduce((sum, item) => sum + item.cost * item.units, 0);
+  const discountRate = clamp(val("bundleDiscountRate"), 0, 95) / 100;
+  const overridePrice = val("bundlePriceOverride");
+
+  return {
+    preset,
+    items,
+    retailSubtotal,
+    productCost,
+    itemRevenue: "itemRevenue" in overrides
+      ? overrides.itemRevenue
+      : (overridePrice > 0 ? overridePrice : retailSubtotal * (1 - discountRate)),
+    discountRate,
+    overridePrice,
+    shippingCharged: val("bundleShippingCharged"),
+    shippingCost: val("bundleShippingCost"),
+    packagingCost: val("bundlePackagingCost"),
+    laborCost: val("bundleLaborCost"),
+    adSpend: val("bundleAdSpend"),
+    taxCollected: val("bundleTaxCollected"),
+    listingUnits: Math.max(0, val("bundleListingUnits")),
+    paymentRate: (customPayment ? val("paymentRate") : preset.rate * 100) / 100,
+    paymentFlat: customPayment ? val("paymentFlat") : preset.flat,
+    offsiteRate: ("offsiteRate" in overrides ? overrides.offsiteRate : val("bundleOffsiteRate") / 100),
+    currencyConversion: bool("bundleCurrencyConversion"),
+    regulatoryRate: val("bundleRegulatoryRate") / 100
+  };
+}
+
+function calculateBundle(inputs) {
+  const itemRevenue = Math.max(0, inputs.itemRevenue);
+  const sellerRevenue = itemRevenue + inputs.shippingCharged;
+  const orderTotalWithTax = sellerRevenue + inputs.taxCollected;
+  const listingFee = 0.2 * inputs.listingUnits;
+  const transactionFee = 0.065 * sellerRevenue;
+  const paymentFee = inputs.paymentRate * orderTotalWithTax + inputs.paymentFlat;
+  const offsiteAdsFee = inputs.offsiteRate * orderTotalWithTax;
+  const conversionFee = inputs.currencyConversion ? 0.025 * sellerRevenue : 0;
+  const regulatoryFee = inputs.regulatoryRate * sellerRevenue;
+  const platformFees = listingFee + transactionFee + paymentFee + offsiteAdsFee + conversionFee + regulatoryFee;
+  const operatingCost = inputs.productCost + inputs.shippingCost + inputs.packagingCost + inputs.laborCost + inputs.adSpend;
+  const profit = sellerRevenue - platformFees - operatingCost;
+  const margin = sellerRevenue > 0 ? (profit / sellerRevenue) * 100 : 0;
+  const buyerSavings = Math.max(0, inputs.retailSubtotal - itemRevenue);
+  const savingsRate = inputs.retailSubtotal > 0 ? (buyerSavings / inputs.retailSubtotal) * 100 : 0;
+
+  return {
+    itemRevenue,
+    sellerRevenue,
+    buyerSavings,
+    savingsRate,
+    listingFee,
+    transactionFee,
+    paymentFee,
+    offsiteAdsFee,
+    conversionFee,
+    regulatoryFee,
+    platformFees,
+    operatingCost,
+    profit,
+    margin
+  };
+}
+
+function findBundleBreakEven(inputs) {
+  let low = 0;
+  let high = Math.max(10, inputs.retailSubtotal * 1.5, inputs.productCost * 4 + inputs.shippingCost + 20);
+  for (let i = 0; i < 60; i += 1) {
+    const mid = (low + high) / 2;
+    const result = calculateBundle({ ...inputs, itemRevenue: mid });
+    if (result.profit >= 0) high = mid;
+    else low = mid;
+  }
+  return Math.ceil(high * 100) / 100;
+}
+
+function findMaxBundleDiscount(inputs) {
+  if (inputs.retailSubtotal <= 0) return 0;
+  let low = 0;
+  let high = 0.95;
+  for (let i = 0; i < 50; i += 1) {
+    const mid = (low + high) / 2;
+    const result = calculateBundle({ ...inputs, itemRevenue: inputs.retailSubtotal * (1 - mid) });
+    if (result.profit >= 0) low = mid;
+    else high = mid;
+  }
+  return low * 100;
+}
+
+function renderBundleRows(inputs, fmt) {
+  const rows = [
+    ["Current bundle", inputs.itemRevenue, calculateBundle(inputs)],
+    ["No bundle discount", inputs.retailSubtotal, calculateBundle({ ...inputs, itemRevenue: inputs.retailSubtotal })],
+    ["10% lower bundle price", inputs.itemRevenue * 0.9, calculateBundle({ ...inputs, itemRevenue: inputs.itemRevenue * 0.9 })],
+    ["Offsite Ads stress", inputs.itemRevenue, calculateBundle({ ...inputs, offsiteRate: inputs.offsiteRate || 0.15 })]
+  ];
+  const container = byId("bundleScenarioRows");
+  if (!container) return;
+  container.innerHTML = rows
+    .map(([label, price, result]) => {
+      const [status, tone] = health(result);
+      return `<tr>
+        <td>${label}</td>
+        <td>${fmt.format(price)}</td>
+        <td>${fmt.format(result.profit)}</td>
+        <td>${pct(result.margin)}</td>
+        <td><span class="status ${tone}">${status}</span></td>
+      </tr>`;
+    })
+    .join("");
+}
+
+function renderBundleInsights(inputs, result, breakEven, maxDiscount, baseline, fmt) {
+  const notes = [];
+  if (result.profit < 0) {
+    notes.push(`This bundle is below break-even. Raise the bundle price to about ${fmt.format(breakEven)} or reduce cost before promoting it.`);
+  } else if (result.margin < 15) {
+    notes.push("The bundle works, but the margin is thin. Treat this as a conversion bundle, not a paid-ad bundle.");
+  } else {
+    notes.push("This bundle has enough room to test as a higher-average-order-value offer.");
+  }
+  if (result.profit < baseline.profit) {
+    notes.push(`The bundle earns ${fmt.format(baseline.profit - result.profit)} less than selling the same items at full retail. Make sure the conversion lift is worth that tradeoff.`);
+  }
+  if (inputs.overridePrice > 0) {
+    notes.push("A fixed bundle price is overriding the percent discount. Clear it if you want the discount field to control price.");
+  }
+  notes.push(`Maximum break-even discount is about ${pct(maxDiscount)} before the bundle turns unprofitable under these assumptions.`);
+
+  const list = byId("bundleInsights");
+  if (list) list.innerHTML = notes.map((item) => `<li>${item}</li>`).join("");
+}
+
+function exportBundleCsv(inputs, result, breakEven, maxDiscount) {
+  const rows = [
+    ["Metric", "Value"],
+    ["Retail subtotal", inputs.retailSubtotal],
+    ["Bundle item revenue", result.itemRevenue],
+    ["Buyer savings", result.buyerSavings],
+    ["Seller revenue", result.sellerRevenue],
+    ["Platform fees", result.platformFees],
+    ["Operating cost", result.operatingCost],
+    ["Net profit", result.profit],
+    ["Profit margin", result.margin],
+    ["Break-even bundle price", breakEven],
+    ["Maximum break-even discount percent", maxDiscount]
+  ];
+  inputs.items.forEach((item) => {
+    rows.push([`${item.name} units`, item.units]);
+    rows.push([`${item.name} retail`, item.price]);
+    rows.push([`${item.name} cost`, item.cost]);
+  });
+  return rows.map((row) => row.join(",")).join("\n");
+}
+
+function calculateBundleAndRender() {
+  const inputs = readBundleInputs();
+  const fmt = currencyFormatter(inputs.preset.currency);
+  const result = calculateBundle(inputs);
+  const baseline = calculateBundle({ ...inputs, itemRevenue: inputs.retailSubtotal });
+  const breakEven = findBundleBreakEven(inputs);
+  const maxDiscount = findMaxBundleDiscount(inputs);
+  const [status, tone] = health(result);
+
+  text("currencyLabel", inputs.preset.currency);
+  text("paymentPresetText", `${inputs.preset.label}: ${pct(inputs.paymentRate * 100)} + ${fmt.format(inputs.paymentFlat)}`);
+  text("bundlePriceResult", fmt.format(result.itemRevenue));
+  text("bundleProfit", fmt.format(result.profit));
+  text("bundleMargin", pct(result.margin));
+  text("bundleSavings", `${fmt.format(result.buyerSavings)} (${pct(result.savingsRate)})`);
+  text("bundleBreakEven", fmt.format(breakEven));
+  text("bundleMaxDiscount", pct(maxDiscount));
+  text("bundleFees", fmt.format(result.platformFees));
+  text("bundleCosts", fmt.format(result.operatingCost));
+  text("bundleStatusLabel", status);
+
+  const statusEl = byId("bundleStatusLabel");
+  if (statusEl) statusEl.className = `status ${tone}`;
+  const meter = byId("profitMeter");
+  if (meter) meter.style.setProperty("--value", `${clamp(result.margin, 0, 45) / 45 * 100}%`);
+
+  text("bundleFormulaLine", `Bundle profit = ${fmt.format(result.sellerRevenue)} seller revenue - ${fmt.format(result.platformFees)} Etsy/payment fees - ${fmt.format(result.operatingCost)} product, shipping, labor, packaging and ad cost = ${fmt.format(result.profit)}.`);
+  renderBundleRows(inputs, fmt);
+  renderBundleInsights(inputs, result, breakEven, maxDiscount, baseline, fmt);
+
+  window.currentBundleReport = {
+    inputs,
+    result,
+    breakEven,
+    maxDiscount,
+    csv: exportBundleCsv(inputs, result, breakEven, maxDiscount),
+    fmtCurrency: inputs.preset.currency
+  };
+}
+
+function bindBundlePricing() {
+  const tool = document.querySelector("[data-tool='etsy-bundle-pricing']");
+  if (!tool) return;
+
+  tool.querySelectorAll("input, select").forEach((input) => {
+    input.addEventListener("input", calculateBundleAndRender);
+    input.addEventListener("change", calculateBundleAndRender);
+  });
+
+  byId("countryPreset")?.addEventListener("change", () => {
+    const preset = currentPreset();
+    if (byId("countryPreset").value !== "CUSTOM") {
+      byId("paymentRate").value = compact.format(preset.rate * 100);
+      byId("paymentFlat").value = preset.flat;
+    }
+    calculateBundleAndRender();
+  });
+
+  document.querySelectorAll("[data-bundle-preset]").forEach((button) => {
+    button.addEventListener("click", () => {
+      const type = button.dataset.bundlePreset;
+      if (type === "digital") {
+        byId("bundleItem1Name").value = "Printable planner";
+        byId("bundleItem1Price").value = 9;
+        byId("bundleItem1Cost").value = 0.3;
+        byId("bundleItem2Name").value = "Tracker sheet";
+        byId("bundleItem2Price").value = 7;
+        byId("bundleItem2Cost").value = 0.2;
+        byId("bundleItem3Name").value = "Bonus template";
+        byId("bundleItem3Price").value = 5;
+        byId("bundleItem3Cost").value = 0.15;
+        byId("bundleDiscountRate").value = 25;
+        byId("bundleShippingCharged").value = 0;
+        byId("bundleShippingCost").value = 0;
+        byId("bundlePackagingCost").value = 0;
+        byId("bundleLaborCost").value = 1.5;
+      }
+      if (type === "physical") {
+        byId("bundleItem1Name").value = "Sticker pack";
+        byId("bundleItem1Price").value = 6;
+        byId("bundleItem1Cost").value = 1.1;
+        byId("bundleItem2Name").value = "Mini print";
+        byId("bundleItem2Price").value = 12;
+        byId("bundleItem2Cost").value = 3.2;
+        byId("bundleItem3Name").value = "Greeting card";
+        byId("bundleItem3Price").value = 5;
+        byId("bundleItem3Cost").value = 1;
+        byId("bundleDiscountRate").value = 15;
+        byId("bundleShippingCharged").value = 4.99;
+        byId("bundleShippingCost").value = 4.25;
+        byId("bundlePackagingCost").value = 0.9;
+        byId("bundleLaborCost").value = 3;
+      }
+      if (type === "offsite") {
+        byId("bundleDiscountRate").value = 20;
+        byId("bundleOffsiteRate").value = 15;
+      }
+      byId("bundlePriceOverride").value = 0;
+      calculateBundleAndRender();
+    });
+  });
+
+  byId("copyBundleSummary")?.addEventListener("click", async () => {
+    const report = window.currentBundleReport;
+    if (!report) return;
+    const fmt = currencyFormatter(report.fmtCurrency);
+    const summary = `Etsy bundle pricing plan
+Retail subtotal: ${fmt.format(report.inputs.retailSubtotal)}
+Bundle price: ${fmt.format(report.result.itemRevenue)}
+Buyer savings: ${fmt.format(report.result.buyerSavings)}
+Net profit: ${fmt.format(report.result.profit)}
+Margin: ${pct(report.result.margin)}
+Break-even bundle price: ${fmt.format(report.breakEven)}
+Max break-even discount: ${pct(report.maxDiscount)}`;
+    await navigator.clipboard.writeText(summary);
+    text("copyBundleSummary", "Copied");
+    setTimeout(() => text("copyBundleSummary", "Copy bundle plan"), 1200);
+  });
+
+  byId("downloadBundleCsv")?.addEventListener("click", () => {
+    const report = window.currentBundleReport;
+    if (!report) return;
+    const blob = new Blob([report.csv], { type: "text/csv" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = "etsy-bundle-pricing.csv";
+    link.click();
+    URL.revokeObjectURL(url);
+  });
+
+  calculateBundleAndRender();
+}
+
 function bindSpreadsheetBuilder() {
   const builder = document.querySelector("[data-tool='spreadsheet-builder']");
   if (!builder) return;
@@ -624,4 +923,5 @@ function bindSpreadsheetBuilder() {
 
 bindCalculator();
 bindTargetPrice();
+bindBundlePricing();
 bindSpreadsheetBuilder();

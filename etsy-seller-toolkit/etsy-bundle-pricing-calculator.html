@@ -1,0 +1,216 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Etsy Bundle Pricing Calculator: Profit, Discount and Break-Even</title>
+    <meta name="description" content="Free Etsy bundle pricing calculator for product bundles, buyer savings, fees, shipping, Offsite Ads, profit margin and maximum safe discount.">
+    <link rel="canonical" href="https://etsy.shortformtools.com/etsy-bundle-pricing-calculator">
+    <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+    <link rel="stylesheet" href="styles.css">
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4259477754165351" crossorigin="anonymous"></script>
+    <script type="application/ld+json">
+      [{"@context":"https://schema.org","@type":"WebSite","name":"Etsy Seller Profit Toolkit","url":"https://etsy.shortformtools.com/"},{"@context":"https://schema.org","@type":"SoftwareApplication","name":"Etsy Bundle Pricing Calculator","applicationCategory":"BusinessApplication","operatingSystem":"Web","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"}}]
+    </script>
+  </head>
+  <body>
+    <header class="site-header">
+      <nav class="nav" aria-label="Primary navigation">
+        <a class="brand" href="/"><span class="mark">E</span><span>Etsy Seller Toolkit</span></a>
+        <div class="nav-links">
+          <a href="/etsy-fee-calculator">Fee calculator</a>
+          <a href="/etsy-profit-calculator">Profit calculator</a>
+          <a href="/etsy-price-target-calculator">Price target</a>
+          <a href="/etsy-bundle-pricing-calculator">Bundle pricing</a>
+          <a href="/etsy-offsite-ads-calculator">Offsite Ads</a>
+          <a href="/free-etsy-pricing-spreadsheet">Spreadsheet</a>
+        </div>
+      </nav>
+    </header>
+
+    <main>
+      <section class="hero wrap">
+        <div>
+          <p class="eyebrow">Etsy bundle pricing calculator</p>
+          <h1>Price Etsy bundles without accidentally discounting away the profit.</h1>
+          <p class="lead">Add up the retail value, costs, shipping, labor and Etsy fees. Then compare buyer savings, margin, break-even bundle price and the maximum discount the bundle can survive.</p>
+          <div class="hero-actions">
+            <a class="button primary" href="#calculator">Calculate bundle profit</a>
+            <a class="button" href="/etsy-discount-profit-calculator">Check a coupon instead</a>
+          </div>
+        </div>
+        <aside class="hero-panel" aria-label="Example bundle plan">
+          <div class="mini-ledger">
+            <div class="ledger-line"><span>Retail value</span><strong>$23.00</strong></div>
+            <div class="ledger-line"><span>Bundle price</span><strong>$19.55</strong></div>
+            <div class="ledger-line"><span>Buyer savings</span><strong>15%</strong></div>
+            <div class="ledger-line"><span>Estimated profit</span><strong>$8.81</strong></div>
+          </div>
+        </aside>
+      </section>
+
+      <section class="tool-shell wrap" id="calculator" data-tool="etsy-bundle-pricing">
+        <div class="tool-grid">
+          <section class="tool-panel">
+            <div class="section-head">
+              <div>
+                <h2>Bundle price planner</h2>
+                <p>Use this for kits, digital bundles, gift sets, and multi-item offers.</p>
+              </div>
+              <span class="status ok" id="currencyLabel">USD</span>
+            </div>
+            <div class="preset-row">
+              <button type="button" data-bundle-preset="physical">Physical gift set</button>
+              <button type="button" data-bundle-preset="digital">Digital download bundle</button>
+              <button type="button" data-bundle-preset="offsite">Offsite Ads stress</button>
+            </div>
+
+            <div class="field-grid">
+              <div class="group-title">Bundle items</div>
+              <div class="field"><label for="bundleItem1Name">Item 1 name</label><input id="bundleItem1Name" value="Sticker pack"></div>
+              <div class="field"><label for="bundleItem1Price">Item 1 retail price</label><input id="bundleItem1Price" type="number" min="0" step="0.01" value="6"></div>
+              <div class="field"><label for="bundleItem1Cost">Item 1 cost</label><input id="bundleItem1Cost" type="number" min="0" step="0.01" value="1.10"></div>
+              <div class="field"><label for="bundleItem1Units">Item 1 units</label><input id="bundleItem1Units" type="number" min="0" step="1" value="1"></div>
+
+              <div class="field"><label for="bundleItem2Name">Item 2 name</label><input id="bundleItem2Name" value="Mini print"></div>
+              <div class="field"><label for="bundleItem2Price">Item 2 retail price</label><input id="bundleItem2Price" type="number" min="0" step="0.01" value="12"></div>
+              <div class="field"><label for="bundleItem2Cost">Item 2 cost</label><input id="bundleItem2Cost" type="number" min="0" step="0.01" value="3.20"></div>
+              <div class="field"><label for="bundleItem2Units">Item 2 units</label><input id="bundleItem2Units" type="number" min="0" step="1" value="1"></div>
+
+              <div class="field"><label for="bundleItem3Name">Item 3 name</label><input id="bundleItem3Name" value="Greeting card"></div>
+              <div class="field"><label for="bundleItem3Price">Item 3 retail price</label><input id="bundleItem3Price" type="number" min="0" step="0.01" value="5"></div>
+              <div class="field"><label for="bundleItem3Cost">Item 3 cost</label><input id="bundleItem3Cost" type="number" min="0" step="0.01" value="1.00"></div>
+              <div class="field"><label for="bundleItem3Units">Item 3 units</label><input id="bundleItem3Units" type="number" min="0" step="1" value="1"></div>
+
+              <div class="group-title">Bundle offer</div>
+              <div class="field"><label for="bundleDiscountRate">Bundle discount percent</label><input id="bundleDiscountRate" type="number" min="0" max="95" step="0.1" value="15"></div>
+              <div class="field"><label for="bundlePriceOverride">Fixed bundle price</label><input id="bundlePriceOverride" type="number" min="0" step="0.01" value="0"><span class="hint">Leave at 0 to price from discount percent.</span></div>
+              <div class="field"><label for="bundleShippingCharged">Shipping charged to buyer</label><input id="bundleShippingCharged" type="number" min="0" step="0.01" value="4.99"></div>
+              <div class="field"><label for="bundleShippingCost">Shipping label cost</label><input id="bundleShippingCost" type="number" min="0" step="0.01" value="4.25"></div>
+              <div class="field"><label for="bundlePackagingCost">Extra bundle packaging</label><input id="bundlePackagingCost" type="number" min="0" step="0.01" value="0.90"></div>
+              <div class="field"><label for="bundleLaborCost">Bundle labor cost</label><input id="bundleLaborCost" type="number" min="0" step="0.01" value="3"></div>
+              <div class="field"><label for="bundleAdSpend">Etsy Ads spend per order</label><input id="bundleAdSpend" type="number" min="0" step="0.01" value="0"></div>
+              <div class="field"><label for="bundleTaxCollected">Sales tax collected</label><input id="bundleTaxCollected" type="number" min="0" step="0.01" value="0"></div>
+
+              <div class="group-title">Fee assumptions</div>
+              <div class="field full">
+                <label for="countryPreset">Seller payment country</label>
+                <select id="countryPreset">
+                  <option value="US">United States</option>
+                  <option value="UK">United Kingdom</option>
+                  <option value="CA">Canada domestic / US orders</option>
+                  <option value="CA_INTL">Canada international</option>
+                  <option value="AU">Australia domestic</option>
+                  <option value="AU_INTL">Australia international</option>
+                  <option value="EU">EU common rate</option>
+                  <option value="CUSTOM">Custom processing rate</option>
+                </select>
+                <span class="hint" id="paymentPresetText">United States: 3% + $0.25</span>
+              </div>
+              <div class="field"><label for="bundleListingUnits">Listing fee units</label><input id="bundleListingUnits" type="number" min="0" step="1" value="3"></div>
+              <div class="field"><label for="bundleOffsiteRate">Offsite Ads percent</label><input id="bundleOffsiteRate" type="number" min="0" step="0.1" value="0"></div>
+              <div class="field"><label for="paymentRate">Custom payment percent</label><input id="paymentRate" type="number" min="0" step="0.1" value="3"></div>
+              <div class="field"><label for="paymentFlat">Custom payment flat fee</label><input id="paymentFlat" type="number" min="0" step="0.01" value="0.25"></div>
+              <div class="field"><label for="bundleRegulatoryRate">Regulatory operating fee percent</label><input id="bundleRegulatoryRate" type="number" min="0" step="0.1" value="0"></div>
+              <div class="field check-row"><input id="bundleCurrencyConversion" type="checkbox"><label for="bundleCurrencyConversion">Apply 2.5% currency conversion fee</label></div>
+            </div>
+          </section>
+
+          <aside class="result-panel" aria-live="polite">
+            <div class="result-stack">
+              <div class="metric-large">
+                <span>Bundle item price</span>
+                <strong id="bundlePriceResult">$0.00</strong>
+                <div class="meter" id="profitMeter"></div>
+              </div>
+              <div><span id="bundleStatusLabel" class="status ok">Workable</span></div>
+              <div class="metric-grid">
+                <div class="metric"><span>Net profit</span><strong id="bundleProfit">$0.00</strong></div>
+                <div class="metric"><span>Profit margin</span><strong id="bundleMargin">0%</strong></div>
+                <div class="metric"><span>Buyer savings</span><strong id="bundleSavings">$0.00</strong></div>
+                <div class="metric"><span>Break-even bundle price</span><strong id="bundleBreakEven">$0.00</strong></div>
+                <div class="metric"><span>Max break-even discount</span><strong id="bundleMaxDiscount">0%</strong></div>
+                <div class="metric"><span>Total fees</span><strong id="bundleFees">$0.00</strong></div>
+                <div class="metric"><span>Costs</span><strong id="bundleCosts">$0.00</strong></div>
+              </div>
+              <div class="formula" id="bundleFormulaLine"></div>
+              <ul class="insights" id="bundleInsights"></ul>
+              <div class="hero-actions">
+                <button type="button" id="copyBundleSummary">Copy bundle plan</button>
+                <button type="button" id="downloadBundleCsv">Download CSV</button>
+              </div>
+            </div>
+          </aside>
+        </div>
+      </section>
+
+      <section class="content-band wrap">
+        <div class="plain-panel">
+          <div class="section-head">
+            <div>
+              <h2>Bundle scenario comparison</h2>
+              <p>Compare the proposed bundle against full retail, a lower price, and an Offsite Ads order.</p>
+            </div>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Scenario</th><th>Bundle price</th><th>Profit</th><th>Margin</th><th>Status</th></tr></thead>
+              <tbody id="bundleScenarioRows"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <section class="content-band wrap">
+        <div class="plain-panel">
+          <div class="section-head">
+            <div>
+              <h2>When bundle pricing helps</h2>
+              <p>Bundles can raise average order value, but only if the savings story and cost structure both work.</p>
+            </div>
+          </div>
+          <div class="content-grid">
+            <div class="info-card">
+              <h3>Gift sets</h3>
+              <p>Show enough buyer savings to feel like a set, while checking that extra packaging and shipping do not erase the margin.</p>
+            </div>
+            <div class="info-card">
+              <h3>Digital bundles</h3>
+              <p>Bundle templates, printables, or downloads by tracking the small processing fees and the real time spent creating support material.</p>
+            </div>
+            <div class="info-card">
+              <h3>Ad-safe offers</h3>
+              <p>Stress-test 12% or 15% Offsite Ads before turning a bundle into the main promoted listing.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="content-band wrap" id="tools">
+        <div class="section-head">
+          <div>
+            <h2>Focused Etsy seller tools</h2>
+            <p>Use bundle pricing with target price, discount, and fee calculators before changing a listing.</p>
+          </div>
+        </div>
+        <div class="tool-list">
+          <a class="tool-link" href="/etsy-fee-calculator"><strong>Etsy fee calculator</strong><span>Break down listing, transaction, processing and ad fees.</span></a>
+          <a class="tool-link" href="/etsy-profit-calculator"><strong>Etsy profit calculator</strong><span>Calculate margin, break-even price and product economics.</span></a>
+          <a class="tool-link" href="/etsy-price-target-calculator"><strong>Price target calculator</strong><span>Find the minimum item price for a target profit or margin.</span></a>
+          <a class="tool-link" href="/etsy-bundle-pricing-calculator"><strong>Bundle pricing calculator</strong><span>Price kits, sets, and digital bundles without losing margin.</span></a>
+          <a class="tool-link" href="/etsy-discount-profit-calculator"><strong>Discount profit</strong><span>Check coupons and sales before launching.</span></a>
+          <a class="tool-link" href="/etsy-offsite-ads-calculator"><strong>Offsite Ads calculator</strong><span>Compare 12% and 15% attributed ad orders.</span></a>
+          <a class="tool-link" href="/free-etsy-pricing-spreadsheet"><strong>Pricing spreadsheet</strong><span>Copy a starter CSV for shop pricing research.</span></a>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <div class="footer-inner">
+        <span>Pricing math is a planning aid, not tax or accounting advice.</span>
+        <span><a href="/about">About</a> · <a href="/contact">Contact</a> · <a href="/privacy">Privacy</a> · <a href="/terms">Terms</a></span>
+      </div>
+    </footer>
+    <script src="app.js"></script>
+  </body>
+</html>
