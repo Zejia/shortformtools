@@ -958,12 +958,12 @@ function initSupplierQuoteTools() {
         await navigator.clipboard.writeText(lines.join("\n"));
         copyButton.textContent = "Copied";
         window.setTimeout(() => {
-          copyButton.textContent = "Copy quote comparison";
+          copyButton.textContent = "Copy summary";
         }, 1200);
       } catch (_error) {
         copyButton.textContent = "Copy failed";
         window.setTimeout(() => {
-          copyButton.textContent = "Copy quote comparison";
+          copyButton.textContent = "Copy summary";
         }, 1200);
       }
     });
