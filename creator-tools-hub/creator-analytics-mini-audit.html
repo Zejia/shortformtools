@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Creator Analytics Mini Audit: Diagnose Views, Engagement and Conversion</title>
+    <meta name="description" content="Run a quick creator analytics mini audit from recent views, engagement, saves, shares, follower growth and profile clicks. Get a diagnosis, next experiment and exportable report.">
+    <link rel="canonical" href="https://shortformtools.com/creator-analytics-mini-audit">
+    <meta property="og:title" content="Creator Analytics Mini Audit">
+    <meta property="og:description" content="Diagnose recent creator performance and choose the next content experiment.">
+    <meta property="og:type" content="website">
+    <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+    <link rel="manifest" href="site.webmanifest">
+    <link rel="stylesheet" href="styles.css">
+    <script type="application/ld+json">[{"@context":"https://schema.org","@type":"SoftwareApplication","name":"Creator Analytics Mini Audit","applicationCategory":"UtilitiesApplication","operatingSystem":"Web","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"}},{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Creator Tools Hub","item":"https://shortformtools.com/"},{"@type":"ListItem","position":2,"name":"Creator Analytics Mini Audit","item":"https://shortformtools.com/creator-analytics-mini-audit"}]}]</script>
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4259477754165351" crossorigin="anonymous"></script>
+  </head>
+  <body>
+    <header class="site-header">
+      <nav class="nav" aria-label="Primary">
+        <a class="brand" href="index.html"><img class="brand-logo" src="assets/logo.svg" alt="Creator Tools Hub"></a>
+        <div class="nav-links">
+          <a href="tiktok-tools.html">TikTok Tools</a>
+          <a href="instagram-tools.html">Instagram Tools</a>
+          <a href="youtube-tools.html">YouTube Tools</a>
+        </div>
+      </nav>
+    </header>
+    <main>
+      <section class="intro">
+        <p class="eyebrow">Creator analytics diagnostic</p>
+        <h1>Creator Analytics Mini Audit</h1>
+        <p class="lede">Paste the numbers from a recent batch of posts and get a fast diagnosis: reach problem, packaging problem, engagement problem, or profile-conversion problem.</p>
+      </section>
+
+      <section class="tool-shell" data-tool="creator-analytics-audit">
+        <div class="tool-head">
+          <div>
+            <h2>Audit recent creator performance</h2>
+            <p>Use 3-10 recent posts from the same platform so the diagnosis points to a real next experiment.</p>
+          </div>
+        </div>
+        <div class="tool-grid">
+          <div class="form-panel">
+            <div class="field-grid">
+              <div class="field">
+                <label for="auditPlatform">Platform</label>
+                <select id="auditPlatform">
+                  <option>TikTok</option>
+                  <option>Instagram Reels</option>
+                  <option>YouTube Shorts</option>
+                </select>
+              </div>
+              <div class="field"><label for="auditPosts">Posts audited</label><input id="auditPosts" type="number" min="1" step="1" value="5"></div>
+              <div class="field"><label for="auditFollowers">Followers</label><input id="auditFollowers" type="number" min="0" value="25000"></div>
+              <div class="field"><label for="auditViews">Total views</label><input id="auditViews" type="number" min="0" value="180000"></div>
+              <div class="field"><label for="auditLikes">Likes</label><input id="auditLikes" type="number" min="0" value="4200"></div>
+              <div class="field"><label for="auditComments">Comments</label><input id="auditComments" type="number" min="0" value="310"></div>
+              <div class="field"><label for="auditShares">Shares</label><input id="auditShares" type="number" min="0" value="180"></div>
+              <div class="field"><label for="auditSaves">Saves</label><input id="auditSaves" type="number" min="0" value="90"></div>
+              <div class="field"><label for="auditProfileClicks">Profile clicks</label><input id="auditProfileClicks" type="number" min="0" value="650"></div>
+              <div class="field"><label for="auditFollowerGain">Follower gain</label><input id="auditFollowerGain" type="number" min="0" value="420"></div>
+            </div>
+            <div class="field" style="margin-top:14px">
+              <label for="auditGoal">Current content goal</label>
+              <input id="auditGoal" value="turn viewers into newsletter subscribers">
+            </div>
+            <div class="actions">
+              <button type="button" id="copyCreatorAudit">Copy audit</button>
+              <button type="button" id="downloadCreatorAudit">Download .txt</button>
+            </div>
+          </div>
+          <aside class="result-panel">
+            <div class="metric">
+              <span class="label">Audit score</span>
+              <strong id="creatorAuditScore">0/100</strong>
+              <div class="meter"><span id="creatorAuditMeter"></span></div>
+            </div>
+            <div class="metric"><span class="label">Primary diagnosis</span><span id="creatorAuditDiagnosis" class="badge">Calculating</span></div>
+            <div class="metric"><span class="label">Views per post</span><strong id="creatorAuditViewsPerPost">0</strong></div>
+            <div class="metric"><span class="label">Engagement by view</span><strong id="creatorAuditEngagement">0%</strong></div>
+            <div class="metric"><span class="label">Profile click-through</span><strong id="creatorAuditCtr">0%</strong></div>
+          </aside>
+        </div>
+        <div class="section">
+          <div class="tool-list">
+            <div class="tool-card"><h3>What the numbers say</h3><p id="creatorAuditSummary">Your diagnosis will appear here.</p></div>
+            <div class="tool-card"><h3>Next experiment</h3><p id="creatorAuditExperiment">Your next experiment will appear here.</p></div>
+            <div class="tool-card"><h3>Tracking note</h3><p id="creatorAuditTracking">Your tracking note will appear here.</p></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="section">
+        <div class="section-heading">
+          <p class="eyebrow">How to use the audit</p>
+          <h2>Do not average everything together forever.</h2>
+          <p class="lede">This tool is a direction finder. Once it finds the weakest part of the funnel, test one clear change for the next 3-5 posts instead of changing hook, topic, CTA, and edit style at the same time.</p>
+        </div>
+        <div class="tool-list">
+          <a class="tool-card" href="tiktok-engagement-rate-calculator.html"><h3>Engagement rate calculator</h3><p>Go deeper on interaction rate by followers or views.</p></a>
+          <a class="tool-card" href="youtube-title-ab-tester.html"><h3>YouTube title A/B tester</h3><p>Pressure-test packaging if the audit flags weak reach.</p></a>
+          <a class="tool-card" href="creator-content-brief-generator.html"><h3>Content brief generator</h3><p>Turn the recommended experiment into a filming brief.</p></a>
+        </div>
+      </section>
+    </main>
+    <footer class="site-footer"><div><a href="about.html">About</a> · <a href="creator-metrics-glossary.html">Metrics Glossary</a> · <a href="tool-methodology.html">Methodology</a> · <a href="contact.html">Contact</a> · <a href="privacy.html">Privacy</a> · <a href="terms.html">Terms</a></div></footer>
+    <script src="app.js"></script>
+  </body>
+</html>

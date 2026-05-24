@@ -33,6 +33,16 @@ function rateBadge(rate) {
   return ["Low", "bad"];
 }
 
+function pct(value) {
+  return `${numberFormat.format(value)}%`;
+}
+
+function creatorHealthBadge(score) {
+  if (score >= 78) return ["Healthy batch", ""];
+  if (score >= 58) return ["Needs one fix", "warn"];
+  return ["Needs reset", "bad"];
+}
+
 function initTikTok() {
   const shell = document.querySelector("[data-tool='tiktok']");
   if (!shell) return;
@@ -88,6 +98,93 @@ Target gap: ${gap ? `${numberFormat.format(gap)} more interactions for ${numberF
     setTimeout(() => (copy.textContent = "Copy report"), 1200);
   });
   calculate();
+}
+
+function initCreatorAnalyticsAudit() {
+  const shell = document.querySelector("[data-tool='creator-analytics-audit']");
+  if (!shell) return;
+
+  const copy = document.getElementById("copyCreatorAudit");
+  const download = document.getElementById("downloadCreatorAudit");
+  let lastReport = "";
+
+  function render() {
+    const platform = document.getElementById("auditPlatform")?.value || "TikTok";
+    const posts = Math.max(1, num("auditPosts") || 1);
+    const followers = num("auditFollowers");
+    const views = num("auditViews");
+    const interactions = num("auditLikes") + num("auditComments") + num("auditShares") + num("auditSaves");
+    const sharesSaves = num("auditShares") + num("auditSaves");
+    const profileClicks = num("auditProfileClicks");
+    const followerGain = num("auditFollowerGain");
+    const goal = document.getElementById("auditGoal")?.value.trim() || "the current creator goal";
+
+    const viewsPerPost = views / posts;
+    const reachRate = followers > 0 ? (views / followers) * 100 : 0;
+    const engagementByView = views > 0 ? (interactions / views) * 100 : 0;
+    const shareSaveRate = views > 0 ? (sharesSaves / views) * 100 : 0;
+    const profileCtr = views > 0 ? (profileClicks / views) * 100 : 0;
+    const followConversion = profileClicks > 0 ? (followerGain / profileClicks) * 100 : 0;
+
+    const reachScore = Math.min(30, reachRate * 0.22);
+    const engagementScore = Math.min(25, engagementByView * 4.2);
+    const depthScore = Math.min(20, shareSaveRate * 10);
+    const conversionScore = Math.min(15, profileCtr * 8);
+    const followScore = Math.min(10, followConversion * 0.65);
+    const score = Math.round(reachScore + engagementScore + depthScore + conversionScore + followScore);
+
+    const problems = [
+      { key: "reach", label: "Reach and packaging", value: reachScore / 30, experiment: "Test three sharper hooks or titles around the same topic. Keep the topic constant and change only the opening promise." },
+      { key: "engagement", label: "Viewer engagement", value: engagementScore / 25, experiment: "Add a stronger opinion, example, or before-after payoff so viewers have a reason to comment, save, or share." },
+      { key: "depth", label: "Save/share depth", value: depthScore / 20, experiment: "Turn the next post into a checklist, template, mistake list, or repeatable framework that is worth saving." },
+      { key: "clicks", label: "Profile conversion", value: conversionScore / 15, experiment: "Make the CTA and profile promise match. Repeat the profile benefit on-screen and in the caption." },
+      { key: "follow", label: "Follow conversion", value: followScore / 10, experiment: "Clarify the account promise with a series format, pinned post, or bio line that tells viewers what they get next." }
+    ].sort((a, b) => a.value - b.value);
+    const weakest = problems[0];
+    const [badge, tone] = creatorHealthBadge(score);
+
+    setText("creatorAuditScore", `${score}/100`);
+    setText("creatorAuditDiagnosis", weakest.label);
+    setText("creatorAuditViewsPerPost", numberFormat.format(viewsPerPost));
+    setText("creatorAuditEngagement", pct(engagementByView));
+    setText("creatorAuditCtr", pct(profileCtr));
+    setMeter("creatorAuditMeter", score);
+
+    const diagnosis = document.getElementById("creatorAuditDiagnosis");
+    if (diagnosis) diagnosis.className = `badge ${tone}`;
+
+    setText("creatorAuditSummary", `${platform} batch score: ${score}/100 (${badge}). Reach is ${pct(reachRate)} of follower count, engagement by view is ${pct(engagementByView)}, and profile click-through is ${pct(profileCtr)}.`);
+    setText("creatorAuditExperiment", weakest.experiment);
+    setText("creatorAuditTracking", `For the next ${Math.min(5, Math.max(3, posts))} posts, track one change against ${goal}. Compare views per post, save/share rate, profile click-through, and follow conversion before changing another variable.`);
+
+    lastReport = [
+      "Creator analytics mini audit",
+      `Platform: ${platform}`,
+      `Goal: ${goal}`,
+      `Score: ${score}/100 (${badge})`,
+      `Primary diagnosis: ${weakest.label}`,
+      `Views per post: ${numberFormat.format(viewsPerPost)}`,
+      `Reach vs followers: ${pct(reachRate)}`,
+      `Engagement by view: ${pct(engagementByView)}`,
+      `Save/share rate: ${pct(shareSaveRate)}`,
+      `Profile click-through: ${pct(profileCtr)}`,
+      `Follow conversion from profile clicks: ${pct(followConversion)}`,
+      "",
+      `Next experiment: ${weakest.experiment}`
+    ].join("\n");
+  }
+
+  shell.querySelectorAll("input, select").forEach((input) => {
+    input.addEventListener("input", render);
+    input.addEventListener("change", render);
+  });
+  copy?.addEventListener("click", async () => {
+    await navigator.clipboard.writeText(lastReport);
+    copy.textContent = "Copied audit";
+    setTimeout(() => (copy.textContent = "Copy audit"), 1200);
+  });
+  download?.addEventListener("click", () => downloadTextFile("creator-analytics-mini-audit.txt", lastReport));
+  render();
 }
 
 function initLineBreaks() {
@@ -987,6 +1084,7 @@ function initLandingAuditChecklist() {
 }
 
 initTikTok();
+initCreatorAnalyticsAudit();
 initLineBreaks();
 initTitleChecker();
 initTitleAbTester();
