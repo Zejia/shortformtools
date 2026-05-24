@@ -228,6 +228,186 @@ function exportCsv(inputs, result) {
   return rows.map((row) => row.join(",")).join("\n");
 }
 
+function readDigitalBreakEvenInputs() {
+  return {
+    upfrontCost: Math.max(0, val("digitalUpfrontCost")),
+    monthlyCost: Math.max(0, val("digitalMonthlyCost")),
+    paybackMonths: Math.max(1, val("digitalPaybackMonths") || 1),
+    expectedSales: Math.max(0, val("digitalExpectedSales"))
+  };
+}
+
+function digitalBreakEvenPlan(baseInputs, recoveryInputs, patch = {}) {
+  const inputs = { ...baseInputs, ...patch, digitalMode: true };
+  const result = calculate(inputs);
+  const costToRecover = recoveryInputs.upfrontCost + recoveryInputs.monthlyCost * recoveryInputs.paybackMonths;
+  const salesToRecover = result.profit > 0 ? Math.ceil(costToRecover / result.profit) : Infinity;
+  const monthlyProfit = result.profit * recoveryInputs.expectedSales - recoveryInputs.monthlyCost;
+  const monthsToRecover = monthlyProfit > 0 && recoveryInputs.upfrontCost > 0
+    ? recoveryInputs.upfrontCost / monthlyProfit
+    : (recoveryInputs.upfrontCost > 0 ? Infinity : 0);
+
+  return {
+    inputs,
+    result,
+    costToRecover,
+    salesToRecover,
+    monthlyProfit,
+    monthsToRecover
+  };
+}
+
+function digitalStatus(plan) {
+  if (plan.result.profit <= 0) return ["No break-even", "bad"];
+  if (plan.monthlyProfit <= 0) return ["Not recovered monthly", "bad"];
+  if (plan.monthsToRecover > 6) return ["Slow payback", "warn"];
+  if (plan.monthsToRecover > 3) return ["Workable", "ok"];
+  return ["Fast payback", "good"];
+}
+
+function salesLabel(value) {
+  return Number.isFinite(value) ? compact.format(value) : "N/A";
+}
+
+function monthsLabel(value) {
+  return Number.isFinite(value) ? compact.format(value) : "N/A";
+}
+
+function renderDigitalBreakEvenRows(baseInputs, recoveryInputs, fmt) {
+  const rows = [
+    ["Current digital listing", digitalBreakEvenPlan(baseInputs, recoveryInputs)],
+    ["20% launch coupon", digitalBreakEvenPlan(baseInputs, recoveryInputs, { discountRate: 0.2 })],
+    ["Offsite Ads stress", digitalBreakEvenPlan(baseInputs, recoveryInputs, { offsiteRate: baseInputs.offsiteRate || 0.15 })],
+    ["Price raised $2", digitalBreakEvenPlan(baseInputs, recoveryInputs, { price: baseInputs.price + 2 })]
+  ];
+  const container = byId("digitalBreakEvenRows");
+  if (!container) return;
+  container.innerHTML = rows
+    .map(([label, plan]) => {
+      const [status, tone] = digitalStatus(plan);
+      return `<tr>
+        <td>${label}</td>
+        <td>${fmt.format(plan.result.profit)}</td>
+        <td>${salesLabel(plan.salesToRecover)}</td>
+        <td>${fmt.format(plan.monthlyProfit)}</td>
+        <td><span class="status ${tone}">${status}</span></td>
+      </tr>`;
+    })
+    .join("");
+}
+
+function renderDigitalBreakEvenInsights(plan, recoveryInputs, fmt) {
+  const notes = [];
+  if (plan.result.profit <= 0) {
+    notes.push("This listing does not produce positive profit per sale under the current assumptions. Raise price, reduce per-sale support cost, or remove discount/ad stress before estimating payback.");
+  } else {
+    notes.push(`${salesLabel(plan.salesToRecover)} sales are needed to recover ${fmt.format(plan.costToRecover)} across the ${compact.format(recoveryInputs.paybackMonths)} month payback window.`);
+  }
+  if (plan.monthlyProfit <= 0) {
+    notes.push("Expected monthly sales do not cover monthly tool costs after Etsy fees and support cost.");
+  } else if (Number.isFinite(plan.monthsToRecover)) {
+    notes.push(`At ${compact.format(recoveryInputs.expectedSales)} expected monthly sales, the upfront cost pays back in about ${monthsLabel(plan.monthsToRecover)} months.`);
+  }
+  if (plan.result.profit > 0 && plan.salesToRecover > recoveryInputs.expectedSales * recoveryInputs.paybackMonths) {
+    notes.push("The required break-even sales exceed your expected sales in the target window. Consider a higher price, a bundle, or a lower launch-cost plan.");
+  }
+  if (plan.result.feeRate > 20) {
+    notes.push("Fees are a large share of this low-ticket digital order, so small price changes can move payback faster than they appear.");
+  }
+
+  const list = byId("digitalBreakEvenInsights");
+  if (list) list.innerHTML = notes.map((item) => `<li>${item}</li>`).join("");
+}
+
+function exportDigitalBreakEvenCsv(plan, recoveryInputs) {
+  const rows = [
+    ["Metric", "Value"],
+    ["Item price", plan.inputs.price],
+    ["Profit per sale", plan.result.profit],
+    ["Profit margin percent", plan.result.margin],
+    ["One-time design and launch cost", recoveryInputs.upfrontCost],
+    ["Monthly tool cost", recoveryInputs.monthlyCost],
+    ["Target payback months", recoveryInputs.paybackMonths],
+    ["Expected monthly sales", recoveryInputs.expectedSales],
+    ["Cost to recover", plan.costToRecover],
+    ["Sales needed to break even", Number.isFinite(plan.salesToRecover) ? plan.salesToRecover : "N/A"],
+    ["Monthly profit after tools", plan.monthlyProfit],
+    ["Months to recover upfront", Number.isFinite(plan.monthsToRecover) ? plan.monthsToRecover : "N/A"]
+  ];
+  return rows.map((row) => row.join(",")).join("\n");
+}
+
+function calculateDigitalBreakEven() {
+  const tool = document.querySelector("[data-tool='digital-break-even']");
+  if (!tool) return;
+  const baseInputs = readInputs();
+  const recoveryInputs = readDigitalBreakEvenInputs();
+  const fmt = currencyFormatter(baseInputs.preset.currency);
+  const plan = digitalBreakEvenPlan(baseInputs, recoveryInputs);
+  const [status, tone] = digitalStatus(plan);
+
+  text("digitalBreakEvenSales", salesLabel(plan.salesToRecover));
+  text("digitalProfitPerSale", fmt.format(plan.result.profit));
+  text("digitalCostToRecover", fmt.format(plan.costToRecover));
+  text("digitalMonthlyProfit", fmt.format(plan.monthlyProfit));
+  text("digitalMonthsToRecover", monthsLabel(plan.monthsToRecover));
+  text("digitalBreakEvenStatus", status);
+  text("digitalBreakEvenFormula", `Break-even sales = (${fmt.format(recoveryInputs.upfrontCost)} one-time cost + ${fmt.format(recoveryInputs.monthlyCost)} monthly tools x ${compact.format(recoveryInputs.paybackMonths)} months) / ${fmt.format(plan.result.profit)} profit per sale = ${salesLabel(plan.salesToRecover)} sales.`);
+
+  const statusEl = byId("digitalBreakEvenStatus");
+  if (statusEl) statusEl.className = `status ${tone}`;
+
+  renderDigitalBreakEvenRows(baseInputs, recoveryInputs, fmt);
+  renderDigitalBreakEvenInsights(plan, recoveryInputs, fmt);
+
+  window.currentDigitalBreakEvenReport = {
+    baseInputs,
+    recoveryInputs,
+    plan,
+    csv: exportDigitalBreakEvenCsv(plan, recoveryInputs),
+    fmtCurrency: baseInputs.preset.currency
+  };
+}
+
+function bindDigitalBreakEven() {
+  const tool = document.querySelector("[data-tool='digital-break-even']");
+  if (!tool) return;
+  tool.querySelectorAll("input, select").forEach((input) => {
+    input.addEventListener("input", calculateDigitalBreakEven);
+    input.addEventListener("change", calculateDigitalBreakEven);
+  });
+
+  byId("copyDigitalBreakEven")?.addEventListener("click", async () => {
+    const report = window.currentDigitalBreakEvenReport;
+    if (!report) return;
+    const fmt = currencyFormatter(report.fmtCurrency);
+    const summary = `Etsy digital product break-even plan
+Profit per sale: ${fmt.format(report.plan.result.profit)}
+Cost to recover: ${fmt.format(report.plan.costToRecover)}
+Sales needed to break even: ${salesLabel(report.plan.salesToRecover)}
+Expected monthly sales: ${compact.format(report.recoveryInputs.expectedSales)}
+Monthly profit after tools: ${fmt.format(report.plan.monthlyProfit)}
+Months to recover upfront: ${monthsLabel(report.plan.monthsToRecover)}`;
+    await navigator.clipboard.writeText(summary);
+    text("copyDigitalBreakEven", "Copied");
+    setTimeout(() => text("copyDigitalBreakEven", "Copy break-even plan"), 1200);
+  });
+
+  byId("downloadDigitalBreakEvenCsv")?.addEventListener("click", () => {
+    const report = window.currentDigitalBreakEvenReport;
+    if (!report) return;
+    const blob = new Blob([report.csv], { type: "text/csv" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = "etsy-digital-product-break-even.csv";
+    link.click();
+    URL.revokeObjectURL(url);
+  });
+
+  calculateDigitalBreakEven();
+}
+
 function readTargetGoal() {
   return {
     mode: byId("targetMode")?.value || "margin",
@@ -370,6 +550,7 @@ function calculateAndRender() {
   updateFormula(inputs, result, fmt);
 
   window.currentReport = { inputs, result, csv: exportCsv(inputs, result), fmtCurrency: inputs.preset.currency };
+  calculateDigitalBreakEven();
 }
 
 function bindCalculator() {
@@ -1473,6 +1654,7 @@ function bindSpreadsheetBuilder() {
 }
 
 bindCalculator();
+bindDigitalBreakEven();
 bindTargetPrice();
 bindBundlePricing();
 bindAdsRoas();

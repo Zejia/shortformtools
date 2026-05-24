@@ -3,8 +3,8 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Etsy Digital Product Fee Calculator: Downloads and Templates</title>
-    <meta name="description" content="Calculate Etsy fees and profit for digital products, printables, downloads, templates and low-cost digital listings.">
+    <title>Etsy Digital Product Fee Calculator: Downloads, Templates and Break-Even Sales</title>
+    <meta name="description" content="Calculate Etsy fees, profit per sale, and break-even sales needed to recover design, software, labor and launch costs for digital products, printables and templates.">
     <link rel="canonical" href="https://etsy.shortformtools.com/etsy-digital-product-fee-calculator">
     <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
     <link rel="stylesheet" href="styles.css">
@@ -32,8 +32,8 @@
       <section class="hero wrap">
         <div>
           <p class="eyebrow">Digital product fee calculator</p>
-          <h1>Calculate Etsy profit for printables, templates and downloads.</h1>
-          <p class="lead">Digital products have no shipping label, but small prices make fixed listing and payment fees matter. Model low-ticket orders, bundles, discounts and Offsite Ads.</p>
+          <h1>Calculate Etsy profit and break-even sales for printables, templates and downloads.</h1>
+          <p class="lead">Digital products have no shipping label, but small prices make fixed listing and payment fees matter. Model low-ticket orders, design costs, software costs, discounts and Offsite Ads.</p>
           <div class="hero-actions">
             <a class="button primary" href="/etsy-fee-calculator">Open fee calculator</a>
             <a class="button" href="#tools">See all tools</a>
@@ -41,10 +41,10 @@
         </div>
         <aside class="hero-panel" aria-label="Example order breakdown">
           <div class="mini-ledger">
-            <div class="ledger-line"><span>Sale revenue</span><strong>$34.99</strong></div>
-            <div class="ledger-line"><span>Etsy and payment fees</span><strong>$4.22</strong></div>
-            <div class="ledger-line"><span>Shipping and product cost</span><strong>$16.80</strong></div>
-            <div class="ledger-line"><span>Estimated profit</span><strong>$13.97</strong></div>
+            <div class="ledger-line"><span>Digital listing price</span><strong>$9.00</strong></div>
+            <div class="ledger-line"><span>Etsy and payment fees</span><strong>$1.05</strong></div>
+            <div class="ledger-line"><span>Per-sale support cost</span><strong>$1.85</strong></div>
+            <div class="ledger-line"><span>Break-even sales</span><strong>19</strong></div>
           </div>
         </aside>
       </section>
@@ -80,18 +80,18 @@
                 <span class="hint" id="paymentPresetText">United States: 3% + $0.25</span>
               </div>
               <div class="group-title">Revenue</div>
-              <div class="field"><label for="itemPrice">Item price</label><input id="itemPrice" type="number" min="0" step="0.01" value="28"></div>
+              <div class="field"><label for="itemPrice">Item price</label><input id="itemPrice" type="number" min="0" step="0.01" value="9"></div>
               <div class="field"><label for="quantity">Quantity sold</label><input id="quantity" type="number" min="1" step="1" value="1"></div>
-              <div class="field"><label for="shippingCharged">Shipping charged to buyer</label><input id="shippingCharged" type="number" min="0" step="0.01" value="4.99"></div>
+              <div class="field"><label for="shippingCharged">Shipping charged to buyer</label><input id="shippingCharged" type="number" min="0" step="0.01" value="0"></div>
               <div class="field"><label for="giftWrapCharged">Gift wrap charged</label><input id="giftWrapCharged" type="number" min="0" step="0.01" value="0"></div>
               <div class="field"><label for="discountRate">Discount percent</label><input id="discountRate" type="number" min="0" max="100" step="0.1" value="0"></div>
               <div class="field"><label for="discountFixed">Fixed coupon amount</label><input id="discountFixed" type="number" min="0" step="0.01" value="0"></div>
 
               <div class="group-title">Costs</div>
-              <div class="field"><label for="itemCost">Item cost per unit</label><input id="itemCost" type="number" min="0" step="0.01" value="8.75"></div>
-              <div class="field"><label for="shippingCost">Shipping label cost</label><input id="shippingCost" type="number" min="0" step="0.01" value="4.25"></div>
-              <div class="field"><label for="packagingCost">Packaging cost</label><input id="packagingCost" type="number" min="0" step="0.01" value="0.85"></div>
-              <div class="field"><label for="laborCost">Labor cost for this order</label><input id="laborCost" type="number" min="0" step="0.01" value="3"></div>
+              <div class="field"><label for="itemCost">Item cost per unit</label><input id="itemCost" type="number" min="0" step="0.01" value="0.35"></div>
+              <div class="field"><label for="shippingCost">Shipping label cost</label><input id="shippingCost" type="number" min="0" step="0.01" value="0"></div>
+              <div class="field"><label for="packagingCost">Packaging cost</label><input id="packagingCost" type="number" min="0" step="0.01" value="0"></div>
+              <div class="field"><label for="laborCost">Support cost for this order</label><input id="laborCost" type="number" min="0" step="0.01" value="1.5"></div>
               <div class="field"><label for="adSpend">Etsy Ads spend per order</label><input id="adSpend" type="number" min="0" step="0.01" value="0"></div>
               <div class="field"><label for="taxCollected">Sales tax collected</label><input id="taxCollected" type="number" min="0" step="0.01" value="0"><span class="hint">Used for payment processing base when applicable.</span></div>
 
@@ -102,7 +102,7 @@
               <div class="field"><label for="paymentFlat">Custom payment flat fee</label><input id="paymentFlat" type="number" min="0" step="0.01" value="0.25"></div>
               <div class="field"><label for="regulatoryRate">Regulatory operating fee percent</label><input id="regulatoryRate" type="number" min="0" step="0.1" value="0"></div>
               <div class="field check-row"><input id="currencyConversion" type="checkbox"><label for="currencyConversion">Apply 2.5% currency conversion fee</label></div>
-              <div class="field check-row"><input id="digitalMode" type="checkbox"><label for="digitalMode">Digital product mode</label></div>
+              <div class="field check-row"><input id="digitalMode" type="checkbox" checked><label for="digitalMode">Digital product mode</label></div>
             </div>
           </section>
 
@@ -146,6 +146,89 @@
               <thead><tr><th>Scenario</th><th>Profit</th><th>Margin</th><th>Fees</th><th>Status</th></tr></thead>
               <tbody id="scenarioRows"></tbody>
             </table>
+          </div>
+        </div>
+      </section>
+
+      <section class="tool-shell wrap" data-tool="digital-break-even">
+        <div class="tool-grid">
+          <section class="tool-panel">
+            <div class="section-head">
+              <div>
+                <h2>Digital product break-even planner</h2>
+                <p>Use the current per-sale profit above, then add design, software, mockup, and launch costs.</p>
+              </div>
+            </div>
+            <div class="field-grid">
+              <div class="field"><label for="digitalUpfrontCost">One-time design and launch cost</label><input id="digitalUpfrontCost" type="number" min="0" step="0.01" value="120"><span class="hint">Design time, mockups, templates, listing setup, and initial research.</span></div>
+              <div class="field"><label for="digitalMonthlyCost">Monthly tool cost</label><input id="digitalMonthlyCost" type="number" min="0" step="0.01" value="18"><span class="hint">Canva, font licenses, stock assets, keyword tools, or storage.</span></div>
+              <div class="field"><label for="digitalPaybackMonths">Target payback window</label><input id="digitalPaybackMonths" type="number" min="1" step="1" value="3"></div>
+              <div class="field"><label for="digitalExpectedSales">Expected monthly sales</label><input id="digitalExpectedSales" type="number" min="0" step="1" value="15"></div>
+            </div>
+          </section>
+
+          <aside class="result-panel" aria-live="polite">
+            <div class="result-stack">
+              <div class="metric-large">
+                <span>Sales needed to break even</span>
+                <strong id="digitalBreakEvenSales">0</strong>
+              </div>
+              <div><span id="digitalBreakEvenStatus" class="status ok">Planning</span></div>
+              <div class="metric-grid">
+                <div class="metric"><span>Profit per sale</span><strong id="digitalProfitPerSale">$0.00</strong></div>
+                <div class="metric"><span>Cost to recover</span><strong id="digitalCostToRecover">$0.00</strong></div>
+                <div class="metric"><span>Monthly profit after tools</span><strong id="digitalMonthlyProfit">$0.00</strong></div>
+                <div class="metric"><span>Months to recover upfront</span><strong id="digitalMonthsToRecover">0</strong></div>
+              </div>
+              <div class="formula" id="digitalBreakEvenFormula"></div>
+              <ul class="insights" id="digitalBreakEvenInsights"></ul>
+              <div class="hero-actions">
+                <button type="button" id="copyDigitalBreakEven">Copy break-even plan</button>
+                <button type="button" id="downloadDigitalBreakEvenCsv">Download CSV</button>
+              </div>
+            </div>
+          </aside>
+        </div>
+      </section>
+
+      <section class="content-band wrap">
+        <div class="plain-panel">
+          <div class="section-head">
+            <div>
+              <h2>Digital product break-even scenarios</h2>
+              <p>Compare the current listing against the most common digital-product stress cases.</p>
+            </div>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Scenario</th><th>Profit per sale</th><th>Break-even sales</th><th>Monthly profit</th><th>Status</th></tr></thead>
+              <tbody id="digitalBreakEvenRows"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <section class="content-band wrap">
+        <div class="plain-panel">
+          <div class="section-head">
+            <div>
+              <h2>What counts as digital product cost?</h2>
+              <p>Use this page for printables, Notion templates, Lightroom presets, Canva templates, planners, pattern files, SVG bundles and other download products.</p>
+            </div>
+          </div>
+          <div class="content-grid">
+            <div class="info-card">
+              <h3>One-time build cost</h3>
+              <p>Include your design time, research, template buildout, mockup creation, listing images, proofing, and any outsourced setup cost.</p>
+            </div>
+            <div class="info-card">
+              <h3>Monthly tool cost</h3>
+              <p>Include subscriptions or licenses needed to keep selling the product. The planner spreads those costs across your payback window.</p>
+            </div>
+            <div class="info-card">
+              <h3>Per-sale support cost</h3>
+              <p>Use the support-cost field in the main calculator for buyer messages, file updates, personalization, or manual delivery checks.</p>
+            </div>
           </div>
         </div>
       </section>
