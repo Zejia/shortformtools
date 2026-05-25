@@ -101,6 +101,7 @@
             </div>
             <div class="actions">
               <button type="button" id="copyAuditPlan">Copy audit plan</button>
+              <button type="button" id="downloadAuditPlan">Download .txt</button>
             </div>
           </div>
 
@@ -116,6 +117,22 @@
             <div class="status-list" id="auditRows"></div>
             <p class="inline-note" id="auditSummary">Rate the page to generate a focused punch list.</p>
           </aside>
+        </div>
+      </section>
+
+      <section class="section">
+        <div class="tool-shell">
+          <div class="tool-head">
+            <div>
+              <h2>Priority fix sequence</h2>
+              <p>Fix the weakest section first instead of rewriting the whole page at once.</p>
+            </div>
+          </div>
+          <div class="tool-list" style="padding:18px">
+            <div class="tool-card"><h3>First fix</h3><p id="auditPriorityOne">Score the page to generate the first fix.</p></div>
+            <div class="tool-card"><h3>Second fix</h3><p id="auditPriorityTwo">Score the page to generate the second fix.</p></div>
+            <div class="tool-card"><h3>Third fix</h3><p id="auditPriorityThree">Score the page to generate the third fix.</p></div>
+          </div>
         </div>
       </section>
 

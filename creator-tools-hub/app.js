@@ -1042,6 +1042,7 @@ function initLandingAuditChecklist() {
     ["auditSeo", "Search intent fit", "Match the title, H1, intro, and sections to the exact problem people search for."]
   ];
   const copy = document.getElementById("copyAuditPlan");
+  const download = document.getElementById("downloadAuditPlan");
   let lastPlan = "";
 
   function render() {
@@ -1080,6 +1081,9 @@ function initLandingAuditChecklist() {
     }
 
     const topFixes = sorted.slice(0, 4).map((item) => `- ${item.fix}`);
+    setText("auditPriorityOne", sorted[0]?.fix || "Score the page to generate the first fix.");
+    setText("auditPriorityTwo", sorted[1]?.fix || "Score the page to generate the second fix.");
+    setText("auditPriorityThree", sorted[2]?.fix || "Score the page to generate the third fix.");
     lastPlan = [
       `${pageType} landing page audit`,
       `Primary goal: ${goal}`,
@@ -1102,6 +1106,7 @@ function initLandingAuditChecklist() {
     copy.textContent = "Copied audit";
     setTimeout(() => (copy.textContent = "Copy audit plan"), 1200);
   });
+  download?.addEventListener("click", () => downloadTextFile("landing-page-audit-plan.txt", lastPlan));
   render();
 }
 
