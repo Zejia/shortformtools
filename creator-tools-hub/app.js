@@ -556,6 +556,7 @@ function initHashtagGenerator() {
   const niche = document.getElementById("hashtagNiche");
   const output = document.getElementById("hashtagOutput");
   const copy = document.getElementById("copyHashtags");
+  const download = document.getElementById("downloadHashtags");
   const generate = document.getElementById("generateHashtags");
   const banks = {
     creator: ["creator", "contentcreator", "creatortips", "creatorlife", "socialmediatips"],
@@ -564,14 +565,34 @@ function initHashtagGenerator() {
     business: ["businesstok", "smallbusiness", "foundertok", "marketingtips", "sidehustle"],
     food: ["foodtok", "easyrecipe", "homecooking", "foodcreator", "dinnerideas"]
   };
+  const intentTags = ["howto", "tips", "tutorial", "learnontiktok", "ideas"];
+  const broadTags = ["tiktoktips", "fyp"];
+  let lastReport = "";
 
   function build() {
     const seed = topic.value.trim().toLowerCase().replace(/[^a-z0-9 ]/g, "").split(/\s+/).filter(Boolean);
     const selected = banks[niche.value] || banks.creator;
     const topicTags = seed.slice(0, 3).map((word) => word.length > 2 ? word : "").filter(Boolean);
-    const tags = [...new Set([...topicTags, ...selected, "tiktoktips", "fyp"])].slice(0, 12).map((tag) => `#${tag}`);
+    const clusters = {
+      "Topic tags": topicTags.slice(0, 4).map((tag) => `#${tag}`),
+      "Niche tags": selected.slice(0, 4).map((tag) => `#${tag}`),
+      "Intent tags": intentTags.slice(0, 3).map((tag) => `#${tag}`),
+      "Broad tags": broadTags.map((tag) => `#${tag}`)
+    };
+    const tags = [...new Set(Object.values(clusters).flat())];
     output.textContent = tags.join(" ");
     setText("hashtagCount", numberFormat.format(tags.length));
+    setText("topicHashtagCluster", clusters["Topic tags"].join(" ") || "Add a more specific video topic to generate topic tags.");
+    setText("nicheHashtagCluster", clusters["Niche tags"].join(" "));
+    setText("intentHashtagCluster", clusters["Intent tags"].join(" "));
+    setText("broadHashtagCluster", clusters["Broad tags"].join(" "));
+    lastReport = [
+      `TikTok hashtag clusters for: ${topic.value.trim() || "Untitled topic"}`,
+      "",
+      ...Object.entries(clusters).map(([label, items]) => `${label}: ${items.join(" ")}`),
+      "",
+      `Combined set: ${tags.join(" ")}`
+    ].join("\n");
   }
 
   generate.addEventListener("click", build);
@@ -579,9 +600,10 @@ function initHashtagGenerator() {
   niche.addEventListener("change", build);
   copy.addEventListener("click", async () => {
     await navigator.clipboard.writeText(output.textContent);
-    copy.textContent = "Copied";
-    setTimeout(() => (copy.textContent = "Copy"), 1200);
+    copy.textContent = "Copied all";
+    setTimeout(() => (copy.textContent = "Copy all"), 1200);
   });
+  download?.addEventListener("click", () => downloadTextFile("tiktok-hashtag-clusters.txt", lastReport));
   build();
 }
 
