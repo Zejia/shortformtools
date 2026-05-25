@@ -3,8 +3,8 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Free Etsy Pricing Spreadsheet Template: Fees and Profit CSV</title>
-    <meta name="description" content="Copy a free Etsy pricing spreadsheet CSV template for product price, fees, shipping, discount assumptions and profit formulas.">
+    <title>Free Etsy Pricing Spreadsheet Template: Fees, Profit and Monthly Projection CSV</title>
+    <meta name="description" content="Copy or download a free Etsy pricing spreadsheet CSV template for product price, fees, shipping, discounts, profit per order, margin and monthly profit projection.">
     <link rel="canonical" href="https://etsy.shortformtools.com/free-etsy-pricing-spreadsheet">
     <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
     <link rel="stylesheet" href="styles.css">
@@ -28,16 +28,17 @@
       <section class="hero wrap">
         <div>
           <p class="eyebrow">Free Etsy pricing spreadsheet</p>
-          <h1>Copy a starter Etsy pricing spreadsheet for fee and profit checks.</h1>
-          <p class="lead">Use this CSV as a simple pricing worksheet, then refine it with your own shop costs, country fees and product categories.</p>
+          <h1>Copy a starter Etsy pricing spreadsheet for fees, margin and monthly profit checks.</h1>
+          <p class="lead">Use this CSV as a simple pricing worksheet, then refine it with your own shop costs, country fees, product categories and expected monthly sales.</p>
           <div class="hero-actions">
             <a class="button primary" href="/etsy-fee-calculator">Use calculator first</a>
           </div>
         </div>
         <aside class="hero-panel">
           <div class="mini-ledger">
-            <div class="ledger-line"><span>Columns</span><strong>9</strong></div>
+            <div class="ledger-line"><span>Columns</span><strong>17</strong></div>
             <div class="ledger-line"><span>Includes fee formula</span><strong>Yes</strong></div>
+            <div class="ledger-line"><span>Monthly projection</span><strong>Yes</strong></div>
             <div class="ledger-line"><span>Format</span><strong>CSV</strong></div>
           </div>
         </aside>
@@ -49,7 +50,10 @@
               <h2>Spreadsheet CSV</h2>
               <p>Paste this into Google Sheets, Excel or Numbers. Update rates when your Etsy Payments country is different.</p>
             </div>
-            <button type="button" id="copySpreadsheet">Copy CSV</button>
+            <div class="hero-actions" style="margin-top:0">
+              <button type="button" id="copySpreadsheet">Copy CSV</button>
+              <button type="button" id="downloadSpreadsheetCsv">Download CSV</button>
+            </div>
           </div>
           <textarea id="spreadsheetCsv" aria-label="Etsy pricing spreadsheet CSV"></textarea>
         </div>
@@ -61,6 +65,7 @@
             <li>Create one row for each listing or product variation.</li>
             <li>Keep a normal-price row and a discounted row for each best seller.</li>
             <li>Add a separate row for Offsite Ads if that channel affects the listing.</li>
+            <li>Use the monthly units column for a rough shop-level projection before changing prices.</li>
             <li>Review shipping and packaging costs monthly, because small changes can erase margin.</li>
           </ul>
         </div>

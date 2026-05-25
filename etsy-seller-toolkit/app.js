@@ -1639,9 +1639,10 @@ function bindSpreadsheetBuilder() {
   const output = byId("spreadsheetCsv");
   const makeCsv = () => {
     const rows = [
-      ["Item", "Price", "Qty", "Item cost", "Shipping charged", "Shipping cost", "Discount %", "Offsite ads %", "Profit formula"],
-      ["Example sticker", "5.00", "3", "0.80", "1.50", "1.10", "0", "0", "=B2*C2+E2-((B2*C2+E2)*0.065)-((B2*C2+E2)*0.03+0.25)-(D2*C2)-F2"],
-      ["Example digital planner", "9.00", "1", "0.25", "0", "0", "15", "0", "=B3*C3*(1-G3/100)-((B3*C3*(1-G3/100))*0.065)-((B3*C3*(1-G3/100))*0.03+0.25)-(D3*C3)"]
+      ["Item", "Category", "Price", "Qty/order", "Monthly units", "Item cost", "Shipping charged", "Shipping cost", "Packaging", "Labor", "Discount %", "Offsite ads %", "Ad spend/order", "Estimated fees", "Profit/order", "Margin %", "Monthly profit"],
+      ["Example sticker pack", "Physical", "5.00", "3", "40", "0.80", "1.50", "1.10", "0.25", "1.00", "0", "0", "0.00", "=(C2*D2+G2)*(0.065+L2/100)+(C2*D2+G2)*0.03+0.25+0.20", "=C2*D2+G2-N2-(F2*D2)-H2-I2-J2-M2", "=O2/(C2*D2+G2)", "=O2*E2"],
+      ["Example digital planner", "Digital", "9.00", "1", "30", "0.25", "0", "0", "0", "1.50", "15", "0", "0.00", "=(C3*D3*(1-K3/100)+G3)*(0.065+L3/100)+(C3*D3*(1-K3/100)+G3)*0.03+0.25+0.20", "=C3*D3*(1-K3/100)+G3-N3-(F3*D3)-H3-I3-J3-M3", "=O3/(C3*D3*(1-K3/100)+G3)", "=O3*E3"],
+      ["Example Offsite Ads order", "Stress test", "28.00", "1", "8", "8.75", "4.99", "4.25", "0.85", "3.00", "10", "15", "0.00", "=(C4*D4*(1-K4/100)+G4)*(0.065+L4/100)+(C4*D4*(1-K4/100)+G4)*0.03+0.25+0.20", "=C4*D4*(1-K4/100)+G4-N4-(F4*D4)-H4-I4-J4-M4", "=O4/(C4*D4*(1-K4/100)+G4)", "=O4*E4"]
     ];
     output.value = rows.map((row) => row.join(",")).join("\n");
   };
@@ -1649,6 +1650,15 @@ function bindSpreadsheetBuilder() {
     await navigator.clipboard.writeText(output.value);
     text("copySpreadsheet", "Copied");
     setTimeout(() => text("copySpreadsheet", "Copy CSV"), 1200);
+  });
+  byId("downloadSpreadsheetCsv")?.addEventListener("click", () => {
+    const blob = new Blob([output.value], { type: "text/csv" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = "etsy-pricing-profit-spreadsheet.csv";
+    link.click();
+    URL.revokeObjectURL(url);
   });
   makeCsv();
 }
