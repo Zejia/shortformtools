@@ -254,6 +254,36 @@
       </section>
 
       <section class="section">
+        <div class="tool-shell" data-tool="sprint-brief">
+          <div class="tool-head">
+            <div>
+              <h2>Build a sprint brief before you email</h2>
+              <p>Draft the useful parts first: offer, audience, CTA, assets, and references. Nothing is sent automatically.</p>
+            </div>
+          </div>
+          <div class="tool-grid">
+            <div class="form-panel">
+              <div class="field-grid">
+                <div class="field"><label for="sprintOffer">What do you sell?</label><input id="sprintOffer" value="A paid workshop for creators who want better landing pages"></div>
+                <div class="field"><label for="sprintAudience">Who is it for?</label><input id="sprintAudience" value="solo creators and consultants"></div>
+                <div class="field"><label for="sprintCta">Primary action</label><input id="sprintCta" value="book a call"></div>
+                <div class="field"><label for="sprintTier">Likely tier</label><select id="sprintTier"><option>Starter</option><option>Growth</option><option>Toolkit</option></select></div>
+              </div>
+              <div class="field" style="margin-top:14px"><label for="sprintAssets">Assets or links ready</label><textarea id="sprintAssets">Logo, current checkout link, two competitor examples, rough homepage copy.</textarea></div>
+              <div class="field" style="margin-top:14px"><label for="sprintNotes">What feels weak right now?</label><textarea id="sprintNotes">The offer is clear in conversation, but the page does not make the value obvious fast enough.</textarea></div>
+              <div class="actions"><button type="button" id="copySprintBrief">Copy sprint brief</button><button type="button" id="downloadSprintBrief">Download .txt</button></div>
+            </div>
+            <aside class="result-panel">
+              <div class="metric"><span class="label">Brief readiness</span><strong id="sprintBriefScore">0/100</strong><div class="meter"><span id="sprintBriefMeter"></span></div></div>
+              <div class="metric"><span class="label">Recommended tier</span><span id="sprintTierLabel" class="badge">Starter</span></div>
+              <div class="metric"><span class="label">Missing detail</span><strong id="sprintMissingDetail">None</strong></div>
+              <p class="inline-note" id="sprintBriefSummary">Fill the brief to generate a clean inquiry.</p>
+            </aside>
+          </div>
+        </div>
+      </section>
+
+      <section class="section">
         <div class="section-heading">
           <p class="eyebrow">FAQ</p>
           <h2>Short answers before you reach out.</h2>
@@ -266,5 +296,6 @@
       </section>
     </main>
     <footer class="site-footer"><div><a href="index.html">Home</a> · <a href="about.html">About</a> · <a href="contact.html">Contact</a> · <a href="tool-methodology.html">Methodology</a> · <a href="privacy.html">Privacy</a> · <a href="terms.html">Terms</a></div></footer>
+    <script src="app.js"></script>
   </body>
 </html>

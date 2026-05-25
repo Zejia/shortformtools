@@ -1105,6 +1105,78 @@ function initLandingAuditChecklist() {
   render();
 }
 
+function initSprintBriefBuilder() {
+  const shell = document.querySelector("[data-tool='sprint-brief']");
+  if (!shell) return;
+
+  const copy = document.getElementById("copySprintBrief");
+  const download = document.getElementById("downloadSprintBrief");
+  let lastBrief = "";
+
+  function fieldValue(id) {
+    return document.getElementById(id)?.value.trim() || "";
+  }
+
+  function render() {
+    const offer = fieldValue("sprintOffer");
+    const audience = fieldValue("sprintAudience");
+    const cta = fieldValue("sprintCta");
+    const tier = fieldValue("sprintTier") || "Starter";
+    const assets = fieldValue("sprintAssets");
+    const notes = fieldValue("sprintNotes");
+    const fields = [
+      ["Offer", offer],
+      ["Audience", audience],
+      ["Primary action", cta],
+      ["Assets or links", assets],
+      ["Weak spot", notes]
+    ];
+    const completed = fields.filter(([, value]) => value.length >= 8).length;
+    const score = Math.round((completed / fields.length) * 100);
+    const missing = fields.find(([, value]) => value.length < 8)?.[0] || "None";
+    const recommendedTier = tier === "Starter" && /calculator|quiz|tool|seo|pages|support/i.test(`${assets} ${notes}`) ? "Growth" : tier;
+
+    setText("sprintBriefScore", `${score}/100`);
+    setText("sprintTierLabel", recommendedTier);
+    setText("sprintMissingDetail", missing);
+    setText("sprintBriefSummary", score >= 80
+      ? "This is enough to start a useful sprint email."
+      : `Add more detail for: ${missing}. The clearer the brief, the faster the first draft can be scoped.`);
+    setMeter("sprintBriefMeter", score);
+
+    const tierNode = document.getElementById("sprintTierLabel");
+    if (tierNode) tierNode.className = `badge ${score >= 80 ? "" : "warn"}`;
+
+    lastBrief = [
+      "Landing Page Sprint brief",
+      `Offer: ${offer || "[add offer]"}`,
+      `Audience: ${audience || "[add audience]"}`,
+      `Primary action: ${cta || "[add CTA]"}`,
+      `Likely tier: ${recommendedTier}`,
+      "",
+      "Assets or links ready:",
+      assets || "[add assets, links, or references]",
+      "",
+      "What feels weak right now:",
+      notes || "[add the main page problem]",
+      "",
+      "Preferred next step: confirm scope, timeline, and what you need from me before the first draft."
+    ].join("\n");
+  }
+
+  shell.querySelectorAll("input, select, textarea").forEach((input) => {
+    input.addEventListener("input", render);
+    input.addEventListener("change", render);
+  });
+  copy?.addEventListener("click", async () => {
+    await navigator.clipboard.writeText(lastBrief);
+    copy.textContent = "Copied brief";
+    setTimeout(() => (copy.textContent = "Copy sprint brief"), 1200);
+  });
+  download?.addEventListener("click", () => downloadTextFile("landing-page-sprint-brief.txt", lastBrief));
+  render();
+}
+
 initTikTok();
 initCreatorAnalyticsAudit();
 initLineBreaks();
@@ -1122,3 +1194,4 @@ initContentBriefGenerator();
 initCreatorHookGenerator();
 initCreatorScriptTimer();
 initLandingAuditChecklist();
+initSprintBriefBuilder();
