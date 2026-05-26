@@ -49,6 +49,7 @@ function initTikTok() {
 
   const buttons = shell.querySelectorAll("[data-mode]");
   const copy = document.getElementById("copyTiktokReport");
+  const download = document.getElementById("downloadTiktokReport");
   let mode = "followers";
   let lastReport = "";
 
@@ -97,6 +98,7 @@ Target gap: ${gap ? `${numberFormat.format(gap)} more interactions for ${numberF
     copy.textContent = "Copied report";
     setTimeout(() => (copy.textContent = "Copy report"), 1200);
   });
+  download?.addEventListener("click", () => downloadTextFile("tiktok-engagement-report.txt", lastReport));
   calculate();
 }
 
