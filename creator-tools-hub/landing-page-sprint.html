@@ -16,7 +16,46 @@
     <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
     <link rel="manifest" href="site.webmanifest">
     <link rel="stylesheet" href="styles.css">
-    <script type="application/ld+json">{"@context":"https://schema.org","@type":"Service","name":"48-Hour Landing Page Sprint","provider":{"@type":"Organization","name":"Shortform Tools"},"serviceType":"Static landing-page design and development","areaServed":"Worldwide","url":"https://shortformtools.com/landing-page-sprint","offers":[{"@type":"Offer","price":"149","priceCurrency":"USD","name":"Starter"},{"@type":"Offer","price":"299","priceCurrency":"USD","name":"Growth"},{"@type":"Offer","price":"599","priceCurrency":"USD","name":"Toolkit"}]}</script>
+    <script type="application/ld+json">
+      {
+        "@context":"https://schema.org",
+        "@graph":[
+          {
+            "@type":"Service",
+            "name":"48-Hour Landing Page Sprint",
+            "provider":{"@type":"Organization","name":"Shortform Tools","url":"https://shortformtools.com/"},
+            "serviceType":"Static landing-page design and development",
+            "areaServed":"Worldwide",
+            "url":"https://shortformtools.com/landing-page-sprint",
+            "description":"A focused static landing-page sprint for creators, solo founders, consultants, agencies, and small teams that need a clean page shipped quickly.",
+            "offers":{
+              "@type":"OfferCatalog",
+              "name":"Landing page sprint packages",
+              "itemListElement":[
+                {"@type":"Offer","price":"149","priceCurrency":"USD","name":"Starter","description":"One focused landing page with light copy cleanup and mobile polish."},
+                {"@type":"Offer","price":"299","priceCurrency":"USD","name":"Growth","description":"One landing page with a fuller copy pass, custom CTA, and one mini calculator or quiz."},
+                {"@type":"Offer","price":"599","priceCurrency":"USD","name":"Toolkit","description":"One landing page plus three supporting SEO pages for a small launch or service offer."}
+              ]
+            }
+          },
+          {
+            "@type":"FAQPage",
+            "mainEntity":[
+              {"@type":"Question","name":"Do you only work with creators?","acceptedAnswer":{"@type":"Answer","text":"No. The sprint also fits consultants, agencies, indie products, info products, and small ecommerce or software projects that need one focused page."}},
+              {"@type":"Question","name":"Can this be the first step before a bigger site?","acceptedAnswer":{"@type":"Answer","text":"Yes. Many teams need one live page first, then expand later once they learn what copy, offer, or audience angle is actually working."}},
+              {"@type":"Question","name":"What is usually not included?","acceptedAnswer":{"@type":"Answer","text":"Large CMS builds, account systems, deep backend work, payment logic, and open-ended redesign projects are outside this sprint by default."}}
+            ]
+          },
+          {
+            "@type":"BreadcrumbList",
+            "itemListElement":[
+              {"@type":"ListItem","position":1,"name":"Creator Tools Hub","item":"https://shortformtools.com/"},
+              {"@type":"ListItem","position":2,"name":"Landing Page Sprint","item":"https://shortformtools.com/landing-page-sprint"}
+            ]
+          }
+        ]
+      }
+    </script>
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4259477754165351" crossorigin="anonymous"></script>
     <style>
       .service-hero {
