@@ -1163,18 +1163,30 @@ function initSprintBriefBuilder() {
     const completed = fields.filter(([, value]) => value.length >= 8).length;
     const score = Math.round((completed / fields.length) * 100);
     const missing = fields.find(([, value]) => value.length < 8)?.[0] || "None";
-    const recommendedTier = tier === "Starter" && /calculator|quiz|tool|seo|pages|support/i.test(`${assets} ${notes}`) ? "Growth" : tier;
+    const briefText = `${offer} ${audience} ${cta} ${assets} ${notes}`;
+    const recommendedTier = tier === "Starter" && /calculator|quiz|tool|seo|pages|support/i.test(briefText) ? "Growth" : tier;
+    const isOutOfScope = /cms|shopify|wordpress|webflow|login|account|dashboard|backend|database|payment|stripe|membership|marketplace|app redesign/i.test(briefText);
+    const isStrongFit = /waitlist|landing page|service page|creator|consultant|workshop|course|lead magnet|newsletter|static|one page|offer/i.test(briefText);
+    const fitLabel = isOutOfScope ? "Needs custom scope" : isStrongFit || score >= 80 ? "Good sprint fit" : "Clarify fit";
+    const fitNote = isOutOfScope
+      ? "This may be bigger than the 48-hour sprint. Ask for scope confirmation before assuming it fits the fixed packages."
+      : fitLabel === "Good sprint fit"
+        ? "This looks aligned with a narrow static landing-page sprint."
+        : "Add one clear page type or launch use case so the fit is easier to judge.";
 
     setText("sprintBriefScore", `${score}/100`);
     setText("sprintTierLabel", recommendedTier);
+    setText("sprintFitLabel", fitLabel);
     setText("sprintMissingDetail", missing);
     setText("sprintBriefSummary", score >= 80
-      ? "This is enough to start a useful sprint email."
-      : `Add more detail for: ${missing}. The clearer the brief, the faster the first draft can be scoped.`);
+      ? `${fitNote} This is enough to start a useful sprint email.`
+      : `${fitNote} Add more detail for: ${missing}. The clearer the brief, the faster the first draft can be scoped.`);
     setMeter("sprintBriefMeter", score);
 
     const tierNode = document.getElementById("sprintTierLabel");
     if (tierNode) tierNode.className = `badge ${score >= 80 ? "" : "warn"}`;
+    const fitNode = document.getElementById("sprintFitLabel");
+    if (fitNode) fitNode.className = `badge ${isOutOfScope ? "warn" : fitLabel === "Good sprint fit" ? "" : "warn"}`;
 
     lastBrief = [
       "Landing Page Sprint brief",
@@ -1182,12 +1194,16 @@ function initSprintBriefBuilder() {
       `Audience: ${audience || "[add audience]"}`,
       `Primary action: ${cta || "[add CTA]"}`,
       `Likely tier: ${recommendedTier}`,
+      `Fit check: ${fitLabel}`,
       "",
       "Assets or links ready:",
       assets || "[add assets, links, or references]",
       "",
       "What feels weak right now:",
       notes || "[add the main page problem]",
+      "",
+      "Scope note:",
+      fitNote,
       "",
       "Preferred next step: confirm scope, timeline, and what you need from me before the first draft."
     ].join("\n");
