@@ -1069,6 +1069,15 @@ function initLandingAuditChecklist() {
   const download = document.getElementById("downloadAuditPlan");
   let lastPlan = "";
 
+  function blockerLabel(weakestId, score) {
+    if (weakestId === "auditProof" || weakestId === "auditObjection") return "Trust gap";
+    if (weakestId === "auditHero" || weakestId === "auditOffer") return "Clarity gap";
+    if (weakestId === "auditCta") return "CTA gap";
+    if (weakestId === "auditMobile" || weakestId === "auditSpeed") return "Friction gap";
+    if (weakestId === "auditSeo") return score >= 65 ? "Intent mismatch" : "Positioning gap";
+    return "Conversion gap";
+  }
+
   function render() {
     const scores = fields.map(([id, label, fix]) => ({
       id,
@@ -1084,10 +1093,12 @@ function initLandingAuditChecklist() {
     const goal = document.getElementById("auditGoal")?.value.trim() || "primary conversion";
     const notes = document.getElementById("auditNotes")?.value.trim();
     const readiness = score >= 82 ? "Ready to send" : score >= 65 ? "Tighten before traffic" : "Needs a focused pass";
+    const blocker = blockerLabel(weakest.id, score);
 
     setText("auditScore", `${score}/100`);
     setText("auditReadiness", readiness);
     setText("auditWeakest", weakest.label);
+    setText("auditBlocker", blocker);
     setText("auditNextFix", weakest.fix);
     setText("auditSummary", `${pageType} goal: ${goal}. ${score >= 82 ? "The page is close enough to test with real traffic." : "Fix the weakest areas before spending more on distribution."}`);
     setMeter("auditMeter", score);
@@ -1113,6 +1124,7 @@ function initLandingAuditChecklist() {
       `Primary goal: ${goal}`,
       `Score: ${score}/100`,
       `Readiness: ${readiness}`,
+      `Likely blocker: ${blocker}`,
       `Weakest area: ${weakest.label}`,
       notes ? `Notes: ${notes}` : "",
       "",
