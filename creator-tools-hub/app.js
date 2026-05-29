@@ -231,30 +231,52 @@ function initTitleChecker() {
   const keyword = document.getElementById("targetKeyword");
   const previewTitle = document.getElementById("serpPreviewTitle");
   const previewMeta = document.getElementById("serpPreviewMeta");
+  const copy = document.getElementById("copyTitleReport");
+  const download = document.getElementById("downloadTitleReport");
+  let lastReport = "";
 
   function check() {
     const text = title.value.trim();
-    const key = keyword.value.trim().toLowerCase();
+    const keywordText = keyword.value.trim();
+    const key = keywordText.toLowerCase();
     const length = text.length;
     const hasKeyword = key && text.toLowerCase().includes(key);
     const frontLoaded = key && text.toLowerCase().slice(0, 45).includes(key);
     const ideal = length >= 45 && length <= 70;
     const score = Math.max(0, Math.min(100, 35 + (ideal ? 35 : 0) + (hasKeyword ? 20 : 0) + (frontLoaded ? 10 : 0) - (length > 85 ? 25 : 0)));
+    const lengthStatus = ideal ? "Good range" : length < 45 ? "Short" : "Long";
+    const previewStatus = length > 70 ? "Likely truncated on smaller screens." : "Likely readable in search and suggested video surfaces.";
 
     setText("titleLength", `${length}/70`);
     setText("titleScore", `${score}`);
     setText("keywordStatus", hasKeyword ? "Found" : "Missing");
-    setText("lengthStatus", ideal ? "Good range" : length < 45 ? "Short" : "Long");
+    setText("lengthStatus", lengthStatus);
     setText("frontStatus", frontLoaded ? "Early" : "Not early");
     setMeter("titleMeter", score);
     if (previewTitle) previewTitle.textContent = text || "Your YouTube title preview";
     if (previewMeta) {
-      previewMeta.textContent = length > 70 ? "Likely truncated on smaller screens." : "Likely readable in search and suggested video surfaces.";
+      previewMeta.textContent = previewStatus;
     }
+    lastReport = [
+      "YouTube title checker report",
+      `Title: ${text || "Untitled draft"}`,
+      `Target keyword: ${keywordText || "Not provided"}`,
+      `Score: ${score}/100`,
+      `Length: ${length}/70 (${lengthStatus})`,
+      `Keyword: ${hasKeyword ? "Found" : "Missing"}`,
+      `Placement: ${frontLoaded ? "Early" : "Not early"}`,
+      `Preview note: ${previewStatus}`
+    ].join("\n");
   }
 
   title.addEventListener("input", check);
   keyword.addEventListener("input", check);
+  copy?.addEventListener("click", async () => {
+    await navigator.clipboard.writeText(lastReport);
+    copy.textContent = "Copied report";
+    setTimeout(() => (copy.textContent = "Copy report"), 1200);
+  });
+  download?.addEventListener("click", () => downloadTextFile("youtube-title-checker-report.txt", lastReport));
   check();
 }
 
