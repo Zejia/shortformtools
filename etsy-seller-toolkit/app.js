@@ -188,6 +188,31 @@ function renderScenarios(inputs, fmt) {
     .join("");
 }
 
+function scenarioExports(inputs) {
+  const fmt = currencyFormatter(inputs.preset.currency);
+  const scenarios = [
+    scenario("Current setup", inputs),
+    scenario("No discount", inputs, { discountRate: 0, discountFixed: 0 }),
+    scenario("Offsite ad sale", inputs, { offsiteRate: inputs.offsiteRate || 0.15 }),
+    scenario("Raise price 10%", inputs, { price: inputs.price * 1.1 })
+  ];
+  const rows = [
+    ["Scenario", "Seller revenue", "Platform fees", "Operating cost", "Net profit", "Margin %", "Status"],
+    ...scenarios.map(({ label, result }) => {
+      const [status] = health(result);
+      return [label, result.sellerRevenue, result.platformFees, result.operatingCost, result.profit, result.margin, status];
+    })
+  ];
+  const csv = rows.map((row) => row.join(",")).join("\n");
+  const summary = scenarios
+    .map(({ label, result }) => {
+      const [status] = health(result);
+      return `${label}: ${fmt.format(result.profit)} profit, ${pct(result.margin)} margin, ${fmt.format(result.platformFees)} fees (${status})`;
+    })
+    .join("\n");
+  return { csv, summary };
+}
+
 function renderRecommendations(inputs, result, breakEven, fmt) {
   const notes = [];
   if (result.profit < 0) {
@@ -549,7 +574,7 @@ function calculateAndRender() {
   renderRecommendations(inputs, result, breakEven, fmt);
   updateFormula(inputs, result, fmt);
 
-  window.currentReport = { inputs, result, csv: exportCsv(inputs, result), fmtCurrency: inputs.preset.currency };
+  window.currentReport = { inputs, result, csv: exportCsv(inputs, result), scenarios: scenarioExports(inputs), fmtCurrency: inputs.preset.currency };
   calculateDigitalBreakEven();
 }
 
@@ -603,6 +628,26 @@ Margin: ${pct(report.result.margin)}`;
     const link = document.createElement("a");
     link.href = url;
     link.download = "etsy-profit-estimate.csv";
+    link.click();
+    URL.revokeObjectURL(url);
+  });
+
+  byId("copyScenarioSummary")?.addEventListener("click", async () => {
+    const report = window.currentReport;
+    if (!report) return;
+    await navigator.clipboard.writeText(report.scenarios.summary);
+    text("copyScenarioSummary", "Copied");
+    setTimeout(() => text("copyScenarioSummary", "Copy scenarios"), 1200);
+  });
+
+  byId("downloadScenarioCsv")?.addEventListener("click", () => {
+    const report = window.currentReport;
+    if (!report) return;
+    const blob = new Blob([report.scenarios.csv], { type: "text/csv" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = "etsy-profit-scenarios.csv";
     link.click();
     URL.revokeObjectURL(url);
   });
