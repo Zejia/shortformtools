@@ -1163,6 +1163,7 @@ function initSprintBriefBuilder() {
     const audience = fieldValue("sprintAudience");
     const cta = fieldValue("sprintCta");
     const tier = fieldValue("sprintTier") || "Starter";
+    const scope = fieldValue("sprintScope") || "simple";
     const assets = fieldValue("sprintAssets");
     const notes = fieldValue("sprintNotes");
     const fields = [
@@ -1176,8 +1177,9 @@ function initSprintBriefBuilder() {
     const score = Math.round((completed / fields.length) * 100);
     const missing = fields.find(([, value]) => value.length < 8)?.[0] || "None";
     const briefText = `${offer} ${audience} ${cta} ${assets} ${notes}`;
-    const recommendedTier = tier === "Starter" && /calculator|quiz|tool|seo|pages|support/i.test(briefText) ? "Growth" : tier;
-    const isOutOfScope = /cms|shopify|wordpress|webflow|login|account|dashboard|backend|database|payment|stripe|membership|marketplace|app redesign/i.test(briefText);
+    const scopeTier = scope === "custom" ? "Custom scope" : scope === "seo" ? "Toolkit" : scope === "tool" || scope === "copy" ? "Growth" : tier;
+    const recommendedTier = scopeTier === "Starter" && /calculator|quiz|tool|seo|pages|support/i.test(briefText) ? "Growth" : scopeTier;
+    const isOutOfScope = scope === "custom" || /cms|shopify|wordpress|webflow|login|account|dashboard|backend|database|payment|stripe|membership|marketplace|app redesign/i.test(briefText);
     const isStrongFit = /waitlist|landing page|service page|creator|consultant|workshop|course|lead magnet|newsletter|static|one page|offer/i.test(briefText);
     const fitLabel = isOutOfScope ? "Needs custom scope" : isStrongFit || score >= 80 ? "Good sprint fit" : "Clarify fit";
     const fitNote = isOutOfScope
@@ -1205,6 +1207,7 @@ function initSprintBriefBuilder() {
       `Offer: ${offer || "[add offer]"}`,
       `Audience: ${audience || "[add audience]"}`,
       `Primary action: ${cta || "[add CTA]"}`,
+      `Scope shortcut: ${document.getElementById("sprintScope")?.selectedOptions[0]?.textContent || "One static page"}`,
       `Likely tier: ${recommendedTier}`,
       `Fit check: ${fitLabel}`,
       "",
