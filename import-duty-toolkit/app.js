@@ -329,6 +329,36 @@ function renderScenarioTable(scope, inputs) {
   body.innerHTML = rows;
 }
 
+function landedScenarioRows(inputs) {
+  return [
+    ["Scenario", "Duty", "Tax", "Total landed", "Per unit", "Status"],
+    ...scenarioRows(inputs).map((scenario) => {
+      const merged = { ...inputs, ...scenario.patch };
+      const result = calculateLandedCost(merged);
+      const [status] = planningStatus(merged, result);
+      return [
+        scenario.label,
+        result.duty,
+        result.tax,
+        result.totalLanded,
+        result.perUnit,
+        status
+      ];
+    })
+  ];
+}
+
+function landedScenarioSummary(inputs) {
+  return scenarioRows(inputs)
+    .map((scenario) => {
+      const merged = { ...inputs, ...scenario.patch };
+      const result = calculateLandedCost(merged);
+      const [status] = planningStatus(merged, result);
+      return `${scenario.label}: ${formatCurrency(result.totalLanded, inputs.currency)} total, ${formatCurrency(result.perUnit, inputs.currency)} per unit, ${formatCurrency(result.duty, inputs.currency)} duty, ${formatCurrency(result.tax, inputs.currency)} tax (${status})`;
+    })
+    .join("\n");
+}
+
 function landedCsvRows(inputs, result) {
   return [
     ["Metric", "Value"],
@@ -458,6 +488,8 @@ function renderTool(scope) {
 function attachCsvAndHistory(scope) {
   const downloadButton = byOutput(scope, "downloadCsv");
   const saveButton = byOutput(scope, "saveScenario");
+  const copyScenarioButton = byOutput(scope, "copyScenarioTable");
+  const downloadScenarioButton = byOutput(scope, "downloadScenarioCsv");
   const copyHistoryButton = byOutput(scope, "copyHistory");
   const clearHistoryButton = byOutput(scope, "clearHistory");
 
@@ -493,6 +525,27 @@ function attachCsvAndHistory(scope) {
     window.setTimeout(() => {
       saveButton.textContent = "Save scenario";
     }, 1200);
+  });
+
+  copyScenarioButton?.addEventListener("click", async () => {
+    const inputs = readToolInputs(scope);
+    try {
+      await navigator.clipboard.writeText(landedScenarioSummary(inputs));
+      copyScenarioButton.textContent = "Copied";
+      window.setTimeout(() => {
+        copyScenarioButton.textContent = "Copy scenarios";
+      }, 1200);
+    } catch (_error) {
+      copyScenarioButton.textContent = "Copy failed";
+      window.setTimeout(() => {
+        copyScenarioButton.textContent = "Copy scenarios";
+      }, 1200);
+    }
+  });
+
+  downloadScenarioButton?.addEventListener("click", () => {
+    const inputs = readToolInputs(scope);
+    downloadCsvFile("landed-cost-scenarios.csv", landedScenarioRows(inputs));
   });
 
   copyHistoryButton?.addEventListener("click", async () => {
