@@ -983,6 +983,7 @@ function initCreatorScriptTimer() {
   const targetSeconds = document.getElementById("scriptTargetSeconds");
   const wordsPerMinute = document.getElementById("scriptWpm");
   const copy = document.getElementById("copyScriptPlan");
+  const download = document.getElementById("downloadScriptPlan");
   let lastPlan = "";
 
   function words(text) {
@@ -1043,7 +1044,10 @@ function initCreatorScriptTimer() {
       `Pacing: ${hookBudget}s hook / ${proofBudget}s proof / ${payoffBudget}s payoff`,
       "",
       "Suggestions:",
-      ...suggestions.map((item) => `- ${item}`)
+      ...suggestions.map((item) => `- ${item}`),
+      "",
+      "Script draft:",
+      text || "(No script pasted yet.)"
     ].join("\n");
   }
 
@@ -1055,6 +1059,11 @@ function initCreatorScriptTimer() {
     await navigator.clipboard.writeText(lastPlan);
     copy.textContent = "Copied plan";
     setTimeout(() => (copy.textContent = "Copy timing plan"), 1200);
+  });
+  download?.addEventListener("click", () => {
+    downloadTextFile("creator-script-timing-plan.txt", lastPlan);
+    download.textContent = "Downloaded";
+    setTimeout(() => (download.textContent = "Download .txt"), 1200);
   });
   render();
 }
