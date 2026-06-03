@@ -662,6 +662,7 @@ function initDescriptionGenerator() {
   const cta = document.getElementById("descriptionCta");
   const output = document.getElementById("descriptionOutput");
   const copy = document.getElementById("copyDescription");
+  const download = document.getElementById("downloadDescription");
 
   function generate() {
     const lines = [
@@ -687,6 +688,11 @@ function initDescriptionGenerator() {
     await navigator.clipboard.writeText(output.textContent);
     copy.textContent = "Copied";
     setTimeout(() => (copy.textContent = "Copy"), 1200);
+  });
+  download?.addEventListener("click", () => {
+    downloadTextFile("youtube-description-draft.txt", output.textContent);
+    download.textContent = "Downloaded";
+    setTimeout(() => (download.textContent = "Download .txt"), 1200);
   });
   generate();
 }
