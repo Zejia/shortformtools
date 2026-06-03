@@ -905,6 +905,7 @@ function initCreatorHookGenerator() {
   const outcome = document.getElementById("hookOutcome");
   const rows = document.getElementById("hookRows");
   const copy = document.getElementById("copyHooks");
+  const download = document.getElementById("downloadHooks");
   let lastHooks = "";
 
   function clean(value, fallback) {
@@ -949,6 +950,8 @@ function initCreatorHookGenerator() {
       `${platformName} ${formatName} hook set`,
       `Topic: ${subject}`,
       `Audience: ${viewer}`,
+      `Pain point: ${problem}`,
+      `Viewer outcome: ${promise}`,
       "",
       ...uniqueHooks.map((hook, index) => `${index + 1}. ${hook}`)
     ].join("\n");
@@ -962,6 +965,11 @@ function initCreatorHookGenerator() {
     await navigator.clipboard.writeText(lastHooks);
     copy.textContent = "Copied hooks";
     setTimeout(() => (copy.textContent = "Copy hooks"), 1200);
+  });
+  download?.addEventListener("click", () => {
+    downloadTextFile("creator-hook-ideas.txt", lastHooks);
+    download.textContent = "Downloaded";
+    setTimeout(() => (download.textContent = "Download .txt"), 1200);
   });
   buildHooks();
 }
