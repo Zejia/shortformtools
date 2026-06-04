@@ -196,18 +196,25 @@ function initLineBreaks() {
   const input = document.getElementById("captionInput");
   const output = document.getElementById("captionOutput");
   const copy = document.getElementById("copyCaption");
+  const download = document.getElementById("downloadCaption");
   const clear = document.getElementById("clearCaption");
 
   function format() {
     const raw = input.value.trim();
+    const paragraphs = raw.split(/\n{2,}/).map((block) => block.trim()).filter(Boolean);
     const formatted = raw
       .split(/\n{2,}/)
       .map((block) => block.trim())
       .filter(Boolean)
       .join("\n\u2063\n");
+    const lower = raw.toLowerCase();
+    const hasCta = /(save|share|comment|dm|link|subscribe|follow|shop|book|try|download)/.test(lower);
+    const lines = raw ? raw.split("\n").length : 0;
     output.textContent = formatted || "Your formatted caption will appear here.";
     setText("captionChars", numberFormat.format(raw.length));
-    setText("captionLines", numberFormat.format(raw ? raw.split("\n").length : 0));
+    setText("captionLines", numberFormat.format(lines));
+    setText("captionReadability", paragraphs.length >= 2 && lines <= 14 ? "Scannable" : paragraphs.length < 2 ? "Add breaks" : "Trim gaps");
+    setText("captionCtaCheck", hasCta ? "CTA visible" : "Add CTA");
   }
 
   input.addEventListener("input", format);
@@ -215,6 +222,11 @@ function initLineBreaks() {
     await navigator.clipboard.writeText(output.textContent);
     copy.textContent = "Copied";
     setTimeout(() => (copy.textContent = "Copy"), 1200);
+  });
+  download?.addEventListener("click", () => {
+    downloadTextFile("instagram-formatted-caption.txt", output.textContent);
+    download.textContent = "Downloaded";
+    setTimeout(() => (download.textContent = "Download .txt"), 1200);
   });
   clear.addEventListener("click", () => {
     input.value = "";

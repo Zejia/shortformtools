@@ -48,12 +48,17 @@ Save this for your next shoot.</textarea>
             <div class="count-row"><span><span id="captionChars">0</span> characters</span><span><span id="captionLines">0</span> lines</span></div>
             <div class="actions">
               <button class="primary" id="copyCaption" type="button">Copy</button>
+              <button id="downloadCaption" type="button">Download .txt</button>
               <button id="clearCaption" type="button">Clear</button>
             </div>
           </div>
           <aside class="result-panel">
             <span class="label">Formatted caption</span>
             <div id="captionOutput" class="output-box" aria-live="polite"></div>
+            <div class="status-list">
+              <div class="status-item"><span>Readability</span><strong id="captionReadability">Ready</strong></div>
+              <div class="status-item"><span>CTA position</span><strong id="captionCtaCheck">Check caption</strong></div>
+            </div>
           </aside>
         </div>
       </section>
