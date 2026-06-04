@@ -718,6 +718,8 @@ function initShortsTitleGenerator() {
   const output = document.getElementById("shortsOutput");
   const generate = document.getElementById("generateShortsTitles");
   const copy = document.getElementById("copyShortsTitles");
+  const download = document.getElementById("downloadShortsTitles");
+  let lastTitles = "";
 
   function build() {
     const subject = topic.value.trim() || "your niche";
@@ -734,6 +736,17 @@ function initShortsTitleGenerator() {
       item.textContent = title;
       return item;
     }));
+    const best = titles.reduce((winner, title) => Math.abs(title.length - 45) < Math.abs(winner.length - 45) ? title : winner, titles[0]);
+    setText("shortsBestFit", `${best.length} chars`);
+    setText("shortsAngleCheck", prefix.includes("mistake") || prefix.includes("Before") ? "Tension-led" : "Clear promise");
+    lastTitles = [
+      "YouTube Shorts title ideas",
+      `Topic: ${subject}`,
+      `Angle: ${prefix}`,
+      `Best fit: ${best} (${best.length} chars)`,
+      "",
+      ...titles.map((title, index) => `${index + 1}. ${title}`)
+    ].join("\n");
   }
 
   generate.addEventListener("click", build);
@@ -743,6 +756,11 @@ function initShortsTitleGenerator() {
     await navigator.clipboard.writeText([...output.querySelectorAll("li")].map((li) => li.textContent).join("\n"));
     copy.textContent = "Copied";
     setTimeout(() => (copy.textContent = "Copy"), 1200);
+  });
+  download?.addEventListener("click", () => {
+    downloadTextFile("youtube-shorts-title-ideas.txt", lastTitles);
+    download.textContent = "Downloaded";
+    setTimeout(() => (download.textContent = "Download .txt"), 1200);
   });
   build();
 }
