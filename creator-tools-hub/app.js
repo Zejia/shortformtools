@@ -758,7 +758,9 @@ function initBioGenerator() {
   const proof = document.getElementById("bioProof");
   const output = document.getElementById("bioOutput");
   const copy = document.getElementById("copyBios");
+  const download = document.getElementById("downloadBios");
   const generate = document.getElementById("generateBios");
+  let lastBios = "";
 
   function build() {
     const subject = niche.value.trim() || "content creators";
@@ -779,6 +781,16 @@ function initBioGenerator() {
       return item;
     }));
     setText("bioCount", numberFormat.format(bios.length));
+    setText("bioFit", subject.length > 5 && promise.length > 10 ? "Specific" : "Add detail");
+    setText("bioNextStep", signal ? "CTA/proof set" : "Add CTA");
+    lastBios = [
+      `${platformLabel} bio ideas`,
+      `Audience: ${subject}`,
+      `Promise: ${promise}`,
+      signal ? `Proof or CTA: ${signal}` : "Proof or CTA: Not set",
+      "",
+      ...bios.map((bio, index) => `${index + 1}. ${bio}`)
+    ].join("\n");
   }
 
   shell.querySelectorAll("input, select").forEach((input) => input.addEventListener("input", build));
@@ -788,6 +800,12 @@ function initBioGenerator() {
     await navigator.clipboard.writeText([...output.querySelectorAll("li")].map((li) => li.textContent).join("\n"));
     copy.textContent = "Copied";
     setTimeout(() => (copy.textContent = "Copy"), 1200);
+  });
+  download?.addEventListener("click", () => {
+    const filename = platform === "instagram" ? "instagram-bio-ideas.txt" : "tiktok-bio-ideas.txt";
+    downloadTextFile(filename, lastBios);
+    download.textContent = "Downloaded";
+    setTimeout(() => (download.textContent = "Download .txt"), 1200);
   });
   build();
 }
