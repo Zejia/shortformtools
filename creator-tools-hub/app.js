@@ -837,7 +837,9 @@ function initChannelNameGenerator() {
   const style = document.getElementById("channelStyle");
   const output = document.getElementById("channelOutput");
   const copy = document.getElementById("copyChannelNames");
+  const download = document.getElementById("downloadChannelNames");
   const generate = document.getElementById("generateChannelNames");
+  let lastNames = "";
 
   function titleCase(text) {
     return text.replace(/\w\S*/g, (word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase());
@@ -861,6 +863,20 @@ function initChannelNameGenerator() {
       return item;
     }));
     setText("channelNameCount", numberFormat.format(names.length));
+    const shortest = names.reduce((winner, name) => name.length < winner.length ? name : winner, names[0]);
+    setText("channelMemorability", shortest.length <= 22 ? "Easy to say" : "Trim words");
+    setText("channelRange", subject.split(/\s+/).length <= 3 ? "Flexible" : "Very specific");
+    lastNames = [
+      "YouTube channel name shortlist",
+      `Topic: ${subject}`,
+      `Audience: ${viewer}`,
+      `Style: ${styleWord}`,
+      `Most memorable candidate: ${shortest} (${shortest.length} chars)`,
+      "",
+      ...names.map((name, index) => `${index + 1}. ${name}`),
+      "",
+      "Before choosing: check YouTube, Google, social handles, and domain conflicts."
+    ].join("\n");
   }
 
   shell.querySelectorAll("input, select").forEach((input) => input.addEventListener("input", build));
@@ -870,6 +886,11 @@ function initChannelNameGenerator() {
     await navigator.clipboard.writeText([...output.querySelectorAll("li")].map((li) => li.textContent).join("\n"));
     copy.textContent = "Copied";
     setTimeout(() => (copy.textContent = "Copy"), 1200);
+  });
+  download?.addEventListener("click", () => {
+    downloadTextFile("youtube-channel-name-shortlist.txt", lastNames);
+    download.textContent = "Downloaded";
+    setTimeout(() => (download.textContent = "Download .txt"), 1200);
   });
   build();
 }
