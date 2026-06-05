@@ -1206,22 +1206,11 @@ function adsStatus(profitAfterAds, targetProfit) {
 }
 
 function renderAdsScenarios(inputs, plan, fmt) {
-  const rows = [
-    ["Current CPC", inputs.averageCpc, inputs.conversionRate],
-    ["Conversion down 20%", inputs.averageCpc, inputs.conversionRate * 0.8],
-    ["CPC up 20%", inputs.averageCpc * 1.2, inputs.conversionRate],
-    ["Target-margin CPC", plan.targetCpc, inputs.conversionRate],
-    ["Break-even CPC", plan.maxCpc, inputs.conversionRate]
-  ];
+  const rows = adsScenarioData(inputs, plan);
   const container = byId("adsScenarioRows");
   if (!container) return;
   container.innerHTML = rows
-    .map(([label, cpc, conversionRate]) => {
-      const clicksPerOrder = conversionRate > 0 ? 1 / conversionRate : Infinity;
-      const adSpendPerOrder = cpc * clicksPerOrder;
-      const profitAfterAds = plan.baseResult.profit - adSpendPerOrder;
-      const roas = adSpendPerOrder > 0 ? plan.baseResult.sellerRevenue / adSpendPerOrder : Infinity;
-      const [status, tone] = adsStatus(profitAfterAds, plan.targetProfit);
+    .map(({ label, cpc, adSpendPerOrder, roas, profitAfterAds, status, tone }) => {
       return `<tr>
         <td>${label}</td>
         <td>${fmt.format(cpc)}</td>
@@ -1232,6 +1221,23 @@ function renderAdsScenarios(inputs, plan, fmt) {
       </tr>`;
     })
     .join("");
+}
+
+function adsScenarioData(inputs, plan) {
+  return [
+    ["Current CPC", inputs.averageCpc, inputs.conversionRate],
+    ["Conversion down 20%", inputs.averageCpc, inputs.conversionRate * 0.8],
+    ["CPC up 20%", inputs.averageCpc * 1.2, inputs.conversionRate],
+    ["Target-margin CPC", plan.targetCpc, inputs.conversionRate],
+    ["Break-even CPC", plan.maxCpc, inputs.conversionRate]
+  ].map(([label, cpc, conversionRate]) => {
+    const clicksPerOrder = conversionRate > 0 ? 1 / conversionRate : Infinity;
+    const adSpendPerOrder = cpc * clicksPerOrder;
+    const profitAfterAds = plan.baseResult.profit - adSpendPerOrder;
+    const roas = adSpendPerOrder > 0 ? plan.baseResult.sellerRevenue / adSpendPerOrder : Infinity;
+    const [status, tone] = adsStatus(profitAfterAds, plan.targetProfit);
+    return { label, cpc, conversionRate, adSpendPerOrder, roas, profitAfterAds, status, tone };
+  });
 }
 
 function renderAdsInsights(inputs, plan, fmt) {
@@ -1283,6 +1289,26 @@ function exportAdsCsv(inputs, plan) {
   return rows.map((row) => row.join(",")).join("\n");
 }
 
+function adsScenarioExports(inputs, plan) {
+  const fmt = currencyFormatter(inputs.preset.currency);
+  const scenarios = adsScenarioData(inputs, plan);
+  const rows = [
+    ["Scenario", "Conversion rate %", "CPC", "Ad cost per order", "ROAS", "Profit per order", "Status"],
+    ...scenarios.map((item) => [
+      item.label,
+      item.conversionRate * 100,
+      item.cpc,
+      item.adSpendPerOrder,
+      Number.isFinite(item.roas) ? item.roas : "N/A",
+      item.profitAfterAds,
+      item.status
+    ])
+  ];
+  const csv = rows.map((row) => row.join(",")).join("\n");
+  const summary = scenarios.map((item) => `${item.label}: ${fmt.format(item.adSpendPerOrder)} ad cost/order, ${roasLabel(item.roas)} ROAS, ${fmt.format(item.profitAfterAds)} profit/order (${item.status})`).join("\n");
+  return { csv, summary };
+}
+
 function calculateAdsAndRender() {
   const inputs = readAdsInputs();
   const fmt = currencyFormatter(inputs.preset.currency);
@@ -1314,6 +1340,7 @@ function calculateAdsAndRender() {
     inputs,
     plan,
     csv: exportAdsCsv(inputs, plan),
+    scenarios: adsScenarioExports(inputs, plan),
     fmtCurrency: inputs.preset.currency
   };
 }
@@ -1398,6 +1425,26 @@ Profit after ads/order: ${fmt.format(report.plan.profitAfterAds)}`;
     const link = document.createElement("a");
     link.href = url;
     link.download = "etsy-ads-roas-plan.csv";
+    link.click();
+    URL.revokeObjectURL(url);
+  });
+
+  byId("copyAdsScenarios")?.addEventListener("click", async () => {
+    const report = window.currentAdsReport;
+    if (!report) return;
+    await navigator.clipboard.writeText(report.scenarios.summary);
+    text("copyAdsScenarios", "Copied");
+    setTimeout(() => text("copyAdsScenarios", "Copy scenarios"), 1200);
+  });
+
+  byId("downloadAdsScenarioCsv")?.addEventListener("click", () => {
+    const report = window.currentAdsReport;
+    if (!report) return;
+    const blob = new Blob([report.scenarios.csv], { type: "text/csv" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = "etsy-ads-roas-scenarios.csv";
     link.click();
     URL.revokeObjectURL(url);
   });
