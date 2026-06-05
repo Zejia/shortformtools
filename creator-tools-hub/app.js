@@ -308,6 +308,7 @@ function initTitleAbTester() {
   const previewTitle = document.getElementById("abPreviewTitle");
   const previewMeta = document.getElementById("abPreviewMeta");
   const copy = document.getElementById("copyAbReport");
+  const download = document.getElementById("downloadAbReport");
   let lastReport = "";
 
   function scoreTitle(text, key) {
@@ -367,6 +368,11 @@ function initTitleAbTester() {
     await navigator.clipboard.writeText(lastReport);
     copy.textContent = "Copied comparison";
     setTimeout(() => (copy.textContent = "Copy comparison"), 1200);
+  });
+  download?.addEventListener("click", () => {
+    downloadTextFile("youtube-title-ab-comparison.txt", lastReport);
+    download.textContent = "Downloaded";
+    setTimeout(() => (download.textContent = "Download .txt"), 1200);
   });
   render();
 }
