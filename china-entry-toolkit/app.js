@@ -759,6 +759,32 @@ function arrivalWindowLabel(value) {
   return labels[value] || "Arrival";
 }
 
+function transportNeedLabel(value) {
+  const labels = {
+    airportRide: "Airport or station ride",
+    hotelCheckin: "Time-sensitive hotel check-in",
+    cashier: "First payment or cashier test"
+  };
+  return labels[value] || "Arrival focus";
+}
+
+function tripStyleLabel(value) {
+  const labels = {
+    simple: "One city or simple transfer pattern",
+    railHeavy: "Multiple rail legs or multi-city travel"
+  };
+  return labels[value] || "Trip pattern";
+}
+
+function foodNeedLabel(value) {
+  const labels = {
+    none: "No special food note",
+    diet: "Dietary preference or ingredient avoidance",
+    allergy: "Allergy warning needed"
+  };
+  return labels[value] || "Food communication";
+}
+
 function replaceLines(container, lines) {
   if (!container) return;
   container.replaceChildren(...lines.map((line) => {
@@ -1833,8 +1859,9 @@ function initArrivalChecklistBuilder() {
   const medicalField = shell.querySelector(".arrival-medical-ready");
   const feedback = shell.querySelector(".copy-feedback");
   const copyButtons = shell.querySelectorAll("[data-copy-arrival]");
+  const downloadButton = shell.querySelector("[data-download-arrival]");
 
-  let payloads = { short: "", full: "" };
+  let payloads = { short: "", full: "", filename: "china-arrival-checklist.txt" };
 
   populateCountrySelect(countryField, true);
 
@@ -1866,10 +1893,11 @@ function initArrivalChecklistBuilder() {
         ],
         source: `Operational logic reviewed on ${SITE_REVIEW_DATE}`
       });
-      payloads = { short: "", full: "" };
+      payloads = { short: "", full: "", filename: "china-arrival-checklist.txt" };
       copyButtons.forEach((button) => {
         button.disabled = true;
       });
+      if (downloadButton) downloadButton.disabled = true;
       if (feedback) {
         feedback.textContent = "Choose a passport first, then the builder will turn your inputs into a practical checklist.";
       }
@@ -2076,6 +2104,17 @@ function initArrivalChecklistBuilder() {
         `Arrival profile: ${arrivalWindowLabel(arrivalWindow)}`,
         `Payments: ${paymentStateLabel(paymentState)}`,
         `Connectivity: ${dataStateLabel(dataState)}`,
+        `Transport focus: ${transportNeedLabel(transportNeed)}`,
+        `Trip pattern: ${tripStyleLabel(tripStyle)}`,
+        `Food note: ${foodNeedLabel(foodNeed)}`,
+        "",
+        "Prepared already",
+        `- Entry basis confirmed: ${done.rule ? "yes" : "no"}`,
+        `- Chinese hotel or host address saved: ${done.address ? "yes" : "no"}`,
+        `- Backup card or emergency cash ready: ${done.backup ? "yes" : "no"}`,
+        `- Ride or pickup plan ready: ${done.ride ? "yes" : "no"}`,
+        `- Booking or rail app ready: ${done.booking ? "yes" : "no"}`,
+        `- Food or allergy card ready if needed: ${done.medical ? "yes" : "no"}`,
         "",
         "Top priorities",
         ...result.priorities.map((item, index) => `${index + 1}. ${item}`),
@@ -2087,15 +2126,19 @@ function initArrivalChecklistBuilder() {
         ...finalAfterLanding.map((item) => `- ${item}`),
         "",
         "Backup layer",
-        ...finalBackupPlan.map((item) => `- ${item}`)
-      ].join("\n")
+        ...finalBackupPlan.map((item) => `- ${item}`),
+        "",
+        result.source
+      ].join("\n"),
+      filename: `china-arrival-checklist-${country.code.toLowerCase()}.txt`
     };
 
     copyButtons.forEach((button) => {
       button.disabled = false;
     });
+    if (downloadButton) downloadButton.disabled = false;
     if (feedback) {
-      feedback.textContent = "Copy the short priority list for your notes, or copy the full checklist before travel day.";
+      feedback.textContent = "Copy the checklist into your notes, or download the text file for offline travel prep.";
     }
   }
 
@@ -2129,6 +2172,15 @@ function initArrivalChecklistBuilder() {
           : "Copy failed in the browser. Try selecting the text manually.";
       }
     });
+  });
+
+  downloadButton?.addEventListener("click", () => {
+    const ok = downloadTextFile(payloads.filename, payloads.full);
+    if (feedback) {
+      feedback.textContent = ok
+        ? "Downloaded. Keep the file somewhere reachable before the flight."
+        : "Download failed in the browser. Copy the full checklist instead.";
+    }
   });
 
   evaluate();
