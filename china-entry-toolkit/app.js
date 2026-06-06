@@ -712,6 +712,40 @@ function transitScript(input, result) {
   return `This route should not be treated as confirmed 240-hour visa-free transit yet. The checker flagged: ${result.headline} I should verify another legal entry basis, adjust the itinerary, or plan for a visa before travel.`;
 }
 
+function transitRouteSummary(input, result) {
+  const countryName = input.country?.name || "Not selected";
+  const origin = routeName(input.origin) || "Not selected";
+  const destination = routeName(input.destination) || "Not selected";
+  const zone = transitZones.find((item) => item.code === input.zoneCode);
+  const hours = input.hours && input.hours > 0 ? `${formatNumber(input.hours, 1)} hours` : "Not calculated";
+  return [
+    "China 240-hour transit route summary",
+    `Passport nationality: ${countryName}`,
+    `Trip purpose: ${purposeLabel(input.purpose)}`,
+    `Route: ${origin} -> mainland China -> ${destination}`,
+    `Mainland stay window: ${hours}`,
+    `Planned transit area: ${zone ? zone.name : "Not selected"}`,
+    "",
+    "Traveler confirmations",
+    `- Ordinary passport: ${input.ordinaryPassport ? "yes" : "no"}`,
+    `- Confirmed onward departure: ${input.onwardBooked ? "yes" : "no"}`,
+    `- Entry port confirmed as designated: ${input.enteringEligiblePort ? "yes" : "no"}`,
+    `- Stay area confirmed: ${input.stayingInArea ? "yes" : "no"}`,
+    "",
+    "Checker verdict",
+    `${result.status}: ${result.headline}`,
+    result.reason,
+    "",
+    "Next steps",
+    ...result.steps.map((step) => `- ${step}`),
+    "",
+    "Airline check-in script",
+    transitScript(input, result),
+    "",
+    `Transit policy reviewed from NIA sources dated ${TRANSIT_POLICY_SOURCE_DATE} and ${TRANSIT_PORT_UPDATE_DATE}`
+  ].join("\n");
+}
+
 function formatList(items, locale = "en-US") {
   return new Intl.ListFormat(locale, { style: "long", type: "conjunction" }).format(items);
 }
@@ -1121,6 +1155,8 @@ function initTransitChecker() {
   const portField = shell.querySelector(".port-field");
   const areaField = shell.querySelector(".area-field");
   const copyScriptButton = shell.querySelector(".copy-airline-script");
+  const downloadSummaryButton = shell.querySelector(".download-transit-summary");
+  let summaryPayload = "";
 
   populateCountrySelect(countryField, true);
   populateRouteSelect(originField, "Choose where the trip starts");
@@ -1148,6 +1184,8 @@ function initTransitChecker() {
         ],
         source: `Transit policy reviewed from NIA sources dated ${TRANSIT_POLICY_SOURCE_DATE} and ${TRANSIT_PORT_UPDATE_DATE}`
       });
+      summaryPayload = "";
+      if (downloadSummaryButton) downloadSummaryButton.disabled = true;
       return;
     }
 
@@ -1181,6 +1219,8 @@ function initTransitChecker() {
     if (airlineScript) {
       airlineScript.textContent = transitScript(transitInput, output);
     }
+    summaryPayload = transitRouteSummary(transitInput, output);
+    if (downloadSummaryButton) downloadSummaryButton.disabled = false;
   }
 
   [countryField, purposeField, ordinaryField, originField, destinationField, arrivalField, departureField, zoneField, onwardField, portField, areaField]
@@ -1197,6 +1237,14 @@ function initTransitChecker() {
     copyScriptButton.textContent = "Copied";
     setTimeout(() => {
       copyScriptButton.textContent = "Copy script";
+    }, 1200);
+  });
+
+  downloadSummaryButton?.addEventListener("click", () => {
+    const ok = downloadTextFile("china-transit-route-summary.txt", summaryPayload);
+    downloadSummaryButton.textContent = ok ? "Downloaded" : "Download failed";
+    setTimeout(() => {
+      downloadSummaryButton.textContent = "Download route summary";
     }, 1200);
   });
 
