@@ -545,7 +545,7 @@ function attachCsvAndHistory(scope) {
 
   downloadScenarioButton?.addEventListener("click", () => {
     const inputs = readToolInputs(scope);
-    downloadCsvFile("landed-cost-scenarios.csv", landedScenarioRows(inputs));
+    downloadCsvFile(downloadScenarioButton.dataset.filename || "landed-cost-scenarios.csv", landedScenarioRows(inputs));
   });
 
   copyHistoryButton?.addEventListener("click", async () => {
