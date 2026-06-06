@@ -1,0 +1,18 @@
+{
+  "redirects": [
+    { "source": "/import-duty-calculator", "destination": "/import-duty-calculator.html", "permanent": true },
+    { "source": "/landed-cost-calculator", "destination": "/landed-cost-calculator.html", "permanent": true },
+    { "source": "/import-margin-calculator", "destination": "/import-margin-calculator.html", "permanent": true },
+    { "source": "/import-supplier-quote-comparison-calculator", "destination": "/import-supplier-quote-comparison-calculator.html", "permanent": true },
+    { "source": "/customs-duty-calculator", "destination": "/customs-duty-calculator.html", "permanent": true },
+    { "source": "/us-import-duty-calculator", "destination": "/us-import-duty-calculator.html", "permanent": true },
+    { "source": "/uk-import-duty-calculator", "destination": "/uk-import-duty-calculator.html", "permanent": true },
+    { "source": "/de-minimis-calculator", "destination": "/de-minimis-calculator.html", "permanent": true },
+    { "source": "/how-to-estimate-import-duty", "destination": "/how-to-estimate-import-duty.html", "permanent": true },
+    { "source": "/hs-code-lookup-guide", "destination": "/hs-code-lookup-guide.html", "permanent": true },
+    { "source": "/about", "destination": "/about.html", "permanent": true },
+    { "source": "/contact", "destination": "/contact.html", "permanent": true },
+    { "source": "/privacy", "destination": "/privacy.html", "permanent": true },
+    { "source": "/terms", "destination": "/terms.html", "permanent": true }
+  ]
+}
