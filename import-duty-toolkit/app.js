@@ -648,24 +648,32 @@ function marginHealth(result) {
   return ["Healthy resale spread", "good"];
 }
 
-function renderMarginScenarioTable(scope, inputs, landed) {
-  const body = byOutput(scope, "marginScenarioRows");
-  if (!body) return;
-  const scenarios = [
+function marginScenarioDefinitions(inputs) {
+  return [
     { label: "Current sale price", patch: {} },
     { label: "Sale price -10%", patch: { salePrice: inputs.salePrice * 0.9 } },
     { label: "Freight +12%", patch: { shippingCost: inputs.shippingCost * 1.12 } },
     { label: "Duty rate +2 pts", patch: { dutyRate: inputs.dutyRate + 0.02 } }
   ];
+}
 
-  body.innerHTML = scenarios
+function calculateMarginScenario(inputs, landed, scenario) {
+  const merged = { ...inputs, ...scenario.patch };
+  const scenarioLanded = scenario.patch.shippingCost || scenario.patch.dutyRate
+    ? calculateLandedCost(merged)
+    : landed;
+  const result = calculateImportMargin(merged, scenarioLanded);
+  const [status] = marginHealth(result);
+  return { merged, scenarioLanded, result, status };
+}
+
+function renderMarginScenarioTable(scope, inputs, landed) {
+  const body = byOutput(scope, "marginScenarioRows");
+  if (!body) return;
+
+  body.innerHTML = marginScenarioDefinitions(inputs)
     .map((scenario) => {
-      const merged = { ...inputs, ...scenario.patch };
-      const scenarioLanded = scenario.patch.shippingCost || scenario.patch.dutyRate
-        ? calculateLandedCost(merged)
-        : landed;
-      const result = calculateImportMargin(merged, scenarioLanded);
-      const [status] = marginHealth(result);
+      const { merged, scenarioLanded, result, status } = calculateMarginScenario(inputs, landed, scenario);
       return `<tr>
         <td>${scenario.label}</td>
         <td>${formatCurrency(scenarioLanded.perUnit, inputs.currency)}</td>
@@ -676,6 +684,35 @@ function renderMarginScenarioTable(scope, inputs, landed) {
       </tr>`;
     })
     .join("");
+}
+
+function marginScenarioCsvRows(inputs, landed) {
+  return [
+    ["Scenario", "Landed per unit", "Sale price", "Channel costs", "Profit per unit", "Gross margin percent", "Break-even price", "Target price", "Status"],
+    ...marginScenarioDefinitions(inputs).map((scenario) => {
+      const { merged, scenarioLanded, result, status } = calculateMarginScenario(inputs, landed, scenario);
+      return [
+        scenario.label,
+        scenarioLanded.perUnit,
+        merged.salePrice,
+        result.channelCosts,
+        result.profitPerUnit,
+        result.grossMargin,
+        Number.isFinite(result.breakEvenPrice) ? result.breakEvenPrice : "No safe price",
+        Number.isFinite(result.targetPrice) ? result.targetPrice : "No safe price",
+        status
+      ];
+    })
+  ];
+}
+
+function marginScenarioSummary(inputs, landed) {
+  return marginScenarioDefinitions(inputs)
+    .map((scenario) => {
+      const { merged, scenarioLanded, result, status } = calculateMarginScenario(inputs, landed, scenario);
+      return `${scenario.label}: ${formatCurrency(scenarioLanded.perUnit, inputs.currency)} landed/unit, ${formatCurrency(merged.salePrice, inputs.currency)} sale price, ${formatCurrency(result.profitPerUnit, inputs.currency)} profit/unit, ${formatPercent(result.grossMargin)} margin (${status})`;
+    })
+    .join("\n");
 }
 
 function buildMarginInsights(inputs, landed, result) {
@@ -777,6 +814,31 @@ function initImportMarginTools() {
           copyButton.textContent = "Copy margin plan";
         }, 1200);
       }
+    });
+
+    const copyScenarioButton = byOutput(scope, "copyMarginScenarios");
+    copyScenarioButton?.addEventListener("click", async () => {
+      const inputs = readMarginInputs(scope);
+      const landed = calculateLandedCost(inputs);
+      try {
+        await navigator.clipboard.writeText(marginScenarioSummary(inputs, landed));
+        copyScenarioButton.textContent = "Copied";
+        window.setTimeout(() => {
+          copyScenarioButton.textContent = "Copy scenarios";
+        }, 1200);
+      } catch (_error) {
+        copyScenarioButton.textContent = "Copy failed";
+        window.setTimeout(() => {
+          copyScenarioButton.textContent = "Copy scenarios";
+        }, 1200);
+      }
+    });
+
+    const downloadScenarioButton = byOutput(scope, "downloadMarginScenarioCsv");
+    downloadScenarioButton?.addEventListener("click", () => {
+      const inputs = readMarginInputs(scope);
+      const landed = calculateLandedCost(inputs);
+      downloadCsvFile("import-margin-pressure-scenarios.csv", marginScenarioCsvRows(inputs, landed));
     });
 
     renderImportMarginTool(scope);
