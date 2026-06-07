@@ -927,13 +927,42 @@ function findMaxBundleDiscount(inputs) {
   return low * 100;
 }
 
-function renderBundleRows(inputs, fmt) {
-  const rows = [
+function bundleScenarioData(inputs) {
+  return [
     ["Current bundle", inputs.itemRevenue, calculateBundle(inputs)],
     ["No bundle discount", inputs.retailSubtotal, calculateBundle({ ...inputs, itemRevenue: inputs.retailSubtotal })],
     ["10% lower bundle price", inputs.itemRevenue * 0.9, calculateBundle({ ...inputs, itemRevenue: inputs.itemRevenue * 0.9 })],
     ["Offsite Ads stress", inputs.itemRevenue, calculateBundle({ ...inputs, offsiteRate: inputs.offsiteRate || 0.15 })]
   ];
+}
+
+function bundleScenarioExports(inputs, fmt) {
+  const rows = bundleScenarioData(inputs).map(([label, price, result]) => {
+    const [status] = health(result);
+    return { label, price, result, status };
+  });
+  return {
+    summary: rows
+      .map((row) => `${row.label}: ${fmt.format(row.price)} bundle price, ${fmt.format(row.result.profit)} profit, ${pct(row.result.margin)} margin (${row.status})`)
+      .join("\n"),
+    csv: [
+      ["Scenario", "Bundle price", "Seller revenue", "Platform fees", "Operating cost", "Net profit", "Margin percent", "Status"],
+      ...rows.map((row) => [
+        row.label,
+        row.price,
+        row.result.sellerRevenue,
+        row.result.platformFees,
+        row.result.operatingCost,
+        row.result.profit,
+        row.result.margin,
+        row.status
+      ])
+    ].map((row) => row.join(",")).join("\n")
+  };
+}
+
+function renderBundleRows(inputs, fmt) {
+  const rows = bundleScenarioData(inputs);
   const container = byId("bundleScenarioRows");
   if (!container) return;
   container.innerHTML = rows
@@ -1029,6 +1058,7 @@ function calculateBundleAndRender() {
     breakEven,
     maxDiscount,
     csv: exportBundleCsv(inputs, result, breakEven, maxDiscount),
+    scenarios: bundleScenarioExports(inputs, fmt),
     fmtCurrency: inputs.preset.currency
   };
 }
@@ -1120,6 +1150,26 @@ Max break-even discount: ${pct(report.maxDiscount)}`;
     const link = document.createElement("a");
     link.href = url;
     link.download = "etsy-bundle-pricing.csv";
+    link.click();
+    URL.revokeObjectURL(url);
+  });
+
+  byId("copyBundleScenarios")?.addEventListener("click", async () => {
+    const report = window.currentBundleReport;
+    if (!report) return;
+    await navigator.clipboard.writeText(report.scenarios.summary);
+    text("copyBundleScenarios", "Copied");
+    setTimeout(() => text("copyBundleScenarios", "Copy scenarios"), 1200);
+  });
+
+  byId("downloadBundleScenarioCsv")?.addEventListener("click", () => {
+    const report = window.currentBundleReport;
+    if (!report) return;
+    const blob = new Blob([report.scenarios.csv], { type: "text/csv" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = "etsy-bundle-scenarios.csv";
     link.click();
     URL.revokeObjectURL(url);
   });
