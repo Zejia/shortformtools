@@ -387,9 +387,16 @@ function initPackagingScorecard() {
   const payoff = document.getElementById("packagingPayoff");
   const audience = document.getElementById("packagingAudience");
   const angle = document.getElementById("packagingAngle");
+  const stage = document.getElementById("packagingStage");
+  const ctr = document.getElementById("packagingCtr");
   const recommendations = document.getElementById("packagingRecommendations");
   const variants = document.getElementById("packagingVariants");
+  const checklist = document.getElementById("packagingChecklist");
+  const riskTags = document.getElementById("packagingRiskTags");
+  const copyBrief = document.getElementById("copyPackagingBrief");
+  const downloadBrief = document.getElementById("downloadPackagingBrief");
   const badge = document.getElementById("packagingBadge");
+  let lastBrief = "";
 
   const stopWords = new Set(["the", "a", "an", "and", "or", "to", "for", "with", "your", "you", "how", "that", "this", "from"]);
 
@@ -422,6 +429,15 @@ function initPackagingScorecard() {
       const li = document.createElement("li");
       li.textContent = item;
       return li;
+    }));
+  }
+
+  function setTags(el, items) {
+    el.replaceChildren(...items.map((item) => {
+      const tag = document.createElement("span");
+      tag.className = `mini-tag ${item.tone || ""}`.trim();
+      tag.textContent = item.label;
+      return tag;
     }));
   }
 
@@ -464,6 +480,8 @@ function initPackagingScorecard() {
     const payoffText = payoff.value.trim();
     const audienceValue = audience.value;
     const angleValue = angle.value;
+    const stageValue = stage?.value || "draft";
+    const ctrValue = Number((ctr?.value || "").replace("%", "").trim()) || 0;
 
     const titleLength = titleText.length;
     const thumbLength = thumbText.length;
@@ -478,6 +496,8 @@ function initPackagingScorecard() {
     const thumbFriendly = thumbLength > 0 && thumbLength <= 28;
     const hasNumber = /\d/.test(titleText) || /\d/.test(thumbText);
     const hasClearAngle = /how|why|vs|ideas|mistakes|guide|checklist|hooks|examples|template|teardown|review/i.test(titleText);
+    const lowCtr = ctrValue > 0 && ctrValue < 4.5;
+    const strongCtr = ctrValue >= 6.5;
 
     let score = 26;
     if (mobileFriendly) score += 18;
@@ -492,9 +512,42 @@ function initPackagingScorecard() {
     if (audienceValue === "search" && !earlyKeyword) score -= 8;
     if (audienceValue === "browse" && !browseFriendly) score -= 8;
     if (audienceValue === "browse" && overlapCount > 2) score -= 10;
+    if ((stageValue === "lowctr" || lowCtr) && overlapCount > 1) score -= 5;
+    if ((stageValue === "lowctr" || lowCtr) && !hasClearAngle) score -= 7;
+    if (strongCtr && score < 75) score += 4;
     if (titleLength > 70) score -= 14;
     if (thumbLength > 32) score -= 10;
     score = Math.max(0, Math.min(100, score));
+
+    const risks = [];
+    if (!keywordFound && audienceValue !== "browse") risks.push({ label: "Search intent unclear", tone: "bad" });
+    if (titleLength > 60) risks.push({ label: "Mobile truncation", tone: "warn" });
+    if (thumbLength > 28) risks.push({ label: "Thumbnail too wordy", tone: "warn" });
+    if (overlapCount > 2) risks.push({ label: "Duplicate title/thumb", tone: "warn" });
+    if (overlapCount === 0) risks.push({ label: "Weak title-thumb bridge", tone: "warn" });
+    if (!hasClearAngle) risks.push({ label: "Flat promise", tone: "warn" });
+    if (lowCtr || stageValue === "lowctr") risks.push({ label: "CTR rescue mode", tone: "bad" });
+    if (risks.length === 0) risks.push({ label: "No major packaging risk", tone: "good" });
+
+    const diagnosis = (() => {
+      if (!keywordFound && audienceValue !== "browse") return ["Search mismatch", "The title does not clearly claim the target phrase, so search-led viewers and YouTube classification both get a weaker signal."];
+      if (overlapCount > 2) return ["Wasted second message", "The thumbnail repeats too much of the title. Use the thumbnail to add contrast, proof, emotion, or the before/after payoff."];
+      if (titleLength > 60) return ["Mobile payoff risk", "The title is likely to truncate before the value lands. Move the outcome earlier or cut the setup words."];
+      if (!thumbFriendly) return ["Thumbnail readability risk", "The thumbnail text is carrying too many words for home and suggested surfaces. Reduce it to a fast visual label."];
+      if (!hasClearAngle) return ["Weak click reason", "The topic is present, but the viewer does not yet have a strong reason to choose this video over similar results."];
+      if (lowCtr || stageValue === "lowctr") return ["CTR refresh candidate", "The package has enough structure to improve, but the live signal suggests the click promise may need a sharper contrast test."];
+      return ["Publishable package", "The title, thumbnail phrase, and payoff are aligned enough to publish or use as the control against a more emotional test variant."];
+    })();
+
+    const nextMove = (() => {
+      if (!keywordFound && audienceValue !== "browse") return ["Rewrite the title opener", `Start with “${titleCase(keywordText || "the target topic")}” and move the payoff after a colon or dash.`];
+      if (overlapCount > 2) return ["Change only the thumbnail phrase", "Keep the title stable and test a thumbnail phrase that adds proof, contrast, or the viewer pain instead of repeating the same words."];
+      if (titleLength > 60) return ["Cut the title to one promise", "Remove setup words, keep the keyword or topic early, and make sure the payoff appears before the first 55 to 60 characters."];
+      if (!thumbFriendly) return ["Compress thumbnail copy", "Aim for one to four words. Treat the thumbnail like a label, not a second headline."];
+      if (!hasClearAngle) return ["Add a format signal", "Add a concrete angle such as mistakes, examples, before/after, teardown, checklist, or tested framework."];
+      if (lowCtr || stageValue === "lowctr") return ["Run a contrast refresh", "Change the thumbnail message first, wait for enough impressions, then change the title only if CTR stays weak."];
+      return ["Protect clarity", "Use the current package as the control and test only one meaningful variable at a time."];
+    })();
 
     const recs = [];
     if (!keywordFound && audienceValue !== "browse") {
@@ -535,6 +588,24 @@ function initPackagingScorecard() {
       }
     }
 
+    const checklistItems = [
+      keywordFound || audienceValue === "browse"
+        ? "Confirm the title still matches the real video payoff, not just the target keyword."
+        : "Add the target topic to the title in natural language before publishing.",
+      thumbFriendly
+        ? "Open the thumbnail at phone size and confirm the text is readable in under one second."
+        : "Reduce thumbnail copy to one short phrase before you test anything else.",
+      overlapCount > 2
+        ? "Rewrite the thumbnail so it adds a second idea: proof, tension, result, or curiosity."
+        : "Keep the title and thumbnail connected, but let each one carry a different job.",
+      hasClearAngle
+        ? "Make sure the first 15 seconds deliver the same angle promised by the package."
+        : "Choose a clearer format promise: mistakes, examples, teardown, checklist, comparison, or case study.",
+      stageValue === "draft"
+        ? "Save one browse-first variant before publishing so you have a ready fallback if CTR starts weak."
+        : "If the video already has impressions, change only one packaging element and note the date of the refresh."
+    ];
+
     const surfaceStatus = audienceValue === "search"
       ? (keywordFound && earlyKeyword ? "Search-ready" : "Search-weak")
       : audienceValue === "browse"
@@ -548,10 +619,15 @@ function initPackagingScorecard() {
     setText("packagingKeywordStatus", keywordFound ? (earlyKeyword ? "Early" : "Late") : "Missing");
     setText("packagingOverlapStatus", overlapCount > 2 ? "Too similar" : overlapCount === 0 ? "Too separate" : "Good split");
     setText("packagingSurfaceStatus", surfaceStatus);
+    setText("packagingCtrStatus", ctrValue ? (strongCtr ? "Healthy" : lowCtr ? "Weak" : "Average") : "Not used");
     setText("mobileTitlePreview", titleLength > 62 ? `${titleText.slice(0, 59).trim()}...` : (titleText || "Your preview appears here"));
     setText("mobileTitleMeta", mobileFriendly ? "Readable on mobile and still specific enough." : titleLength > 60 ? "Likely to truncate before the payoff lands." : "Readable, but it may still need more specificity.");
     setText("thumbnailPreview", thumbText || "Thumbnail text");
     setText("thumbnailMeta", thumbFriendly ? "Readable enough for quick browse surfaces." : "Too long for fast browse surfaces.");
+    setText("packagingDiagnosis", diagnosis[0]);
+    setText("packagingDiagnosisDetail", diagnosis[1]);
+    setText("packagingNextMove", nextMove[0]);
+    setText("packagingNextMoveDetail", nextMove[1]);
 
     badge.textContent = score >= 78 ? "Strong package" : score >= 62 ? "Promising" : "Needs work";
     badge.className = "badge";
@@ -560,10 +636,45 @@ function initPackagingScorecard() {
 
     setList(recommendations, recs.slice(0, 4));
     setList(variants, buildVariants(keywordText, payoffText, angleValue));
+    setList(checklist, checklistItems);
+    setTags(riskTags, risks.slice(0, 5));
+    lastBrief = [
+      "YouTube packaging repair brief",
+      `Title: ${titleText || "not provided"}`,
+      `Thumbnail text: ${thumbText || "not provided"}`,
+      `Target keyword/topic: ${keywordText || "not provided"}`,
+      `Core payoff: ${payoffText || "not provided"}`,
+      `Primary surface: ${audienceValue}`,
+      `Publishing stage: ${stageValue}`,
+      ctrValue ? `Current CTR: ${numberFormat.format(ctrValue)}%` : "Current CTR: not provided",
+      `Score: ${score}/100 (${badge.textContent})`,
+      `Diagnosis: ${diagnosis[0]} - ${diagnosis[1]}`,
+      `Next best edit: ${nextMove[0]} - ${nextMove[1]}`,
+      `Risk tags: ${risks.map((item) => item.label).join(", ")}`,
+      "",
+      "Fixes:",
+      ...recs.slice(0, 4).map((item, index) => `${index + 1}. ${item}`),
+      "",
+      "Publish or refresh checklist:",
+      ...checklistItems.map((item, index) => `${index + 1}. ${item}`),
+      "",
+      "Safer test variants:",
+      ...buildVariants(keywordText, payoffText, angleValue).map((item, index) => `${index + 1}. ${item}`)
+    ].join("\n");
   }
 
   shell.querySelectorAll("input, textarea, select").forEach((inputEl) => inputEl.addEventListener("input", evaluate));
   shell.querySelectorAll("select").forEach((inputEl) => inputEl.addEventListener("change", evaluate));
+  copyBrief?.addEventListener("click", async () => {
+    await navigator.clipboard.writeText(lastBrief);
+    copyBrief.textContent = "Copied brief";
+    setTimeout(() => (copyBrief.textContent = "Copy repair brief"), 1200);
+  });
+  downloadBrief?.addEventListener("click", () => {
+    downloadTextFile("youtube-packaging-repair-brief.txt", lastBrief);
+    downloadBrief.textContent = "Downloaded";
+    setTimeout(() => (downloadBrief.textContent = "Download brief"), 1200);
+  });
   evaluate();
 }
 

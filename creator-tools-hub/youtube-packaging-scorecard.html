@@ -31,7 +31,7 @@
       <section class="intro">
         <p class="eyebrow">YouTube packaging tool</p>
         <h1>YouTube Packaging Scorecard</h1>
-        <p class="lede">Check whether your title and thumbnail text work together before you publish. This tool scores search fit, browse fit, mobile readability, keyword placement, and title-thumbnail overlap.</p>
+        <p class="lede">Check whether your title and thumbnail text work together before you publish or refresh a video. This tool scores search fit, browse fit, mobile readability, keyword placement, and title-thumbnail overlap, then turns the result into a repair brief.</p>
       </section>
       <section class="tool-shell" data-tool="youtube-packaging">
         <div class="tool-head">
@@ -78,8 +78,25 @@
                   <option value="reaction">Reaction</option>
                 </select>
               </div>
+              <div class="field">
+                <label for="packagingStage">Publishing stage</label>
+                <select id="packagingStage">
+                  <option value="draft">Before publishing</option>
+                  <option value="refresh">Refresh existing video</option>
+                  <option value="lowctr">Published with low CTR</option>
+                </select>
+              </div>
+              <div class="field">
+                <label for="packagingCtr">Current CTR, optional</label>
+                <input id="packagingCtr" inputmode="decimal" value="3.8" aria-describedby="packagingCtrHelp">
+                <span id="packagingCtrHelp" class="field-hint">Use YouTube Studio CTR if the video is already live.</span>
+              </div>
             </div>
-            <div class="inline-note">Use the score as a decision aid, not a rule engine. Strong packaging still needs to match the right topic and viewer promise.</div>
+            <div class="inline-note">Use the score as a decision aid, not a rule engine. Strong packaging still needs to match the right topic, viewer promise, and actual video payoff.</div>
+            <div class="actions">
+              <button id="copyPackagingBrief" type="button">Copy repair brief</button>
+              <button id="downloadPackagingBrief" type="button">Download brief</button>
+            </div>
           </div>
           <aside class="result-panel">
             <div class="metric">
@@ -94,6 +111,7 @@
               <div class="status-item"><span>Keyword placement</span><strong id="packagingKeywordStatus">Missing</strong></div>
               <div class="status-item"><span>Title and thumbnail</span><strong id="packagingOverlapStatus">Too similar</strong></div>
               <div class="status-item"><span>Surface fit</span><strong id="packagingSurfaceStatus">Weak</strong></div>
+              <div class="status-item"><span>CTR signal</span><strong id="packagingCtrStatus">Not used</strong></div>
             </div>
             <div class="preview-stack" style="margin-top:14px">
               <div class="surface-preview">
@@ -112,9 +130,36 @@
       </section>
 
       <section class="section">
+        <h2>Packaging diagnosis</h2>
+        <p>Creators usually do not need another vague score. This panel names the likely failure mode, the next edit to make, and the risks to check before publishing.</p>
+        <div class="diagnostic-grid">
+          <article class="diagnostic-card">
+            <span class="surface-label">Primary diagnosis</span>
+            <strong id="packagingDiagnosis">Waiting for your package</strong>
+            <p id="packagingDiagnosisDetail">Paste a title, thumbnail phrase, keyword, and payoff to see the likely packaging issue.</p>
+          </article>
+          <article class="diagnostic-card">
+            <span class="surface-label">Next best edit</span>
+            <strong id="packagingNextMove">Tighten the viewer promise</strong>
+            <p id="packagingNextMoveDetail">The best next edit appears here after the score updates.</p>
+          </article>
+          <article class="diagnostic-card">
+            <span class="surface-label">Risk tags</span>
+            <div id="packagingRiskTags" class="tag-row" aria-live="polite"></div>
+          </article>
+        </div>
+      </section>
+
+      <section class="section">
         <h2>Fixes to make before publishing</h2>
         <p>The most useful packaging advice is specific. This list points to the highest-leverage edit, not generic SEO tips.</p>
         <ol id="packagingRecommendations" class="generated-list" aria-live="polite"></ol>
+      </section>
+
+      <section class="section">
+        <h2>Publish or refresh checklist</h2>
+        <p>Use this checklist to turn the score into a concrete edit pass. It is especially useful when a video has impressions but weak clicks.</p>
+        <ol id="packagingChecklist" class="generated-list" aria-live="polite"></ol>
       </section>
 
       <section class="section">
