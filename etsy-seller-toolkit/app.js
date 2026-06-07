@@ -1591,17 +1591,44 @@ function refundScenario(label, finalProfit, refund, extraCost, feeCredit) {
   return { label, finalProfit, refund, extraCost, feeCredit };
 }
 
-function renderRefundScenarios(inputs, plan, fmt) {
+function refundScenarioData(inputs, plan) {
   const halfRefund = plan.original.itemRevenue * 0.5;
   const halfCredit = plan.eligibleFees * (plan.original.sellerRevenue > 0 ? halfRefund / plan.original.sellerRevenue : 0) * inputs.feeCreditRate;
   const noReturnProfit = plan.original.profit - plan.refundAmount + plan.feeCredit;
-  const rows = [
+  return [
     refundScenario("Current refund + return", plan.afterReturnProfit, plan.refundAmount, plan.returnExtraCost - inputs.resaleRecovery, plan.feeCredit),
     refundScenario("Refund only", noReturnProfit, plan.refundAmount, 0, plan.feeCredit),
     refundScenario("50% item refund", plan.original.profit - halfRefund + halfCredit, halfRefund, 0, halfCredit),
     refundScenario("Replacement only", plan.replacementProfit, 0, plan.replacementCost + inputs.restockLaborCost, 0),
     refundScenario("Replacement + returned resale", plan.replacementWithReturnProfit, 0, plan.replacementCost + plan.returnExtraCost - inputs.resaleRecovery, 0)
   ];
+}
+
+function refundScenarioExports(inputs, plan, fmt) {
+  const rows = refundScenarioData(inputs, plan).map((row) => {
+    const [status] = refundStatus(row.finalProfit);
+    return { ...row, status };
+  });
+  return {
+    summary: rows
+      .map((row) => `${row.label}: ${fmt.format(row.refund)} refund, ${fmt.format(row.extraCost)} extra cost, ${fmt.format(row.feeCredit)} fee credit, ${fmt.format(row.finalProfit)} final profit (${row.status})`)
+      .join("\n"),
+    csv: [
+      ["Scenario", "Refund", "Extra cost", "Fee credit", "Final profit", "Status"],
+      ...rows.map((row) => [
+        row.label,
+        row.refund,
+        row.extraCost,
+        row.feeCredit,
+        row.finalProfit,
+        row.status
+      ])
+    ].map((row) => row.join(",")).join("\n")
+  };
+}
+
+function renderRefundScenarios(inputs, plan, fmt) {
+  const rows = refundScenarioData(inputs, plan);
   const container = byId("refundScenarioRows");
   if (!container) return;
   container.innerHTML = rows
@@ -1695,6 +1722,7 @@ function calculateRefundAndRender() {
     inputs,
     plan,
     csv: exportRefundCsv(inputs, plan),
+    scenarios: refundScenarioExports(inputs, plan, fmt),
     fmtCurrency: inputs.preset.currency
   };
 }
@@ -1768,6 +1796,26 @@ Max refund to break even: ${fmt.format(report.plan.maxSafeRefund)}`;
     const link = document.createElement("a");
     link.href = url;
     link.download = "etsy-refund-loss-plan.csv";
+    link.click();
+    URL.revokeObjectURL(url);
+  });
+
+  byId("copyRefundScenarios")?.addEventListener("click", async () => {
+    const report = window.currentRefundReport;
+    if (!report) return;
+    await navigator.clipboard.writeText(report.scenarios.summary);
+    text("copyRefundScenarios", "Copied");
+    setTimeout(() => text("copyRefundScenarios", "Copy scenarios"), 1200);
+  });
+
+  byId("downloadRefundScenarioCsv")?.addEventListener("click", () => {
+    const report = window.currentRefundReport;
+    if (!report) return;
+    const blob = new Blob([report.scenarios.csv], { type: "text/csv" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = "etsy-refund-scenarios.csv";
     link.click();
     URL.revokeObjectURL(url);
   });
