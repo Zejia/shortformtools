@@ -3,12 +3,12 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Import Supplier Quote Comparison Calculator for Landed Cost and MOQ</title>
-    <meta name="description" content="Compare three import supplier quotes by landed cost per sellable unit, MOQ cash tied up, duty, VAT, freight, brokerage, inspection, defects, and lead time before you approve a vendor.">
+    <title>Import Supplier Quote Comparison and PO Risk Calculator</title>
+    <meta name="description" content="Compare import supplier quotes by landed cost, MOQ cash tied up, defects, lead time, deposit risk, margin gap, and PO readiness before you approve a vendor.">
     <meta name="google-adsense-account" content="ca-pub-4259477754165351">
     <link rel="canonical" href="https://crossborderkit.com/import-supplier-quote-comparison-calculator.html">
-    <meta property="og:title" content="Import Supplier Quote Comparison Calculator">
-    <meta property="og:description" content="Compare supplier quotes by landed cost per unit, not just factory price.">
+    <meta property="og:title" content="Import Supplier Quote Comparison and PO Risk Calculator">
+    <meta property="og:description" content="Compare supplier quotes by landed cost, cash exposure, margin gap, defects, lead time, and PO readiness.">
     <meta property="og:type" content="article">
     <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
     <link rel="manifest" href="site.webmanifest">
@@ -43,8 +43,8 @@
       <section class="page-hero">
         <div class="page-copy">
           <p class="eyebrow">Supplier quote comparison calculator</p>
-          <h1>Compare import supplier quotes by landed cost, not factory price.</h1>
-          <p class="lede">A cheaper unit quote can lose after freight, duty, VAT, brokerage, inspection, defect allowance, or MOQ cash pressure. Put three supplier offers into the same landed-cost model before choosing a vendor.</p>
+          <h1>Compare import supplier quotes by landed cost and PO risk.</h1>
+          <p class="lede">A cheaper unit quote can lose after freight, duty, VAT, brokerage, inspection, defect allowance, MOQ cash pressure, deposit exposure, or slow lead time. Put three supplier offers into the same landed-cost model before choosing a vendor.</p>
           <div class="inline-actions">
             <a class="button primary" href="#quote-tool">Compare</a>
             <a class="button ghost" href="landed-cost-calculator.html">Landed cost</a>
@@ -54,7 +54,7 @@
           <span class="stamp">For PO and RFQ review</span>
           <div class="data-stack">
             <div class="data-row"><span>Compares</span><strong>3 supplier quotes</strong></div>
-            <div class="data-row"><span>Ranks by</span><strong>Landed cost per sellable unit</strong></div>
+            <div class="data-row"><span>Ranks by</span><strong>Landed cost and PO readiness</strong></div>
             <div class="data-row"><span>Reviewed</span><strong><span data-review-date></span></strong></div>
           </div>
         </aside>
@@ -106,6 +106,23 @@
                 <div class="field">
                   <label for="quoteTargetMargin">Target gross margin %</label>
                   <input id="quoteTargetMargin" data-field="targetMargin" type="number" min="0" max="80" step="0.1" value="30">
+                </div>
+                <div class="group-title span-2">PO readiness limits</div>
+                <div class="field">
+                  <label for="quoteMaxCash">Max landed cash tied up</label>
+                  <input id="quoteMaxCash" data-field="maxCashExposure" type="number" min="0" step="100" value="9000">
+                </div>
+                <div class="field">
+                  <label for="quoteMaxLeadDays">Max acceptable lead time days</label>
+                  <input id="quoteMaxLeadDays" data-field="maxLeadDays" type="number" min="0" step="1" value="45">
+                </div>
+                <div class="field">
+                  <label for="quoteMaxDefectRate">Max defect allowance %</label>
+                  <input id="quoteMaxDefectRate" data-field="maxDefectRate" type="number" min="0" max="60" step="0.1" value="3">
+                </div>
+                <div class="field">
+                  <label for="quoteDepositRate">Deposit due before production %</label>
+                  <input id="quoteDepositRate" data-field="depositRate" type="number" min="0" max="100" step="1" value="30">
                 </div>
                 <div class="field">
                   <label for="quoteThreshold">Low-value threshold</label>
@@ -206,6 +223,26 @@
                   </thead>
                   <tbody data-output="quoteRows"></tbody>
                 </table>
+              </div>
+            </div>
+            <div class="content-panel po-readiness-panel">
+              <div class="panel-title-row">
+                <h3>PO readiness diagnosis</h3>
+                <span class="status-pill" data-output="quoteReadinessTone"><span data-output="quoteReadinessStatus">Reviewing</span></span>
+              </div>
+              <p data-output="quoteDecisionSummary">The diagnosis will compare the recommended quote against your margin, cash, defect, lead-time, and deposit limits.</p>
+              <div class="kpi-grid compact">
+                <div class="kpi"><span>Risk flags</span><strong data-output="quoteRiskCount">-</strong></div>
+                <div class="kpi"><span>Deposit at risk</span><strong data-output="quoteDepositAtRisk">-</strong></div>
+                <div class="kpi"><span>Margin gap</span><strong data-output="quoteMarginGap">-</strong></div>
+                <div class="kpi"><span>Cash headroom</span><strong data-output="quoteCashHeadroom">-</strong></div>
+              </div>
+              <div class="diagnosis-stack" data-output="quoteRiskTags"></div>
+              <h4>Negotiation asks before issuing the PO</h4>
+              <ul class="checklist" data-output="quoteNegotiationAsks"></ul>
+              <div class="hero-actions">
+                <button type="button" data-output="copyQuoteRiskBrief">Copy PO risk brief</button>
+                <button type="button" data-output="downloadQuoteRiskBrief">Download brief</button>
               </div>
             </div>
             <div class="content-panel">
