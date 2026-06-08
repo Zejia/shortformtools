@@ -100,6 +100,15 @@ function formatPercent(value) {
   return `${compactNumber.format(value)}%`;
 }
 
+function escapeHtml(value) {
+  return String(value ?? "")
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#039;");
+}
+
 function clamp(value, min, max) {
   return Math.max(min, Math.min(max, value));
 }
@@ -400,6 +409,16 @@ function toCsv(rows) {
 
 function downloadCsvFile(filename, rows) {
   const blob = new Blob([toCsv(rows)], { type: "text/csv;charset=utf-8" });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = filename;
+  link.click();
+  URL.revokeObjectURL(url);
+}
+
+function downloadTextFile(filename, text) {
+  const blob = new Blob([text], { type: "text/plain;charset=utf-8" });
   const url = URL.createObjectURL(blob);
   const link = document.createElement("a");
   link.href = url;
@@ -851,6 +870,10 @@ function readQuoteInputs(scope) {
     ...baseInputs,
     targetSellPrice: safeNumber(byField(scope, "targetSellPrice")?.value),
     targetMargin: safeNumber(byField(scope, "targetMargin")?.value) / 100,
+    maxCashExposure: safeNumber(byField(scope, "maxCashExposure")?.value),
+    maxLeadDays: safeNumber(byField(scope, "maxLeadDays")?.value),
+    maxDefectRate: clamp(safeNumber(byField(scope, "maxDefectRate")?.value), 0, 60) / 100,
+    depositRate: clamp(safeNumber(byField(scope, "depositRate")?.value), 0, 100) / 100,
     quotes: ["A", "B", "C"].map((key) => ({
       key,
       name: byField(scope, `supplier${key}Name`)?.value?.trim() || `Supplier ${key}`,
@@ -913,13 +936,13 @@ function renderSupplierQuoteRows(scope, results, inputs) {
   body.innerHTML = results
     .map((result, index) => `<tr>
       <td>${index + 1}</td>
-      <td>${result.name}</td>
+      <td>${escapeHtml(result.name)}</td>
       <td>${formatCurrency(result.unitCost, inputs.currency)}</td>
       <td>${formatCurrency(result.landedPerSellableUnit, inputs.currency)}</td>
       <td>${formatCurrency(result.landed.totalLanded, inputs.currency)}</td>
       <td>${formatPercent(result.marginAtTarget)}</td>
       <td>${compactNumber.format(result.leadDays)} days</td>
-      <td>${quoteReadout(result, best)}</td>
+      <td>${escapeHtml(quoteReadout(result, best))}</td>
     </tr>`)
     .join("");
 }
@@ -949,13 +972,136 @@ function buildSupplierQuoteInsights(results, inputs) {
   return notes;
 }
 
+function quoteRiskTag(label, detail, tone = "warn") {
+  return { label, detail, tone };
+}
+
+function buildSupplierQuoteDiagnosis(results, inputs) {
+  const best = results[0];
+  const factoryCheapest = [...results].sort((a, b) => a.unitCost - b.unitCost)[0];
+  const fasterClose = results.find((result) => result !== best && result.leadDays < best.leadDays && result.landedPerSellableUnit <= best.landedPerSellableUnit * 1.08);
+  const marginGap = best.marginAtTarget - (inputs.targetMargin * 100);
+  const cashHeadroom = inputs.maxCashExposure > 0 ? inputs.maxCashExposure - best.landed.totalLanded : Infinity;
+  const depositAtRisk = best.productValue * inputs.depositRate;
+  const tags = [];
+  const asks = [];
+
+  if (factoryCheapest.name !== best.name) {
+    tags.push(quoteRiskTag("Factory-price trap avoided", `${factoryCheapest.name} is cheaper at the factory gate, but ${best.name} has the better landed sellable-unit outcome.`, "good"));
+    asks.push(`Ask ${factoryCheapest.name} to requote freight, MOQ, or inspection terms before treating the low unit price as comparable.`);
+  } else {
+    tags.push(quoteRiskTag("Factory and landed winner match", `${best.name} wins on both factory unit quote and landed sellable-unit cost.`, "good"));
+  }
+
+  if (marginGap < 0) {
+    tags.push(quoteRiskTag("Margin below target", `${best.name} is ${formatPercent(Math.abs(marginGap))} below the target margin at ${formatCurrency(inputs.targetSellPrice, inputs.currency)}.`, marginGap < -8 ? "bad" : "warn"));
+    asks.push(`Request a unit-cost concession, freight split, or target sell price increase; the quote needs about ${formatCurrency(best.targetPrice, inputs.currency)} per unit to hit target margin.`);
+  } else {
+    tags.push(quoteRiskTag("Margin clears target", `${best.name} has ${formatPercent(marginGap)} margin headroom above the target.`, "good"));
+  }
+
+  if (inputs.maxCashExposure > 0) {
+    if (cashHeadroom < 0) {
+      tags.push(quoteRiskTag("Cash exposure over limit", `Total landed cash is ${formatCurrency(Math.abs(cashHeadroom), inputs.currency)} above your approval limit.`, "bad"));
+      asks.push(`Negotiate a lower MOQ, split shipment, staged PO, or later balance payment before approving ${formatCurrency(best.landed.totalLanded, inputs.currency)} in landed cash.`);
+    } else {
+      tags.push(quoteRiskTag("Cash exposure inside limit", `The winning quote leaves ${formatCurrency(cashHeadroom, inputs.currency)} of cash headroom.`, "good"));
+    }
+  }
+
+  if (best.defectRate > inputs.maxDefectRate) {
+    tags.push(quoteRiskTag("Defect allowance too high", `${formatPercent(best.defectRate * 100)} defects is above the ${formatPercent(inputs.maxDefectRate * 100)} limit.`, "bad"));
+    asks.push("Add pre-shipment inspection, AQL acceptance criteria, replacement credit, or a chargeback clause for failed units.");
+  }
+
+  if (inputs.maxLeadDays > 0 && best.leadDays > inputs.maxLeadDays) {
+    tags.push(quoteRiskTag("Lead time too slow", `${best.name} is ${compactNumber.format(best.leadDays - inputs.maxLeadDays)} days beyond the lead-time limit.`, "warn"));
+    asks.push("Ask for production-slot confirmation, partial shipment, or a written ship-date commitment with delay remedies.");
+  } else if (fasterClose) {
+    tags.push(quoteRiskTag("Fast backup exists", `${fasterClose.name} is faster and within 8% of the best landed cost, so keep it as a backup option.`, "good"));
+    asks.push(`Keep ${fasterClose.name} warm as a backup quote in case ${best.name} cannot hold schedule or quality terms.`);
+  }
+
+  if (depositAtRisk > 0) {
+    const depositShareOfCash = best.landed.totalLanded > 0 ? depositAtRisk / best.landed.totalLanded : 0;
+    if (depositShareOfCash >= 0.25) {
+      tags.push(quoteRiskTag("Meaningful deposit exposure", `${formatCurrency(depositAtRisk, inputs.currency)} is due before production at the selected deposit rate.`, "warn"));
+      asks.push("Tie deposit release to a pro forma invoice, golden sample, inspection milestone, or trade-assurance-style payment protection.");
+    }
+  }
+
+  if (best.landed.upliftPercent >= 35) {
+    tags.push(quoteRiskTag("Import overhead is heavy", `Import overhead adds ${formatPercent(best.landed.upliftPercent)} over product value.`, "warn"));
+    asks.push("Ask whether carton optimization, incoterm changes, or freight consolidation can reduce the landed uplift.");
+  }
+
+  const badCount = tags.filter((tag) => tag.tone === "bad").length;
+  const warnCount = tags.filter((tag) => tag.tone === "warn").length;
+  const riskCount = badCount + warnCount;
+  const status = badCount > 0 ? "Needs PO fixes" : warnCount > 1 ? "Approve with conditions" : "Ready to shortlist";
+  const tone = badCount > 0 ? "bad" : warnCount > 1 ? "warn" : "good";
+  const summary = badCount > 0
+    ? `${best.name} is the landed-cost winner, but the PO should not be approved until the red flags are resolved.`
+    : warnCount > 1
+      ? `${best.name} can stay in front, but approval should include written conditions for the yellow flags.`
+      : `${best.name} is a strong shortlist choice under the current margin, cash, quality, and timing limits.`;
+
+  return {
+    best,
+    status,
+    tone,
+    summary,
+    tags,
+    asks: [...new Set(asks)].slice(0, 5),
+    riskCount,
+    depositAtRisk,
+    marginGap,
+    cashHeadroom
+  };
+}
+
+function supplierQuoteRiskBrief(inputs, results) {
+  const diagnosis = buildSupplierQuoteDiagnosis(results, inputs);
+  const best = diagnosis.best;
+  return [
+    "Import supplier PO risk brief",
+    `Recommended supplier: ${best.name}`,
+    `PO readiness: ${diagnosis.status}`,
+    `Landed cost per sellable unit: ${formatCurrency(best.landedPerSellableUnit, inputs.currency)}`,
+    `Total landed cash tied up: ${formatCurrency(best.landed.totalLanded, inputs.currency)}`,
+    `Deposit at risk: ${formatCurrency(diagnosis.depositAtRisk, inputs.currency)}`,
+    `Margin at target sale price: ${formatPercent(best.marginAtTarget)}`,
+    `Margin gap vs target: ${formatPercent(diagnosis.marginGap)}`,
+    `Lead time: ${compactNumber.format(best.leadDays)} days`,
+    `Defect allowance: ${formatPercent(best.defectRate * 100)}`,
+    "",
+    "Risk flags:",
+    ...diagnosis.tags.map((tag) => `- ${tag.label}: ${tag.detail}`),
+    "",
+    "Negotiation asks:",
+    ...(diagnosis.asks.length ? diagnosis.asks.map((ask) => `- ${ask}`) : ["- No major negotiation ask triggered by the current limits."]),
+    "",
+    "Assumption limits:",
+    `Max landed cash: ${inputs.maxCashExposure > 0 ? formatCurrency(inputs.maxCashExposure, inputs.currency) : "No cap"}`,
+    `Max lead time: ${inputs.maxLeadDays > 0 ? `${compactNumber.format(inputs.maxLeadDays)} days` : "No cap"}`,
+    `Max defect allowance: ${formatPercent(inputs.maxDefectRate * 100)}`,
+    `Deposit rate: ${formatPercent(inputs.depositRate * 100)}`
+  ].join("\n");
+}
+
 function supplierQuoteCsvRows(inputs, results) {
   const best = results[0];
+  const diagnosis = buildSupplierQuoteDiagnosis(results, inputs);
   const rows = [
     ["Metric", "Value"],
     ["Destination market", inputs.preset.label],
     ["Currency", inputs.currency],
     ["Recommended supplier", best.name],
+    ["PO readiness status", diagnosis.status],
+    ["PO risk flag count", diagnosis.riskCount],
+    ["Deposit at risk", diagnosis.depositAtRisk],
+    ["Cash headroom vs approval limit", Number.isFinite(diagnosis.cashHeadroom) ? diagnosis.cashHeadroom : "No cap"],
+    ["Margin gap vs target percent", diagnosis.marginGap],
     ["Best landed cost per sellable unit", best.landedPerSellableUnit],
     ["Best total landed cash tied up", best.landed.totalLanded],
     ["Best margin at target sale price", best.marginAtTarget],
@@ -991,6 +1137,12 @@ function supplierQuoteCsvRows(inputs, results) {
   rows.push([]);
   rows.push(["Insight", "Detail"]);
   buildSupplierQuoteInsights(results, inputs).forEach((item) => rows.push(["Note", item]));
+  rows.push([]);
+  rows.push(["PO risk flag", "Detail"]);
+  diagnosis.tags.forEach((tag) => rows.push([tag.label, tag.detail]));
+  rows.push([]);
+  rows.push(["Negotiation ask", "Detail"]);
+  diagnosis.asks.forEach((ask) => rows.push(["Ask", ask]));
   return rows;
 }
 
@@ -1029,14 +1181,35 @@ function renderSupplierQuoteTool(scope) {
   if (meter) meter.style.setProperty("--value", `${clamp(best.marginAtTarget, 0, 45) / 45 * 100}%`);
 
   renderSupplierQuoteRows(scope, results, inputs);
+  const diagnosis = buildSupplierQuoteDiagnosis(results, inputs);
+  setText(scope, "quoteReadinessStatus", diagnosis.status);
+  setText(scope, "quoteDecisionSummary", diagnosis.summary);
+  setText(scope, "quoteRiskCount", `${compactNumber.format(diagnosis.riskCount)} flag${diagnosis.riskCount === 1 ? "" : "s"}`);
+  setText(scope, "quoteDepositAtRisk", formatCurrency(diagnosis.depositAtRisk, inputs.currency));
+  setText(scope, "quoteMarginGap", formatPercent(diagnosis.marginGap));
+  setText(scope, "quoteCashHeadroom", Number.isFinite(diagnosis.cashHeadroom) ? formatCurrency(diagnosis.cashHeadroom, inputs.currency) : "No cap");
+  const readinessNode = byOutput(scope, "quoteReadinessTone");
+  if (readinessNode) readinessNode.className = `status-pill ${diagnosis.tone}`;
+  const riskTags = byOutput(scope, "quoteRiskTags");
+  if (riskTags) {
+    riskTags.innerHTML = diagnosis.tags
+      .map((tag) => `<div class="risk-tag ${tag.tone}"><strong>${escapeHtml(tag.label)}</strong><span>${escapeHtml(tag.detail)}</span></div>`)
+      .join("");
+  }
+  const askList = byOutput(scope, "quoteNegotiationAsks");
+  if (askList) {
+    askList.innerHTML = (diagnosis.asks.length ? diagnosis.asks : ["No major negotiation ask triggered by the current limits."])
+      .map((item) => `<li>${escapeHtml(item)}</li>`)
+      .join("");
+  }
   const insightList = byOutput(scope, "quoteInsights");
   if (insightList) {
     insightList.innerHTML = buildSupplierQuoteInsights(results, inputs)
-      .map((item) => `<li>${item}</li>`)
+      .map((item) => `<li>${escapeHtml(item)}</li>`)
       .join("");
   }
 
-  window.currentSupplierQuoteReport = { inputs, results };
+  window.currentSupplierQuoteReport = { inputs, results, diagnosis };
 }
 
 function initSupplierQuoteTools() {
@@ -1057,6 +1230,8 @@ function initSupplierQuoteTools() {
 
     const copyButton = byOutput(scope, "copyQuoteSummary");
     const downloadButton = byOutput(scope, "downloadQuoteCsv");
+    const copyRiskButton = byOutput(scope, "copyQuoteRiskBrief");
+    const downloadRiskButton = byOutput(scope, "downloadQuoteRiskBrief");
     copyButton?.addEventListener("click", async () => {
       const report = window.currentSupplierQuoteReport;
       if (!report) return;
@@ -1089,6 +1264,31 @@ function initSupplierQuoteTools() {
         .map((quote) => calculateSupplierQuote(inputs, quote))
         .sort((a, b) => a.landedPerSellableUnit - b.landedPerSellableUnit);
       downloadCsvFile("import-supplier-quote-comparison.csv", supplierQuoteCsvRows(inputs, results));
+    });
+
+    copyRiskButton?.addEventListener("click", async () => {
+      const report = window.currentSupplierQuoteReport;
+      if (!report) return;
+      try {
+        await navigator.clipboard.writeText(supplierQuoteRiskBrief(report.inputs, report.results));
+        copyRiskButton.textContent = "Copied";
+        window.setTimeout(() => {
+          copyRiskButton.textContent = "Copy PO risk brief";
+        }, 1200);
+      } catch (_error) {
+        copyRiskButton.textContent = "Copy failed";
+        window.setTimeout(() => {
+          copyRiskButton.textContent = "Copy PO risk brief";
+        }, 1200);
+      }
+    });
+
+    downloadRiskButton?.addEventListener("click", () => {
+      const inputs = readQuoteInputs(scope);
+      const results = inputs.quotes
+        .map((quote) => calculateSupplierQuote(inputs, quote))
+        .sort((a, b) => a.landedPerSellableUnit - b.landedPerSellableUnit);
+      downloadTextFile("import-supplier-po-risk-brief.txt", supplierQuoteRiskBrief(inputs, results));
     });
 
     renderSupplierQuoteTool(scope);

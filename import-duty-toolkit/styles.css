@@ -668,6 +668,10 @@ p {
   gap: 8px;
 }
 
+.kpi-grid.compact {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
 .kpi {
   border: 1px solid var(--line);
   border-radius: var(--radius-sm);
@@ -723,6 +727,41 @@ th {
   padding-left: 16px;
   display: grid;
   gap: 7px;
+}
+
+.panel-title-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: start;
+  gap: 10px;
+}
+
+.diagnosis-stack {
+  display: grid;
+  gap: 8px;
+}
+
+.risk-tag {
+  border: 1px solid var(--line);
+  border-left: 4px solid var(--warn);
+  border-radius: var(--radius-sm);
+  background: var(--panel);
+  padding: 9px 10px;
+  display: grid;
+  gap: 3px;
+}
+
+.risk-tag.good {
+  border-left-color: var(--good);
+}
+
+.risk-tag.bad {
+  border-left-color: var(--bad);
+}
+
+.risk-tag span {
+  color: var(--muted);
+  font-size: 0.84rem;
 }
 
 .utility-grid,
@@ -909,7 +948,8 @@ th {
 
   .field-grid,
   .details-grid,
-  .kpi-grid {
+  .kpi-grid,
+  .kpi-grid.compact {
     grid-template-columns: 1fr;
   }
 }
