@@ -237,6 +237,150 @@ function renderRecommendations(inputs, result, breakEven, fmt) {
   if (list) list.innerHTML = notes.map((item) => `<li>${item}</li>`).join("");
 }
 
+function readPromotionSafetyInputs() {
+  return {
+    targetMargin: clamp(val("promoTargetMargin"), 0, 80) / 100,
+    refundBuffer: Math.max(0, val("promoRefundBuffer")),
+    offsiteShare: clamp(val("promoOffsiteShare"), 0, 100) / 100,
+    volumeLift: Math.max(0, val("promoVolumeLift")) / 100
+  };
+}
+
+function promotionResult(baseInputs, safetyInputs, patch = {}) {
+  const blendedOffsiteRate = ("offsiteRate" in patch)
+    ? patch.offsiteRate
+    : baseInputs.offsiteRate * safetyInputs.offsiteShare;
+  const result = calculate({ ...baseInputs, ...patch, offsiteRate: blendedOffsiteRate });
+  const adjustedProfit = result.profit - safetyInputs.refundBuffer;
+  const adjustedMargin = result.sellerRevenue > 0 ? adjustedProfit / result.sellerRevenue : 0;
+  const targetProfit = result.sellerRevenue * safetyInputs.targetMargin;
+  const marginGap = adjustedProfit - targetProfit;
+  return {
+    result,
+    adjustedProfit,
+    adjustedMargin,
+    targetProfit,
+    marginGap,
+    blendedOffsiteRate
+  };
+}
+
+function promotionSafetyStatus(plan) {
+  if (plan.adjustedProfit < 0) return ["Unsafe", "bad"];
+  if (plan.marginGap < 0) return ["Below target", "warn"];
+  if (plan.adjustedMargin < 0.25) return ["Usable", "ok"];
+  return ["Safe promo", "good"];
+}
+
+function findMaxSafePromotionDiscount(baseInputs, safetyInputs) {
+  let low = 0;
+  let high = 0.95;
+  for (let i = 0; i < 60; i += 1) {
+    const mid = (low + high) / 2;
+    const plan = promotionResult(baseInputs, safetyInputs, { discountRate: mid });
+    if (plan.marginGap >= 0 && plan.adjustedProfit >= 0) low = mid;
+    else high = mid;
+  }
+  return low;
+}
+
+function promotionSafetyCsv(baseInputs, safetyInputs, plan, baseline, maxSafeDiscount, ordersNeeded) {
+  const rows = [
+    ["Metric", "Value"],
+    ["Item price", baseInputs.price],
+    ["Current discount percent", baseInputs.discountRate * 100],
+    ["Fixed coupon amount", baseInputs.discountFixed],
+    ["Blended Offsite Ads percent", plan.blendedOffsiteRate * 100],
+    ["Etsy Ads spend per order", baseInputs.adSpend],
+    ["Refund/support buffer", safetyInputs.refundBuffer],
+    ["Target margin percent", safetyInputs.targetMargin * 100],
+    ["Promotion seller revenue", plan.result.sellerRevenue],
+    ["Promotion adjusted profit", plan.adjustedProfit],
+    ["Promotion adjusted margin percent", plan.adjustedMargin * 100],
+    ["Target profit", plan.targetProfit],
+    ["Margin gap", plan.marginGap],
+    ["Max safe discount percent", maxSafeDiscount * 100],
+    ["Baseline no-sale profit", baseline.adjustedProfit],
+    ["Orders needed to match no-sale profit", Number.isFinite(ordersNeeded) ? ordersNeeded : "N/A"]
+  ];
+  return rows.map((row) => row.join(",")).join("\n");
+}
+
+function renderPromotionSafety(inputs, fmt) {
+  const tool = document.querySelector("[data-tool='promotion-safety']");
+  if (!tool) return;
+
+  const safetyInputs = readPromotionSafetyInputs();
+  const plan = promotionResult(inputs, safetyInputs);
+  const baseline = promotionResult(
+    { ...inputs, discountRate: 0, discountFixed: 0, offsiteRate: 0, adSpend: 0 },
+    { ...safetyInputs, offsiteShare: 0 }
+  );
+  const maxSafeDiscount = findMaxSafePromotionDiscount(inputs, safetyInputs);
+  const ordersNeeded = plan.adjustedProfit > 0
+    ? baseline.adjustedProfit / plan.adjustedProfit
+    : Infinity;
+  const orderLiftNeeded = Number.isFinite(ordersNeeded)
+    ? Math.max(0, (ordersNeeded - 1) * 100)
+    : Infinity;
+  const [status, tone] = promotionSafetyStatus(plan);
+  const notes = [];
+
+  if (plan.adjustedProfit < 0) {
+    notes.push("This promo is expected to lose money after the refund/support buffer. Reduce the discount, remove ad stress, raise price, or cut fulfillment cost before running it.");
+  } else if (plan.marginGap < 0) {
+    notes.push(`The promotion is profitable, but it misses your target margin by ${fmt.format(Math.abs(plan.marginGap))} per order after buffer.`);
+  } else {
+    notes.push("This promotion clears the target margin after the refund/support buffer under the entered assumptions.");
+  }
+
+  if (inputs.discountRate > maxSafeDiscount) {
+    notes.push(`Your current discount is above the estimated ${pct(maxSafeDiscount * 100)} max safe discount. Treat this as a short test, not a default sale depth.`);
+  } else {
+    notes.push(`Estimated max safe discount is about ${pct(maxSafeDiscount * 100)} before this promo misses the margin target.`);
+  }
+
+  if (Number.isFinite(orderLiftNeeded)) {
+    notes.push(`To beat the no-sale baseline, the promo needs roughly ${pct(orderLiftNeeded)} more orders. Your expected lift is ${pct(safetyInputs.volumeLift * 100)}.`);
+    if (safetyInputs.volumeLift * 100 < orderLiftNeeded) {
+      notes.push("The expected volume lift is not enough to offset the profit sacrificed per order.");
+    }
+  } else {
+    notes.push("Because adjusted promo profit is not positive, no realistic order lift can make this promotion safer.");
+  }
+
+  if (plan.blendedOffsiteRate > 0) {
+    notes.push(`The Offsite Ads blend adds an average ${pct(plan.blendedOffsiteRate * 100)} fee load across promo orders.`);
+  }
+
+  text("promoAdjustedProfit", fmt.format(plan.adjustedProfit));
+  text("promoAdjustedMargin", `${pct(plan.adjustedMargin * 100)} margin after buffer`);
+  text("promoMarginGap", fmt.format(plan.marginGap));
+  text("promoMarginGapNote", plan.marginGap >= 0 ? "Above target after buffer." : "Below target after buffer.");
+  text("promoMaxSafeDiscount", pct(maxSafeDiscount * 100));
+  text("promoOrdersNeeded", Number.isFinite(ordersNeeded) ? `${compact.format(ordersNeeded)}x` : "N/A");
+  text("promoOrdersNeededNote", Number.isFinite(orderLiftNeeded) ? `${pct(orderLiftNeeded)} lift needed to match no-sale profit.` : "Promo profit must be positive first.");
+  text("promoSafetyBadge", status);
+
+  const badge = byId("promoSafetyBadge");
+  if (badge) badge.className = `status ${tone}`;
+
+  const list = byId("promoSafetyInsights");
+  if (list) list.innerHTML = notes.map((item) => `<li>${item}</li>`).join("");
+
+  window.currentPromotionSafetyReport = {
+    baseInputs: inputs,
+    safetyInputs,
+    plan,
+    baseline,
+    maxSafeDiscount,
+    ordersNeeded,
+    csv: promotionSafetyCsv(inputs, safetyInputs, plan, baseline, maxSafeDiscount, ordersNeeded),
+    fmtCurrency: inputs.preset.currency,
+    status
+  };
+}
+
 function exportCsv(inputs, result) {
   const rows = [
     ["Metric", "Value"],
@@ -572,6 +716,7 @@ function calculateAndRender() {
   renderBreakdown(result, fmt);
   renderScenarios(inputs, fmt);
   renderRecommendations(inputs, result, breakEven, fmt);
+  renderPromotionSafety(inputs, fmt);
   updateFormula(inputs, result, fmt);
 
   window.currentReport = { inputs, result, csv: exportCsv(inputs, result), scenarios: scenarioExports(inputs), fmtCurrency: inputs.preset.currency };
@@ -689,6 +834,41 @@ Margin: ${pct(report.result.margin)}`;
         item.setAttribute("aria-pressed", String(item === button));
       });
     });
+  });
+
+  document.querySelector("[data-tool='promotion-safety']")?.querySelectorAll("input, select").forEach((input) => {
+    input.addEventListener("input", calculateAndRender);
+    input.addEventListener("change", calculateAndRender);
+  });
+
+  byId("copyPromoSafety")?.addEventListener("click", async () => {
+    const report = window.currentPromotionSafetyReport;
+    if (!report) return;
+    const fmt = currencyFormatter(report.fmtCurrency);
+    const summary = `Etsy promotion safety check
+Status: ${report.status}
+Current discount: ${pct(report.baseInputs.discountRate * 100)}
+Adjusted promo profit: ${fmt.format(report.plan.adjustedProfit)}
+Adjusted promo margin: ${pct(report.plan.adjustedMargin * 100)}
+Target margin: ${pct(report.safetyInputs.targetMargin * 100)}
+Margin gap: ${fmt.format(report.plan.marginGap)}
+Max safe discount: ${pct(report.maxSafeDiscount * 100)}
+Orders needed vs no-sale baseline: ${Number.isFinite(report.ordersNeeded) ? `${compact.format(report.ordersNeeded)}x` : "N/A"}`;
+    await navigator.clipboard.writeText(summary);
+    text("copyPromoSafety", "Copied");
+    setTimeout(() => text("copyPromoSafety", "Copy safety check"), 1200);
+  });
+
+  byId("downloadPromoSafetyCsv")?.addEventListener("click", () => {
+    const report = window.currentPromotionSafetyReport;
+    if (!report) return;
+    const blob = new Blob([report.csv], { type: "text/csv" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = "etsy-promotion-safety-check.csv";
+    link.click();
+    URL.revokeObjectURL(url);
   });
 
   calculateAndRender();

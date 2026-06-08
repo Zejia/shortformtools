@@ -158,6 +158,66 @@
         </div>
       </section>
 
+      <section class="content-band wrap" data-tool="promotion-safety">
+        <div class="plain-panel">
+          <div class="section-head">
+            <div>
+              <h2>Promotion safety check</h2>
+              <p>Use the same listing inputs to decide whether a sale can survive ads, refunds, support time and your minimum margin target.</p>
+            </div>
+            <span id="promoSafetyBadge" class="status ok">Checking</span>
+          </div>
+          <div class="field-grid">
+            <div class="field">
+              <label for="promoTargetMargin">Minimum margin after promotion</label>
+              <input id="promoTargetMargin" type="number" min="0" max="80" step="0.1" value="20">
+            </div>
+            <div class="field">
+              <label for="promoRefundBuffer">Refund/support buffer per order</label>
+              <input id="promoRefundBuffer" type="number" min="0" step="0.01" value="2.50">
+              <span class="hint">Use this for expected replacements, partial refunds, support time or damaged returns.</span>
+            </div>
+            <div class="field">
+              <label for="promoOffsiteShare">Share of promo orders attributed to Offsite Ads</label>
+              <input id="promoOffsiteShare" type="number" min="0" max="100" step="1" value="25">
+              <span class="hint">Blends the Offsite Ads rate instead of assuming every order is attributed.</span>
+            </div>
+            <div class="field">
+              <label for="promoVolumeLift">Expected order lift from the sale</label>
+              <input id="promoVolumeLift" type="number" min="0" step="1" value="25">
+              <span class="hint">Percent more orders you expect because of the discount.</span>
+            </div>
+          </div>
+          <div class="safety-grid" style="margin-top:18px">
+            <div class="safety-card">
+              <span>Promotion-adjusted profit</span>
+              <strong id="promoAdjustedProfit">$0.00</strong>
+              <small id="promoAdjustedMargin">0% margin after buffer</small>
+            </div>
+            <div class="safety-card">
+              <span>Margin gap</span>
+              <strong id="promoMarginGap">$0.00</strong>
+              <small id="promoMarginGapNote">Gap to target appears here.</small>
+            </div>
+            <div class="safety-card">
+              <span>Max safe discount</span>
+              <strong id="promoMaxSafeDiscount">0%</strong>
+              <small>Before the promo misses your target margin.</small>
+            </div>
+            <div class="safety-card">
+              <span>Orders needed to match no-sale profit</span>
+              <strong id="promoOrdersNeeded">N/A</strong>
+              <small id="promoOrdersNeededNote">Compares this promo to a no-discount order.</small>
+            </div>
+          </div>
+          <ul class="insights" id="promoSafetyInsights" style="margin-top:16px"></ul>
+          <div class="hero-actions">
+            <button type="button" id="copyPromoSafety">Copy safety check</button>
+            <button type="button" id="downloadPromoSafetyCsv">Download safety CSV</button>
+          </div>
+        </div>
+      </section>
+
       <section class="content-band wrap" id="tools">
         <div class="section-head">
           <div>
