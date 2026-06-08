@@ -1257,6 +1257,8 @@ function initStayCalculator() {
 
   const entryField = shell.querySelector(".entry-field");
   const exitField = shell.querySelector(".exit-field");
+  const ruleModeField = shell.querySelector(".rule-mode-field");
+  const bufferField = shell.querySelector(".buffer-field");
   const visitOutput = shell.querySelector(".visit-output");
   const visitStart = shell.querySelector(".visit-start");
   const visitDeadline = shell.querySelector(".visit-deadline");
@@ -1264,6 +1266,32 @@ function initStayCalculator() {
   const transitDeadline = shell.querySelector(".transit-deadline");
   const stayHours = shell.querySelector(".stay-hours");
   const stayDays = shell.querySelector(".stay-days");
+  const riskPill = shell.querySelector(".stay-risk-pill");
+  const bufferOutput = shell.querySelector(".stay-buffer-output");
+  const riskNote = shell.querySelector(".stay-risk-note");
+  const safeDepartureOutput = shell.querySelector(".safe-departure-output");
+  const safeDepartureNote = shell.querySelector(".safe-departure-note");
+  const checklist = shell.querySelector(".stay-checklist");
+  const copyBrief = shell.querySelector(".copy-stay-brief");
+  const downloadBrief = shell.querySelector(".download-stay-brief");
+  let timingBrief = "";
+
+  function setRisk(label, tone) {
+    if (!riskPill) return;
+    riskPill.textContent = label;
+    riskPill.className = `status-pill stay-risk-pill ${tone || ""}`.trim();
+  }
+
+  function setChecklist(items) {
+    if (!checklist) return;
+    checklist.innerHTML = items.map((item) => `<li>${item}</li>`).join("");
+  }
+
+  function addHours(date, hours) {
+    const output = new Date(date);
+    output.setHours(output.getHours() + hours);
+    return output;
+  }
 
   function evaluate() {
     const hours = hoursBetween(entryField?.value, exitField?.value);
@@ -1271,6 +1299,11 @@ function initStayCalculator() {
     const hasEntry = Boolean(entryField?.value);
     const hasExit = Boolean(exitField?.value);
     const hasBothDates = hasEntry && hasExit;
+    const ruleMode = ruleModeField?.value || "transit";
+    const desiredBuffer = clamp(Number(bufferField?.value || 0), 0, 96);
+    let selectedDeadline = null;
+    let selectedLimit = ruleMode === "visit" ? "30-day unilateral visit" : "240-hour transit";
+    let selectedStart = null;
 
     if (stayHours) stayHours.textContent = hours && hours > 0 ? formatNumber(hours, 1) : "0";
     if (stayDays) stayDays.textContent = hours && hours > 0 ? formatNumber(hours / 24, 1) : "0";
@@ -1280,6 +1313,10 @@ function initStayCalculator() {
       visitDeadline.textContent = formatDate(visaWindow.deadline);
       if (visitOutput) {
         visitOutput.textContent = "For the current 30-day unilateral visa-free policy, the stay clock starts at 00:00 on the day after entry.";
+      }
+      if (ruleMode === "visit") {
+        selectedDeadline = visaWindow.deadline;
+        selectedStart = visaWindow.start;
       }
     } else {
       visitStart.textContent = "Enter valid dates";
@@ -1297,6 +1334,10 @@ function initStayCalculator() {
       const deadline = new Date(transitStart);
       deadline.setHours(deadline.getHours() + 240);
       transitDeadline.textContent = formatDate(deadline);
+      if (ruleMode === "transit") {
+        selectedDeadline = deadline;
+        selectedStart = transitStart;
+      }
       if (transitOutput) {
         transitOutput.textContent = hours <= 240
           ? "Your raw itinerary length sits inside a 240-hour window."
@@ -1310,11 +1351,107 @@ function initStayCalculator() {
           : "Add arrival and departure times to compare the raw stay against a 240-hour window.";
       }
     }
+
+    if (!hasBothDates || !selectedDeadline || !hours || hours <= 0) {
+      setRisk(hasBothDates ? "Check dates" : "Enter times", hasBothDates ? "warn" : "");
+      if (bufferOutput) bufferOutput.textContent = "Enter valid dates";
+      if (riskNote) riskNote.textContent = hasBothDates
+        ? "Departure must be later than arrival before the timing risk can be calculated."
+        : "Choose arrival and departure times to calculate the deadline buffer.";
+      if (safeDepartureOutput) safeDepartureOutput.textContent = "Enter valid dates";
+      if (safeDepartureNote) safeDepartureNote.textContent = "This subtracts your selected buffer from the modeled deadline.";
+      setChecklist([
+        "Enter the first mainland China arrival time from your itinerary.",
+        "Enter the planned mainland China departure time.",
+        "Choose whether you are stress-testing a 240-hour transit or 30-day visit window."
+      ]);
+      timingBrief = "";
+      if (downloadBrief) downloadBrief.disabled = true;
+      return;
+    }
+
+    const exit = new Date(exitField.value);
+    const bufferHours = (selectedDeadline.getTime() - exit.getTime()) / 36e5;
+    const safeDeparture = addHours(selectedDeadline, -desiredBuffer);
+    const limitHours = ruleMode === "visit" ? 30 * 24 : 240;
+    const countedHours = selectedStart ? (exit.getTime() - selectedStart.getTime()) / 36e5 : hours;
+    const overLimit = bufferHours < 0 || countedHours > limitHours;
+    const belowBuffer = bufferHours >= 0 && bufferHours < desiredBuffer;
+    const tight = bufferHours >= desiredBuffer && bufferHours < desiredBuffer + 12;
+
+    if (bufferOutput) {
+      bufferOutput.textContent = `${formatNumber(bufferHours, 1)} hours`;
+    }
+    if (safeDepartureOutput) {
+      safeDepartureOutput.textContent = formatDate(safeDeparture);
+    }
+    if (safeDepartureNote) {
+      safeDepartureNote.textContent = `Based on a ${formatNumber(desiredBuffer)} hour buffer before the modeled ${selectedLimit} deadline.`;
+    }
+
+    if (overLimit) {
+      setRisk("Over deadline", "bad");
+      if (riskNote) riskNote.textContent = `This itinerary leaves after the modeled ${selectedLimit} deadline. Do not rely on this timing without changing the itinerary or confirming another legal entry basis.`;
+    } else if (belowBuffer) {
+      setRisk("Too tight", "warn");
+      if (riskNote) riskNote.textContent = `The itinerary is inside the modeled deadline, but it does not keep your selected ${formatNumber(desiredBuffer)} hour safety buffer.`;
+    } else if (tight) {
+      setRisk("Narrow buffer", "warn");
+      if (riskNote) riskNote.textContent = "The itinerary clears your selected buffer, but a delay, retimed flight, or check-in dispute could make it fragile.";
+    } else {
+      setRisk("Comfortable", "good");
+      if (riskNote) riskNote.textContent = `The itinerary keeps at least ${formatNumber(desiredBuffer)} hours before the modeled ${selectedLimit} deadline.`;
+    }
+
+    const checklistItems = [
+      ruleMode === "transit"
+        ? "Confirm the route also satisfies the third-country or third-region transit rule."
+        : "Confirm your nationality, passport type, and purpose fit the current 30-day unilateral visit rule.",
+      `Keep departure no later than ${formatDate(safeDeparture)} if you want the selected safety buffer.`,
+      bufferHours < 24
+        ? "Consider moving the outbound flight earlier; this timing leaves little room for delays or interpretation differences."
+        : "Keep screenshots of the arrival and departure bookings with local times visible.",
+      "Recheck airline, port, and official guidance if any flight time changes before travel."
+    ];
+    setChecklist(checklistItems);
+
+    timingBrief = [
+      "China stay timing brief",
+      `Rule family checked: ${selectedLimit}`,
+      `Mainland entry: ${formatDate(new Date(entryField.value))}`,
+      `Mainland departure: ${formatDate(exit)}`,
+      `Raw stay: ${formatNumber(hours, 1)} hours (${formatNumber(hours / 24, 1)} days)`,
+      `Modeled clock start: ${selectedStart ? formatDate(selectedStart) : "Not calculated"}`,
+      `Modeled deadline: ${formatDate(selectedDeadline)}`,
+      `Selected safety buffer: ${formatNumber(desiredBuffer)} hours`,
+      `Buffer before deadline: ${formatNumber(bufferHours, 1)} hours`,
+      `Latest safer departure: ${formatDate(safeDeparture)}`,
+      `Timing risk: ${riskPill ? riskPill.textContent : "Not calculated"}`,
+      "",
+      "Checklist:",
+      ...checklistItems.map((item, index) => `${index + 1}. ${item}`),
+      "",
+      `Official-source review dates: transit policy ${TRANSIT_POLICY_SOURCE_DATE}; transit port update ${TRANSIT_PORT_UPDATE_DATE}; unilateral list ${UNILATERAL_VISA_FREE_SOURCE_DATE}.`
+    ].join("\n");
+    if (downloadBrief) downloadBrief.disabled = false;
   }
 
-  [entryField, exitField].filter(Boolean).forEach((field) => {
+  [entryField, exitField, ruleModeField, bufferField].filter(Boolean).forEach((field) => {
     field.addEventListener("input", evaluate);
     field.addEventListener("change", evaluate);
+  });
+
+  copyBrief?.addEventListener("click", async () => {
+    if (!timingBrief) return;
+    const ok = await copyText(timingBrief);
+    copyBrief.textContent = ok ? "Copied timing brief" : "Copy failed";
+    setTimeout(() => (copyBrief.textContent = "Copy timing brief"), 1200);
+  });
+
+  downloadBrief?.addEventListener("click", () => {
+    const ok = downloadTextFile("china-stay-timing-brief.txt", timingBrief);
+    downloadBrief.textContent = ok ? "Downloaded" : "Download failed";
+    setTimeout(() => (downloadBrief.textContent = "Download timing brief"), 1200);
   });
 
   evaluate();

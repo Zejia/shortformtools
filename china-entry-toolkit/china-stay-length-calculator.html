@@ -60,9 +60,26 @@
                   <label for="stayExit">Departure from mainland China</label>
                   <input id="stayExit" class="exit-field" type="datetime-local">
                 </div>
+                <div class="field">
+                  <label for="stayRuleMode">Rule family to stress-test</label>
+                  <select id="stayRuleMode" class="rule-mode-field">
+                    <option value="transit">240-hour transit</option>
+                    <option value="visit">30-day unilateral visit</option>
+                  </select>
+                </div>
+                <div class="field">
+                  <label for="stayBuffer">Safety buffer to keep before deadline</label>
+                  <input id="stayBuffer" class="buffer-field" type="number" min="0" max="96" step="1" value="12">
+                  <small>Use this for delays, airline check-in questions, immigration queues, or route changes.</small>
+                </div>
+              </div>
+              <div class="inline-actions">
+                <button type="button" class="copy-stay-brief">Copy timing brief</button>
+                <button type="button" class="download-stay-brief">Download timing brief</button>
               </div>
             </div>
             <aside class="result-panel">
+              <span class="status-pill stay-risk-pill">Enter times</span>
               <div class="result-card">
                 <span class="label">Raw stay time</span>
                 <strong><span class="stay-hours">0</span> hours</strong>
@@ -81,6 +98,20 @@
                 <span class="label">240-hour transit deadline</span>
                 <strong class="transit-deadline">Enter valid dates</strong>
                 <p class="transit-output">Add arrival and departure times to compare the raw stay against a 240-hour window.</p>
+              </div>
+              <div class="result-card">
+                <span class="label">Buffer before selected deadline</span>
+                <strong class="stay-buffer-output">Enter valid dates</strong>
+                <p class="stay-risk-note">Choose the rule family and your desired safety buffer to see the timing risk.</p>
+              </div>
+              <div class="result-card">
+                <span class="label">Latest safer departure</span>
+                <strong class="safe-departure-output">Enter valid dates</strong>
+                <p class="safe-departure-note">This subtracts your selected buffer from the modeled deadline.</p>
+              </div>
+              <div class="result-card">
+                <span class="label">Timing checklist</span>
+                <ul class="stay-checklist"></ul>
               </div>
             </aside>
           </div>
