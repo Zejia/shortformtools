@@ -83,6 +83,8 @@
               <div class="field"><label for="adsAverageCpc">Average CPC</label><input id="adsAverageCpc" type="number" min="0" step="0.01" value="0.35"></div>
               <div class="field"><label for="adsMonthlyBudget">Monthly Etsy Ads budget</label><input id="adsMonthlyBudget" type="number" min="0" step="1" value="150"></div>
               <div class="field"><label for="adsTargetMargin">Target profit margin after ads</label><input id="adsTargetMargin" type="number" min="0" max="80" step="0.1" value="20"></div>
+              <div class="field"><label for="adsSampleClicks">Recent ad clicks reviewed</label><input id="adsSampleClicks" type="number" min="0" step="1" value="100"><span class="hint">Use listing-level Etsy Ads clicks from a recent test window.</span></div>
+              <div class="field"><label for="adsSampleOrders">Recent ad-attributed orders</label><input id="adsSampleOrders" type="number" min="0" step="1" value="3"><span class="hint">Used only for confidence, not fee math.</span></div>
 
               <div class="group-title">Fee assumptions</div>
               <div class="field full">
@@ -154,6 +156,53 @@
           <div class="hero-actions">
             <button type="button" id="copyAdsScenarios">Copy scenarios</button>
             <button type="button" id="downloadAdsScenarioCsv">Download scenario CSV</button>
+          </div>
+        </div>
+      </section>
+
+      <section class="content-band wrap">
+        <div class="plain-panel">
+          <div class="section-head">
+            <div>
+              <h2>Campaign action guardrail</h2>
+              <p>Translate the ROAS math into a budget move, listing fix, or pause decision before changing spend.</p>
+            </div>
+            <span class="status ok" id="adsActionStatus">Reviewing</span>
+          </div>
+          <div class="action-grid">
+            <div class="action-card primary-card">
+              <span>Recommended move</span>
+              <strong id="adsBudgetMove">-</strong>
+              <small id="adsBudgetMoveDetail">Run the calculator to see the next budget action.</small>
+            </div>
+            <div class="action-card">
+              <span>Target-safe CPC</span>
+              <strong id="adsTargetCpc">$0.00</strong>
+              <small id="adsCpcGap">-</small>
+            </div>
+            <div class="action-card">
+              <span>Conversion needed</span>
+              <strong id="adsConversionNeeded">0%</strong>
+              <small id="adsConversionGap">-</small>
+            </div>
+            <div class="action-card">
+              <span>Sample confidence</span>
+              <strong id="adsSampleConfidence">-</strong>
+              <small id="adsSampleDetail">-</small>
+            </div>
+          </div>
+          <div class="decision-grid">
+            <div>
+              <h3>Why this action</h3>
+              <ul class="insights" id="adsDecisionReasons"></ul>
+            </div>
+            <div>
+              <h3>Next listing tests</h3>
+              <ul class="insights" id="adsNextTests"></ul>
+            </div>
+          </div>
+          <div class="hero-actions">
+            <button type="button" id="copyAdsActionPlan">Copy action plan</button>
           </div>
         </div>
       </section>

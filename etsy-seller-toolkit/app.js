@@ -1384,7 +1384,9 @@ function readAdsInputs() {
     conversionRate: Math.max(0.1, val("adsConversionRate")) / 100,
     averageCpc: Math.max(0, val("adsAverageCpc")),
     monthlyBudget: Math.max(0, val("adsMonthlyBudget")),
-    targetMargin: clamp(val("adsTargetMargin"), 0, 80)
+    targetMargin: clamp(val("adsTargetMargin"), 0, 80),
+    sampleClicks: Math.max(0, val("adsSampleClicks")),
+    sampleOrders: Math.max(0, val("adsSampleOrders"))
   };
 }
 
@@ -1409,6 +1411,12 @@ function calculateAdsPlan(inputs) {
   const ordersFromBudget = currentAdSpendPerOrder > 0 ? inputs.monthlyBudget / currentAdSpendPerOrder : 0;
   const revenueFromBudget = ordersFromBudget * baseResult.sellerRevenue;
   const profitFromBudget = ordersFromBudget * profitAfterAds;
+  const observedConversionRate = inputs.sampleClicks > 0 ? inputs.sampleOrders / inputs.sampleClicks : 0;
+  const conversionNeededForTarget = inputs.averageCpc > 0 && targetAdSpend > 0 ? inputs.averageCpc / targetAdSpend : 0;
+  const conversionNeededForBreakEven = inputs.averageCpc > 0 && breakEvenSpend > 0 ? inputs.averageCpc / breakEvenSpend : 0;
+  const sampleSpend = inputs.sampleClicks * inputs.averageCpc;
+  const sampleRevenue = inputs.sampleOrders * baseResult.sellerRevenue;
+  const sampleRoas = sampleSpend > 0 ? sampleRevenue / sampleSpend : Infinity;
 
   return {
     baseResult,
@@ -1425,7 +1433,13 @@ function calculateAdsPlan(inputs) {
     currentRoas,
     ordersFromBudget,
     revenueFromBudget,
-    profitFromBudget
+    profitFromBudget,
+    observedConversionRate,
+    conversionNeededForTarget,
+    conversionNeededForBreakEven,
+    sampleSpend,
+    sampleRevenue,
+    sampleRoas
   };
 }
 
@@ -1539,11 +1553,154 @@ function adsScenarioExports(inputs, plan) {
   return { csv, summary };
 }
 
+function adsSampleConfidence(inputs, plan) {
+  if (plan.targetAdSpend <= 0 && plan.baseResult.profit < plan.targetProfit) {
+    return {
+      label: "Margin-limited",
+      tone: "warn",
+      detail: "The listing misses the target margin before ads, so click data is secondary until base economics improve."
+    };
+  }
+  if (inputs.sampleClicks < 30) {
+    return {
+      label: "Too early",
+      tone: "warn",
+      detail: "Fewer than 30 reviewed clicks. Avoid major budget changes until the listing has more signal."
+    };
+  }
+  if (inputs.sampleClicks < 100) {
+    return {
+      label: "Directional",
+      tone: "warn",
+      detail: "The sample can guide bid tests, but it is still light for confident scaling."
+    };
+  }
+  if (inputs.sampleOrders < 3) {
+    return {
+      label: "Click-heavy",
+      tone: "bad",
+      detail: "There are enough clicks to worry, but too few orders. Diagnose thumbnail, price, shipping, reviews, or search fit before adding spend."
+    };
+  }
+  if (plan.observedConversionRate >= plan.conversionNeededForTarget) {
+    return {
+      label: "Usable",
+      tone: "good",
+      detail: "Recent click/order signal supports the target-margin assumption."
+    };
+  }
+  return {
+    label: "Needs lift",
+    tone: "warn",
+    detail: "Recent click/order signal is below the conversion needed for the target-margin CPC."
+  };
+}
+
+function buildAdsActionPlan(inputs, plan, fmt) {
+  const currentClearsTarget = plan.profitAfterAds >= plan.targetProfit && plan.baseResult.profit > 0;
+  const currentProfitable = plan.profitAfterAds > 0;
+  const cpcOverTarget = inputs.averageCpc > plan.targetCpc && plan.targetCpc > 0;
+  const conversionBelowTarget = inputs.conversionRate < plan.conversionNeededForTarget && plan.conversionNeededForTarget > 0;
+  const noTargetAdRoom = plan.targetAdSpend <= 0 && plan.baseResult.profit < plan.targetProfit;
+  const budgetOrders = plan.ordersFromBudget;
+  const confidence = adsSampleConfidence(inputs, plan);
+  const reasons = [];
+  const tests = [];
+  let move = "Hold and measure";
+  let tone = "ok";
+  let detail = "Keep the current budget until more clicks confirm the conversion and CPC assumptions.";
+
+  if (plan.baseResult.profit <= 0) {
+    move = "Do not advertise yet";
+    tone = "bad";
+    detail = "The listing has no pre-ad profit cushion, so ads cannot fix the economics.";
+    reasons.push("Profit before ads is not positive. Fix price, costs, shipping, discount, or fees before buying traffic.");
+    tests.push("Raise item price or reduce fulfillment cost, then rerun the ROAS plan before restarting ads.");
+  } else if (!currentProfitable) {
+    move = "Pause or cut bids";
+    tone = "bad";
+    detail = "Current CPC and conversion lose money per order.";
+    reasons.push(`Ad spend per order is above the break-even allowance by ${fmt.format(plan.currentAdSpendPerOrder - plan.breakEvenSpend)}.`);
+    tests.push("Lower CPC toward break-even, tighten keywords, or pause the listing until conversion improves.");
+  } else if (noTargetAdRoom) {
+    move = "Fix margin before scaling";
+    tone = "warn";
+    detail = "The listing is profitable, but its pre-ad margin is already below the selected target.";
+    reasons.push(`Profit before ads is ${fmt.format(plan.targetProfit - plan.baseResult.profit)} short of the target-margin profit before any Etsy Ads spend.`);
+    tests.push("Raise price, reduce fulfillment cost, or lower the target margin before using paid traffic to scale this listing.");
+  } else if (!currentClearsTarget) {
+    move = cpcOverTarget ? "Reduce CPC before scaling" : "Improve conversion before scaling";
+    tone = "warn";
+    detail = "The campaign is profitable, but it does not protect the selected target margin.";
+    reasons.push(`Profit after ads is below the target-margin profit by ${fmt.format(plan.targetProfit - plan.profitAfterAds)} per order.`);
+    if (cpcOverTarget) tests.push(`Lower average CPC toward ${fmt.format(plan.targetCpc)} before increasing budget.`);
+    if (conversionBelowTarget) tests.push(`Improve listing conversion toward ${pct(plan.conversionNeededForTarget * 100)} before scaling.`);
+  } else if (confidence.tone === "good" && budgetOrders >= 3) {
+    move = "Scale cautiously";
+    tone = "good";
+    detail = "The current inputs clear target margin and have enough sample signal for a small budget increase.";
+    reasons.push("Current CPC and conversion clear the target-margin profit threshold.");
+    tests.push("Increase budget in a small step, then re-check CPC, conversion, and profit after the next click sample.");
+  } else {
+    reasons.push("The economics clear target margin, but the click/order sample is not strong enough for aggressive scaling.");
+    tests.push("Keep budget steady until the listing reaches a larger click sample with stable conversion.");
+  }
+
+  if (cpcOverTarget && plan.targetCpc > 0) {
+    reasons.push(`Average CPC is ${fmt.format(inputs.averageCpc - plan.targetCpc)} above the target-safe CPC.`);
+  } else if (plan.targetCpc > 0) {
+    reasons.push(`Average CPC has ${fmt.format(plan.targetCpc - inputs.averageCpc)} of room before missing target margin.`);
+  }
+
+  if (conversionBelowTarget) {
+    reasons.push(`Conversion needs about ${pct((plan.conversionNeededForTarget - inputs.conversionRate) * 100)} more to protect target margin at this CPC.`);
+  }
+
+  if (confidence.tone !== "good") {
+    reasons.push(confidence.detail);
+  }
+
+  tests.push("Review ad search terms and pause irrelevant clicks before raising spend.");
+  tests.push("Test one listing variable at a time: main photo, title promise, price/shipping, or first review/social-proof block.");
+
+  return {
+    move,
+    tone,
+    detail,
+    confidence,
+    reasons: [...new Set(reasons)].slice(0, 5),
+    tests: [...new Set(tests)].slice(0, 5)
+  };
+}
+
+function adsActionSummary(inputs, plan, action) {
+  const fmt = currencyFormatter(inputs.preset.currency);
+  return [
+    "Etsy Ads action plan",
+    `Recommended move: ${action.move}`,
+    `Reason: ${action.detail}`,
+    `Profit after ads/order: ${fmt.format(plan.profitAfterAds)}`,
+    `Target-safe CPC: ${fmt.format(plan.targetCpc)}`,
+    `Current CPC: ${fmt.format(inputs.averageCpc)}`,
+    `Conversion needed for target margin: ${pct(plan.conversionNeededForTarget * 100)}`,
+    `Current modeled conversion: ${pct(inputs.conversionRate * 100)}`,
+    `Reviewed sample: ${compact.format(inputs.sampleClicks)} clicks / ${compact.format(inputs.sampleOrders)} orders`,
+    `Sample confidence: ${action.confidence.label}`,
+    "",
+    "Decision reasons:",
+    ...action.reasons.map((item) => `- ${item}`),
+    "",
+    "Next tests:",
+    ...action.tests.map((item) => `- ${item}`)
+  ].join("\n");
+}
+
 function calculateAdsAndRender() {
   const inputs = readAdsInputs();
   const fmt = currencyFormatter(inputs.preset.currency);
   const plan = calculateAdsPlan(inputs);
   const [status, tone] = adsStatus(plan.profitAfterAds, plan.targetProfit);
+  const action = buildAdsActionPlan(inputs, plan, fmt);
 
   text("currencyLabel", inputs.preset.currency);
   text("paymentPresetText", `${inputs.preset.label}: ${pct(inputs.paymentRate * 100)} + ${fmt.format(inputs.paymentFlat)}`);
@@ -1565,10 +1722,31 @@ function calculateAdsAndRender() {
   text("adsFormulaLine", `Before ads, this listing keeps ${fmt.format(plan.baseResult.profit)} profit. At ${pct(inputs.conversionRate * 100)} conversion and ${fmt.format(inputs.averageCpc)} CPC, ad cost is ${fmt.format(plan.currentAdSpendPerOrder)} per order, leaving ${fmt.format(plan.profitAfterAds)} profit after ads.`);
   renderAdsScenarios(inputs, plan, fmt);
   renderAdsInsights(inputs, plan, fmt);
+  text("adsActionStatus", action.move);
+  text("adsBudgetMove", action.move);
+  text("adsBudgetMoveDetail", action.detail);
+  text("adsTargetCpc", fmt.format(plan.targetCpc));
+  text("adsCpcGap", plan.targetCpc > 0 ? `${fmt.format(plan.targetCpc - inputs.averageCpc)} vs current CPC` : "No target-safe CPC until pre-ad profit improves");
+  text("adsConversionNeeded", pct(plan.conversionNeededForTarget * 100));
+  text("adsConversionGap", `${pct((inputs.conversionRate - plan.conversionNeededForTarget) * 100)} vs modeled conversion`);
+  text("adsSampleConfidence", action.confidence.label);
+  text("adsSampleDetail", action.confidence.detail);
+  const actionStatus = byId("adsActionStatus");
+  if (actionStatus) actionStatus.className = `status ${action.tone}`;
+  const actionCard = byId("adsBudgetMove")?.closest(".action-card");
+  if (actionCard) actionCard.dataset.tone = action.tone;
+  const confidenceNode = byId("adsSampleConfidence")?.closest(".action-card");
+  if (confidenceNode) confidenceNode.dataset.tone = action.confidence.tone;
+  const reasonList = byId("adsDecisionReasons");
+  if (reasonList) reasonList.innerHTML = action.reasons.map((item) => `<li>${item}</li>`).join("");
+  const testList = byId("adsNextTests");
+  if (testList) testList.innerHTML = action.tests.map((item) => `<li>${item}</li>`).join("");
 
   window.currentAdsReport = {
     inputs,
     plan,
+    action,
+    actionSummary: adsActionSummary(inputs, plan, action),
     csv: exportAdsCsv(inputs, plan),
     scenarios: adsScenarioExports(inputs, plan),
     fmtCurrency: inputs.preset.currency
@@ -1605,6 +1783,8 @@ function bindAdsRoas() {
         byId("adsLaborCost").value = 3;
         byId("adsConversionRate").value = 3;
         byId("adsAverageCpc").value = 0.35;
+        byId("adsSampleClicks").value = 100;
+        byId("adsSampleOrders").value = 3;
       }
       if (type === "digital") {
         byId("adsItemPrice").value = 12;
@@ -1615,6 +1795,8 @@ function bindAdsRoas() {
         byId("adsLaborCost").value = 1.5;
         byId("adsConversionRate").value = 4;
         byId("adsAverageCpc").value = 0.22;
+        byId("adsSampleClicks").value = 120;
+        byId("adsSampleOrders").value = 5;
       }
       if (type === "thin") {
         byId("adsItemPrice").value = 21;
@@ -1625,6 +1807,8 @@ function bindAdsRoas() {
         byId("adsLaborCost").value = 2.5;
         byId("adsConversionRate").value = 2;
         byId("adsAverageCpc").value = 0.4;
+        byId("adsSampleClicks").value = 90;
+        byId("adsSampleOrders").value = 1;
       }
       calculateAdsAndRender();
     });
@@ -1677,6 +1861,14 @@ Profit after ads/order: ${fmt.format(report.plan.profitAfterAds)}`;
     link.download = "etsy-ads-roas-scenarios.csv";
     link.click();
     URL.revokeObjectURL(url);
+  });
+
+  byId("copyAdsActionPlan")?.addEventListener("click", async () => {
+    const report = window.currentAdsReport;
+    if (!report) return;
+    await navigator.clipboard.writeText(report.actionSummary);
+    text("copyAdsActionPlan", "Copied");
+    setTimeout(() => text("copyAdsActionPlan", "Copy action plan"), 1200);
   });
 
   calculateAdsAndRender();

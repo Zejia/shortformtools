@@ -570,6 +570,62 @@ tr:last-child td {
   line-height: 1.35;
 }
 
+.action-grid {
+  display: grid;
+  grid-template-columns: 1.25fr repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.action-card {
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--paper);
+  padding: 14px;
+  display: grid;
+  gap: 6px;
+}
+
+.action-card.primary-card {
+  background:
+    radial-gradient(circle at top right, oklch(88% 0.05 166 / 0.45), transparent 44%),
+    var(--paper);
+}
+
+.action-card[data-tone="good"] {
+  border-color: oklch(72% 0.07 150);
+}
+
+.action-card[data-tone="warn"] {
+  border-color: oklch(76% 0.08 72);
+}
+
+.action-card[data-tone="bad"] {
+  border-color: oklch(72% 0.08 28);
+}
+
+.action-card span {
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 760;
+}
+
+.action-card strong {
+  font-size: 24px;
+  line-height: 1.08;
+}
+
+.action-card small {
+  color: var(--soft);
+  line-height: 1.35;
+}
+
+.decision-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+  margin-top: 18px;
+}
+
 .formula {
   border: 1px solid var(--line);
   border-radius: var(--radius);
@@ -662,6 +718,11 @@ tr:last-child td {
   }
 
   .content-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .action-grid,
+  .decision-grid {
     grid-template-columns: 1fr;
   }
 
