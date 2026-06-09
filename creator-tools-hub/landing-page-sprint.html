@@ -344,6 +344,10 @@
                 <div class="field"><label for="sprintCta">Primary action</label><input id="sprintCta" value="book a call"></div>
                 <div class="field"><label for="sprintTier">Likely tier</label><select id="sprintTier"><option>Starter</option><option>Growth</option><option>Toolkit</option></select></div>
                 <div class="field full-span"><label for="sprintScope">Scope shortcut</label><select id="sprintScope"><option value="simple">One static page from clear existing material</option><option value="copy">Offer is clear, but copy and structure need work</option><option value="tool">Page needs a mini calculator, quiz, or checker</option><option value="seo">Launch needs one page plus supporting SEO pages</option><option value="custom">Needs CMS, login, payments, backend, or a larger app</option></select></div>
+                <div class="field"><label for="sprintDeadline">Launch timing</label><select id="sprintDeadline"><option value="this-week">Need a useful page this week</option><option value="two-weeks">Can wait one to two weeks</option><option value="exploring">Still exploring the offer</option></select></div>
+                <div class="field"><label for="sprintProof">Proof or assets status</label><select id="sprintProof"><option value="ready">Logo, screenshots, examples, or proof are ready</option><option value="some">Some rough assets are ready</option><option value="none">No proof assets yet</option></select></div>
+                <div class="field"><label for="sprintTraffic">First traffic source</label><select id="sprintTraffic"><option>Warm outreach</option><option>Paid ads</option><option>Product launch</option><option>Search traffic</option><option>Social audience</option></select></div>
+                <div class="field"><label for="sprintDecision">Main decision needed</label><select id="sprintDecision"><option>Fix an existing weak page</option><option>Launch a new offer page</option><option>Validate a waitlist or lead magnet</option><option>Add a mini tool or quiz</option><option>Build a small SEO cluster</option></select></div>
               </div>
               <div class="field" style="margin-top:14px"><label for="sprintAssets">Assets or links ready</label><textarea id="sprintAssets">Logo, current checkout link, two competitor examples, rough homepage copy.</textarea></div>
               <div class="field" style="margin-top:14px"><label for="sprintNotes">What feels weak right now?</label><textarea id="sprintNotes">The offer is clear in conversation, but the page does not make the value obvious fast enough.</textarea></div>
@@ -356,6 +360,33 @@
               <div class="metric"><span class="label">Missing detail</span><strong id="sprintMissingDetail">None</strong></div>
               <p class="inline-note" id="sprintBriefSummary">Fill the brief to generate a clean inquiry.</p>
             </aside>
+          </div>
+          <div class="sprint-diagnosis-grid">
+            <article class="sprint-card primary-sprint-card">
+              <span class="label">Scope verdict</span>
+              <strong id="sprintScopeVerdict">Reviewing fit</strong>
+              <p id="sprintScopeReason">Fill the brief to see whether this fits a fixed 48-hour sprint.</p>
+            </article>
+            <article class="sprint-card">
+              <span class="label">Risk flags</span>
+              <strong id="sprintRiskCount">0</strong>
+              <p id="sprintRiskSummary">No risks checked yet.</p>
+            </article>
+            <article class="sprint-card">
+              <span class="label">Best next package</span>
+              <strong id="sprintPackageReason">Starter</strong>
+              <p id="sprintPackageNote">Based on scope and assets.</p>
+            </article>
+          </div>
+          <div class="sprint-action-plan">
+            <div>
+              <h3>48-hour sprint plan</h3>
+              <ol id="sprintActionPlan"></ol>
+            </div>
+            <div>
+              <h3>Send before kickoff</h3>
+              <ul id="sprintSendList"></ul>
+            </div>
           </div>
         </div>
       </section>

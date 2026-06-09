@@ -1064,6 +1064,61 @@ summary {
   text-align: right;
 }
 
+.sprint-diagnosis-grid {
+  display: grid;
+  grid-template-columns: 1.25fr repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  padding: 18px;
+  border-top: 1px solid var(--line);
+}
+
+.sprint-card {
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: oklch(99% 0.004 88);
+  padding: 15px;
+  display: grid;
+  gap: 8px;
+}
+
+.primary-sprint-card {
+  background:
+    radial-gradient(circle at top right, oklch(91% 0.045 190 / 0.5), transparent 45%),
+    oklch(99% 0.004 88);
+}
+
+.sprint-card strong {
+  font-size: 22px;
+  line-height: 1.1;
+}
+
+.sprint-card p {
+  margin: 0;
+  color: var(--muted);
+}
+
+.sprint-action-plan {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+  margin: 0 18px 18px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--panel);
+  padding: 15px;
+}
+
+.sprint-action-plan ol,
+.sprint-action-plan ul {
+  margin: 10px 0 0;
+  padding-left: 22px;
+  color: var(--muted);
+}
+
+.sprint-action-plan li + li {
+  margin-top: 8px;
+}
+
 .site-footer {
   border-top: 1px solid var(--line);
   color: var(--muted);
@@ -1095,6 +1150,11 @@ summary {
   }
 
   .rewrite-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .sprint-diagnosis-grid,
+  .sprint-action-plan {
     grid-template-columns: 1fr;
   }
 

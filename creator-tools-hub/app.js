@@ -1463,6 +1463,10 @@ function initSprintBriefBuilder() {
     const cta = fieldValue("sprintCta");
     const tier = fieldValue("sprintTier") || "Starter";
     const scope = fieldValue("sprintScope") || "simple";
+    const deadline = fieldValue("sprintDeadline") || "this-week";
+    const proof = fieldValue("sprintProof") || "some";
+    const traffic = fieldValue("sprintTraffic") || "Warm outreach";
+    const decision = fieldValue("sprintDecision") || "Fix an existing weak page";
     const assets = fieldValue("sprintAssets");
     const notes = fieldValue("sprintNotes");
     const fields = [
@@ -1480,12 +1484,44 @@ function initSprintBriefBuilder() {
     const recommendedTier = scopeTier === "Starter" && /calculator|quiz|tool|seo|pages|support/i.test(briefText) ? "Growth" : scopeTier;
     const isOutOfScope = scope === "custom" || /cms|shopify|wordpress|webflow|login|account|dashboard|backend|database|payment|stripe|membership|marketplace|app redesign/i.test(briefText);
     const isStrongFit = /waitlist|landing page|service page|creator|consultant|workshop|course|lead magnet|newsletter|static|one page|offer/i.test(briefText);
+    const risks = [];
+    if (isOutOfScope) risks.push("Requires custom app/CMS/payment/backend scoping before a fixed 48-hour page.");
+    if (proof === "none") risks.push("No proof assets yet, so the page may need placeholders or a proof-light structure.");
+    if (deadline === "exploring") risks.push("Offer is still exploratory; clarify the promise before treating this as a launch sprint.");
+    if (scope === "seo" && !/keyword|seo|search|article|page|cluster|topic/i.test(briefText)) risks.push("Toolkit scope needs target topics or search angles before build starts.");
+    if (traffic === "Paid ads" && !/proof|testimonial|case|example|screenshot|review|metric/i.test(assets)) risks.push("Paid traffic needs visible proof or trust assets before spend.");
     const fitLabel = isOutOfScope ? "Needs custom scope" : isStrongFit || score >= 80 ? "Good sprint fit" : "Clarify fit";
     const fitNote = isOutOfScope
       ? "This may be bigger than the 48-hour sprint. Ask for scope confirmation before assuming it fits the fixed packages."
       : fitLabel === "Good sprint fit"
         ? "This looks aligned with a narrow static landing-page sprint."
         : "Add one clear page type or launch use case so the fit is easier to judge.";
+    const scopeVerdict = isOutOfScope
+      ? "Scope before sprint"
+      : risks.length >= 2
+        ? "Good candidate, reduce risk first"
+        : fitLabel === "Good sprint fit"
+          ? "Good 48-hour candidate"
+          : "Clarify before booking";
+    const packageNote = recommendedTier === "Toolkit"
+      ? "Use Toolkit when the launch needs the page plus supporting search pages or internal-link depth."
+      : recommendedTier === "Growth"
+        ? "Use Growth when copy structure or one small interactive tool matters to conversion."
+        : recommendedTier === "Custom scope"
+          ? "Use custom scoping before a fixed package."
+          : "Use Starter when the offer is clear and the main need is a sharper one-page build.";
+    const actionPlan = [
+      scope === "copy" ? "Rewrite hero, offer stack, CTA, and proof sequence before polishing visual layout." : "Lock the one-page structure around audience, promise, proof, and CTA.",
+      scope === "tool" ? "Define the mini tool or quiz inputs, outputs, and edge cases before design polish." : "Build the first mobile-ready static draft around the primary action.",
+      traffic === "Paid ads" ? "Add proof and expectation-setting above the fold before sending paid clicks." : `Tune the page for the first traffic source: ${traffic}.`,
+      "Run one consolidated review pass, then hand off files and deploy-ready next steps."
+    ];
+    const sendList = [
+      "Current page or rough copy, even if it is messy.",
+      "Logo, screenshots, examples, testimonials, or proof assets available now.",
+      "Two or three reference pages with what you like or dislike.",
+      `The first traffic source and success action: ${traffic} -> ${cta || "primary CTA"}.`
+    ];
 
     setText("sprintBriefScore", `${score}/100`);
     setText("sprintTierLabel", recommendedTier);
@@ -1500,6 +1536,28 @@ function initSprintBriefBuilder() {
     if (tierNode) tierNode.className = `badge ${score >= 80 ? "" : "warn"}`;
     const fitNode = document.getElementById("sprintFitLabel");
     if (fitNode) fitNode.className = `badge ${isOutOfScope ? "warn" : fitLabel === "Good sprint fit" ? "" : "warn"}`;
+    setText("sprintScopeVerdict", scopeVerdict);
+    setText("sprintScopeReason", risks[0] || fitNote);
+    setText("sprintRiskCount", `${risks.length}`);
+    setText("sprintRiskSummary", risks.length ? risks.join(" ") : "No major scope risk from the current brief.");
+    setText("sprintPackageReason", recommendedTier);
+    setText("sprintPackageNote", packageNote);
+    const actionPlanNode = document.getElementById("sprintActionPlan");
+    if (actionPlanNode) {
+      actionPlanNode.replaceChildren(...actionPlan.map((item) => {
+        const li = document.createElement("li");
+        li.textContent = item;
+        return li;
+      }));
+    }
+    const sendListNode = document.getElementById("sprintSendList");
+    if (sendListNode) {
+      sendListNode.replaceChildren(...sendList.map((item) => {
+        const li = document.createElement("li");
+        li.textContent = item;
+        return li;
+      }));
+    }
 
     lastBrief = [
       "Landing Page Sprint brief",
@@ -1507,8 +1565,14 @@ function initSprintBriefBuilder() {
       `Audience: ${audience || "[add audience]"}`,
       `Primary action: ${cta || "[add CTA]"}`,
       `Scope shortcut: ${document.getElementById("sprintScope")?.selectedOptions[0]?.textContent || "One static page"}`,
+      `Launch timing: ${document.getElementById("sprintDeadline")?.selectedOptions[0]?.textContent || deadline}`,
+      `Proof status: ${document.getElementById("sprintProof")?.selectedOptions[0]?.textContent || proof}`,
+      `First traffic source: ${traffic}`,
+      `Main decision needed: ${decision}`,
       `Likely tier: ${recommendedTier}`,
       `Fit check: ${fitLabel}`,
+      `Scope verdict: ${scopeVerdict}`,
+      risks.length ? `Risk flags: ${risks.join(" | ")}` : "Risk flags: None from current brief",
       "",
       "Assets or links ready:",
       assets || "[add assets, links, or references]",
@@ -1518,6 +1582,12 @@ function initSprintBriefBuilder() {
       "",
       "Scope note:",
       fitNote,
+      "",
+      "48-hour sprint plan:",
+      ...actionPlan.map((item, index) => `${index + 1}. ${item}`),
+      "",
+      "Send before kickoff:",
+      ...sendList.map((item) => `- ${item}`),
       "",
       "Preferred next step: confirm scope, timeline, and what you need from me before the first draft."
     ].join("\n");
