@@ -93,6 +93,11 @@
                   <select id="tcZone" class="zone-field"></select>
                   <small class="zone-note">Pick a transit region to see the most useful reminder for your stay area.</small>
                 </div>
+                <div class="field">
+                  <label for="tcEntryPort">First mainland entry port</label>
+                  <select id="tcEntryPort" class="entry-port-field"></select>
+                  <small class="entry-port-note">Choose a common 240-hour port, or keep the manual confirmation if your port is not listed here.</small>
+                </div>
               </div>
               <label class="checkbox-line"><input class="ordinary-field" type="checkbox" checked> I am using an ordinary passport</label>
               <label class="checkbox-line"><input class="onward-field" type="checkbox"> I have a confirmed onward ticket or other confirmed onward departure arrangement</label>
@@ -113,6 +118,15 @@
               <div class="result-card">
                 <span class="label">Raw time window</span>
                 <strong class="transit-hours-output">Enter valid arrival and departure times</strong>
+              </div>
+              <div class="result-card evidence-card">
+                <span class="label">Route evidence packet</span>
+                <ul class="evidence-list"></ul>
+                <button class="ghost-button copy-evidence-packet" type="button">Copy evidence packet</button>
+              </div>
+              <div class="result-card">
+                <span class="label">Risk flags to fix before travel</span>
+                <ul class="risk-flags"></ul>
               </div>
               <div class="result-card">
                 <span class="label">Airline check-in script</span>

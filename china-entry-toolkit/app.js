@@ -123,6 +123,29 @@ const transitZones = [
   }
 ];
 
+const transitEntryPorts = [
+  { code: "pek", name: "Beijing Capital International Airport", zoneCode: "bj", group: "Beijing-Tianjin-Hebei" },
+  { code: "pkx", name: "Beijing Daxing International Airport", zoneCode: "bj", group: "Beijing-Tianjin-Hebei" },
+  { code: "tsn", name: "Tianjin Binhai International Airport", zoneCode: "bj", group: "Beijing-Tianjin-Hebei" },
+  { code: "pvg", name: "Shanghai Pudong International Airport", zoneCode: "yd", group: "Shanghai-Jiangsu-Zhejiang" },
+  { code: "sha", name: "Shanghai Hongqiao International Airport", zoneCode: "yd", group: "Shanghai-Jiangsu-Zhejiang" },
+  { code: "hgh", name: "Hangzhou Xiaoshan International Airport", zoneCode: "yd", group: "Shanghai-Jiangsu-Zhejiang" },
+  { code: "nkg", name: "Nanjing Lukou International Airport", zoneCode: "yd", group: "Shanghai-Jiangsu-Zhejiang" },
+  { code: "can", name: "Guangzhou Baiyun International Airport", zoneCode: "gd", group: "Guangdong and Greater Bay" },
+  { code: "szx", name: "Shenzhen Bao'an International Airport", zoneCode: "gd", group: "Guangdong and Greater Bay" },
+  { code: "zuh", name: "Zhuhai Jinwan Airport", zoneCode: "gd", group: "Guangdong and Greater Bay" },
+  { code: "hzm", name: "Hong Kong-Zhuhai-Macao Bridge Zhuhai Port", zoneCode: "gd", group: "Guangdong and Greater Bay" },
+  { code: "tfu", name: "Chengdu Tianfu International Airport", zoneCode: "sc", group: "Sichuan-Chongqing" },
+  { code: "ctu", name: "Chengdu Shuangliu International Airport", zoneCode: "sc", group: "Sichuan-Chongqing" },
+  { code: "ckg", name: "Chongqing Jiangbei International Airport", zoneCode: "sc", group: "Sichuan-Chongqing" },
+  { code: "xiy", name: "Xi'an Xianyang International Airport", zoneCode: "other", group: "Other common 240-hour ports" },
+  { code: "xmn", name: "Xiamen Gaoqi International Airport", zoneCode: "other", group: "Other common 240-hour ports" },
+  { code: "tao", name: "Qingdao Jiaodong International Airport", zoneCode: "other", group: "Other common 240-hour ports" },
+  { code: "wuh", name: "Wuhan Tianhe International Airport", zoneCode: "other", group: "Other common 240-hour ports" },
+  { code: "kun", name: "Kunming Changshui International Airport", zoneCode: "other", group: "Other common 240-hour ports" },
+  { code: "other", name: "Another designated 240-hour port I have verified", zoneCode: "other", group: "Manual confirmation" }
+];
+
 const addressCardPresets = {
   taxi: {
     requestEn: "Please take me to this address.",
@@ -363,6 +386,48 @@ function populateTransitZones(select) {
   select.replaceChildren(...options);
 }
 
+function populateTransitEntryPorts(select) {
+  if (!select) return;
+  const items = [];
+  const blank = document.createElement("option");
+  blank.value = "";
+  blank.textContent = "Choose entry port if known";
+  items.push(blank);
+
+  const grouped = new Map();
+  transitEntryPorts.forEach((port) => {
+    if (!grouped.has(port.group)) grouped.set(port.group, []);
+    grouped.get(port.group).push(port);
+  });
+
+  grouped.forEach((ports, groupName) => {
+    const group = document.createElement("optgroup");
+    group.label = groupName;
+    ports.forEach((port) => {
+      const option = document.createElement("option");
+      option.value = port.code;
+      option.textContent = port.name;
+      group.appendChild(option);
+    });
+    items.push(group);
+  });
+
+  select.replaceChildren(...items);
+}
+
+function transitEntryPort(code) {
+  return transitEntryPorts.find((port) => port.code === code) || null;
+}
+
+function renderTextList(list, items) {
+  if (!list) return;
+  list.replaceChildren(...items.map((item) => {
+    const li = document.createElement("li");
+    li.textContent = item;
+    return li;
+  }));
+}
+
 function renderStatus(container, result) {
   const pill = container.querySelector(".status-pill");
   const verdict = container.querySelector(".verdict");
@@ -376,8 +441,17 @@ function renderStatus(container, result) {
   pill.className = `status-pill ${statusTone(result.status)}`;
   verdict.textContent = result.headline;
   reason.textContent = result.reason;
-  nextSteps.innerHTML = result.steps.map((step) => `<li>${step}</li>`).join("");
-  facts.innerHTML = result.facts.map((fact) => `<div class="fact"><strong>${fact.value}</strong><span>${fact.label}</span></div>`).join("");
+  renderTextList(nextSteps, result.steps);
+  facts.replaceChildren(...result.facts.map((fact) => {
+    const card = document.createElement("div");
+    const value = document.createElement("strong");
+    const label = document.createElement("span");
+    card.className = "fact";
+    value.textContent = fact.value;
+    label.textContent = fact.label;
+    card.append(value, label);
+    return card;
+  }));
   source.textContent = result.source;
 }
 
@@ -502,7 +576,8 @@ function visitEligibility(country, purpose, stayDays, ordinaryPassport) {
 }
 
 function transitEligibility(input) {
-  const { country, purpose, hours, ordinaryPassport, onwardBooked, origin, destination, zoneCode, enteringEligiblePort, stayingInArea } = input;
+  const { country, purpose, hours, ordinaryPassport, onwardBooked, origin, destination, zoneCode, entryPortCode, enteringEligiblePort, stayingInArea } = input;
+  const selectedPort = transitEntryPort(entryPortCode);
 
   if (!country.transit) {
     return {
@@ -627,6 +702,7 @@ function transitEligibility(input) {
       facts: [
         { label: "Planned stay", value: `${formatNumber(hours, 1)} hours` },
         { label: "Policy limit", value: "240 hours" },
+        { label: "Entry port", value: selectedPort ? selectedPort.name : "Needs confirmation" },
         { label: "Route", value: `${routeName(origin)} → China → ${routeName(destination)}` }
       ],
       source: `Transit policy reviewed from NIA sources dated ${TRANSIT_POLICY_SOURCE_DATE} and ${TRANSIT_PORT_UPDATE_DATE}`
@@ -647,6 +723,7 @@ function transitEligibility(input) {
       facts: [
         { label: "Country", value: country.name },
         { label: "Stay window", value: `${formatNumber(hours, 1)} hours` },
+        { label: "Entry port", value: selectedPort ? selectedPort.name : "Needs confirmation" },
         { label: "Route", value: `${routeName(origin)} → China → ${routeName(destination)}` }
       ],
       source: `Transit policy reviewed from NIA sources dated ${TRANSIT_POLICY_SOURCE_DATE} and ${TRANSIT_PORT_UPDATE_DATE}`
@@ -666,6 +743,7 @@ function transitEligibility(input) {
     facts: [
       { label: "Country", value: country.name },
       { label: "Stay window", value: `${formatNumber(hours, 1)} hours` },
+      { label: "Entry port", value: selectedPort ? selectedPort.name : "Confirmed separately" },
       { label: "Route", value: `${routeName(origin)} → China → ${routeName(destination)}` }
     ],
     source: `Transit policy reviewed from NIA sources dated ${TRANSIT_POLICY_SOURCE_DATE} and ${TRANSIT_PORT_UPDATE_DATE}`
@@ -696,17 +774,19 @@ function transitScript(input, result) {
   const destination = routeName(input.destination) || "my onward destination after mainland China";
   const hours = input.hours && input.hours > 0 ? `${formatNumber(input.hours, 1)} hours` : "within the permitted time window";
   const countryName = input.country?.name || "my passport nationality";
+  const selectedPort = transitEntryPort(input.entryPortCode);
+  const portLine = selectedPort ? ` My first mainland entry port is ${selectedPort.name}.` : "";
 
   if (!input.country) {
     return "I am checking whether my route can use China's 240-hour visa-free transit policy. I will confirm nationality, origin, onward destination, entry port, stay area, and confirmed onward booking before relying on it.";
   }
 
   if (result.status === "Eligible") {
-    return `I am traveling on an ordinary ${countryName} passport from ${origin} to mainland China, then onward to ${destination}. My planned mainland stay is ${hours}. I have a confirmed onward departure and have checked that my entry port and stay area match the 240-hour transit requirements.`;
+    return `I am traveling on an ordinary ${countryName} passport from ${origin} to mainland China, then onward to ${destination}.${portLine} My planned mainland stay is ${hours}. I have a confirmed onward departure and have checked that my entry port and stay area match the 240-hour transit requirements.`;
   }
 
   if (result.status === "Check carefully") {
-    return `My route is ${origin} to mainland China, then onward to ${destination}, using a ${countryName} passport. The route may need extra verification: ${result.headline} I should confirm the onward booking, designated port, permitted stay area, and timing before check-in.`;
+    return `My route is ${origin} to mainland China, then onward to ${destination}, using a ${countryName} passport.${portLine} The route may need extra verification: ${result.headline} I should confirm the onward booking, designated port, permitted stay area, and timing before check-in.`;
   }
 
   return `This route should not be treated as confirmed 240-hour visa-free transit yet. The checker flagged: ${result.headline} I should verify another legal entry basis, adjust the itinerary, or plan for a visa before travel.`;
@@ -717,6 +797,8 @@ function transitRouteSummary(input, result) {
   const origin = routeName(input.origin) || "Not selected";
   const destination = routeName(input.destination) || "Not selected";
   const zone = transitZones.find((item) => item.code === input.zoneCode);
+  const selectedPort = transitEntryPort(input.entryPortCode);
+  const packet = transitEvidencePacket(input, result);
   const hours = input.hours && input.hours > 0 ? `${formatNumber(input.hours, 1)} hours` : "Not calculated";
   return [
     "China 240-hour transit route summary",
@@ -725,6 +807,7 @@ function transitRouteSummary(input, result) {
     `Route: ${origin} -> mainland China -> ${destination}`,
     `Mainland stay window: ${hours}`,
     `Planned transit area: ${zone ? zone.name : "Not selected"}`,
+    `First mainland entry port: ${selectedPort ? selectedPort.name : "Not selected"}`,
     "",
     "Traveler confirmations",
     `- Ordinary passport: ${input.ordinaryPassport ? "yes" : "no"}`,
@@ -739,11 +822,51 @@ function transitRouteSummary(input, result) {
     "Next steps",
     ...result.steps.map((step) => `- ${step}`),
     "",
+    "Route evidence packet",
+    ...packet.evidenceItems.map((item) => `- ${item}`),
+    "",
+    "Risk flags",
+    ...packet.riskFlags.map((item) => `- ${item}`),
+    "",
     "Airline check-in script",
     transitScript(input, result),
     "",
     `Transit policy reviewed from NIA sources dated ${TRANSIT_POLICY_SOURCE_DATE} and ${TRANSIT_PORT_UPDATE_DATE}`
   ].join("\n");
+}
+
+function transitEvidencePacket(input, result) {
+  const selectedPort = transitEntryPort(input.entryPortCode);
+  const origin = routeName(input.origin) || "origin before mainland China";
+  const destination = routeName(input.destination) || "onward destination after mainland China";
+  const zone = transitZones.find((item) => item.code === input.zoneCode);
+  const evidenceItems = [
+    `Passport used for check-in: ${input.country?.name || "select nationality"} ordinary passport.`,
+    `Itinerary shape: ${origin} -> mainland China -> ${destination}, with origin and onward destination kept as different countries or regions.`,
+    `Confirmed onward proof: ticket, ferry, train, or other departure arrangement to ${destination} within the permitted window.`,
+    `Entry port proof: ${selectedPort ? selectedPort.name : "confirm the exact first mainland entry port before relying on this route"}.`,
+    `Transit area proof: ${zone ? zone.name : "confirm the permitted stay region for the first mainland entry port"}.`,
+    "Hotel or address details for the mainland stay, plus return/onward eligibility documents for the next destination.",
+    "Screenshots or PDFs of the full itinerary, because airline staff may ask before issuing the boarding pass."
+  ];
+
+  const riskFlags = [];
+  if (!input.country) riskFlags.push("Nationality is not selected yet.");
+  if (input.country && !input.country.transit) riskFlags.push(`${input.country.name} is not covered by the modeled 240-hour transit list.`);
+  if (!input.ordinaryPassport) riskFlags.push("This tool assumes an ordinary passport; verify other travel document types manually.");
+  if (!allowedTransitPurposes.has(input.purpose)) riskFlags.push("Trip purpose is outside tourism, business, family/friend visit, or exchange visit.");
+  if (!thirdRegionSatisfied(input.origin, input.destination)) riskFlags.push("Origin and onward destination must be different countries or regions.");
+  if (!input.onwardBooked) riskFlags.push("Confirmed onward departure is missing.");
+  if (!input.hours || input.hours <= 0) riskFlags.push("Arrival and departure times are incomplete.");
+  if (input.hours > 240) riskFlags.push("Raw mainland stay is longer than 240 hours.");
+  if (!selectedPort && !input.enteringEligiblePort) riskFlags.push("First mainland entry port is not confirmed as a designated 240-hour port.");
+  if (selectedPort?.code === "other" && !input.enteringEligiblePort) riskFlags.push("Manual port selection still needs a checked confirmation.");
+  if (!input.stayingInArea) riskFlags.push("Permitted stay area is not confirmed.");
+  if (result.status === "Eligible" && !riskFlags.length) {
+    riskFlags.push("No major checker flags after your confirmations; still recheck airline, port, and official guidance if flights change.");
+  }
+
+  return { evidenceItems, riskFlags };
 }
 
 function formatList(items, locale = "en-US") {
@@ -1151,22 +1274,30 @@ function initTransitChecker() {
   const arrivalField = shell.querySelector(".arrival-field");
   const departureField = shell.querySelector(".departure-field");
   const zoneField = shell.querySelector(".zone-field");
+  const entryPortField = shell.querySelector(".entry-port-field");
   const onwardField = shell.querySelector(".onward-field");
   const portField = shell.querySelector(".port-field");
   const areaField = shell.querySelector(".area-field");
   const copyScriptButton = shell.querySelector(".copy-airline-script");
+  const copyEvidenceButton = shell.querySelector(".copy-evidence-packet");
   const downloadSummaryButton = shell.querySelector(".download-transit-summary");
   let summaryPayload = "";
+  let evidencePayload = "";
 
   populateCountrySelect(countryField, true);
   populateRouteSelect(originField, "Choose where the trip starts");
   populateRouteSelect(destinationField, "Choose the onward destination");
   populateTransitZones(zoneField);
+  populateTransitEntryPorts(entryPortField);
 
   function evaluate() {
     const country = countryMap.get(countryField?.value);
     const hours = hoursBetween(arrivalField?.value, departureField?.value);
-    const zone = transitZones.find((item) => item.code === zoneField?.value);
+    const selectedPort = transitEntryPort(entryPortField?.value);
+    if (selectedPort?.zoneCode && zoneField && !zoneField.value) {
+      zoneField.value = selectedPort.zoneCode;
+    }
+    const zone = transitZones.find((item) => item.code === zoneField?.value || item.code === selectedPort?.zoneCode);
 
     if (!country) {
       renderStatus(shell, {
@@ -1185,7 +1316,11 @@ function initTransitChecker() {
         source: `Transit policy reviewed from NIA sources dated ${TRANSIT_POLICY_SOURCE_DATE} and ${TRANSIT_PORT_UPDATE_DATE}`
       });
       summaryPayload = "";
+      evidencePayload = "";
+      renderTextList(shell.querySelector(".evidence-list"), ["Select nationality, route, timing, and entry port to build a route evidence packet."]);
+      renderTextList(shell.querySelector(".risk-flags"), ["Nationality is not selected yet."]);
       if (downloadSummaryButton) downloadSummaryButton.disabled = true;
+      if (copyEvidenceButton) copyEvidenceButton.disabled = true;
       return;
     }
 
@@ -1198,10 +1333,12 @@ function initTransitChecker() {
       origin: originField?.value || "",
       destination: destinationField?.value || "",
       zoneCode: zoneField?.value || "",
-      enteringEligiblePort: portField?.checked ?? false,
+      entryPortCode: entryPortField?.value || "",
+      enteringEligiblePort: (portField?.checked ?? false) || Boolean(selectedPort && selectedPort.code !== "other"),
       stayingInArea: areaField?.checked ?? false
     };
     const output = transitEligibility(transitInput);
+    const packet = transitEvidencePacket(transitInput, output);
 
     renderStatus(shell, output);
 
@@ -1210,20 +1347,38 @@ function initTransitChecker() {
       zoneNote.textContent = zone ? zone.note : "Pick a transit region to see the most useful reminder for your stay area.";
     }
 
+    const entryPortNote = shell.querySelector(".entry-port-note");
+    if (entryPortNote) {
+      entryPortNote.textContent = selectedPort
+        ? `${selectedPort.name} is mapped here to ${zone ? zone.name : "its listed transit region"}. Still confirm your exact itinerary before departure.`
+        : "Choose a common 240-hour port, or keep the manual confirmation if your port is not listed here.";
+    }
+
     const rawHours = shell.querySelector(".transit-hours-output");
     if (rawHours) {
       rawHours.textContent = hours && hours > 0 ? `${formatNumber(hours, 1)} hours in mainland China` : "Enter valid arrival and departure times";
     }
 
+    renderTextList(shell.querySelector(".evidence-list"), packet.evidenceItems);
+    renderTextList(shell.querySelector(".risk-flags"), packet.riskFlags);
+
     const airlineScript = shell.querySelector(".airline-script");
     if (airlineScript) {
       airlineScript.textContent = transitScript(transitInput, output);
     }
+    evidencePayload = [
+      "China 240-hour transit route evidence packet",
+      ...packet.evidenceItems.map((item) => `- ${item}`),
+      "",
+      "Risk flags",
+      ...packet.riskFlags.map((item) => `- ${item}`)
+    ].join("\n");
     summaryPayload = transitRouteSummary(transitInput, output);
     if (downloadSummaryButton) downloadSummaryButton.disabled = false;
+    if (copyEvidenceButton) copyEvidenceButton.disabled = false;
   }
 
-  [countryField, purposeField, ordinaryField, originField, destinationField, arrivalField, departureField, zoneField, onwardField, portField, areaField]
+  [countryField, purposeField, ordinaryField, originField, destinationField, arrivalField, departureField, zoneField, entryPortField, onwardField, portField, areaField]
     .filter(Boolean)
     .forEach((field) => {
       field.addEventListener("input", evaluate);
@@ -1237,6 +1392,15 @@ function initTransitChecker() {
     copyScriptButton.textContent = "Copied";
     setTimeout(() => {
       copyScriptButton.textContent = "Copy script";
+    }, 1200);
+  });
+
+  copyEvidenceButton?.addEventListener("click", async () => {
+    if (!evidencePayload) return;
+    await navigator.clipboard.writeText(evidencePayload);
+    copyEvidenceButton.textContent = "Copied";
+    setTimeout(() => {
+      copyEvidenceButton.textContent = "Copy evidence packet";
     }, 1200);
   });
 

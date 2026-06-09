@@ -519,6 +519,15 @@ textarea {
   gap: 8px;
 }
 
+.evidence-card {
+  display: grid;
+  gap: 12px;
+}
+
+.evidence-card .ghost-button {
+  justify-self: flex-start;
+}
+
 .arrival-sections {
   display: grid;
   gap: 12px;
