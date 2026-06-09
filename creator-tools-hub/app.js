@@ -1276,7 +1276,10 @@ function initLandingAuditChecklist() {
   ];
   const copy = document.getElementById("copyAuditPlan");
   const download = document.getElementById("downloadAuditPlan");
+  const copyRewrite = document.getElementById("copyRewriteBrief");
+  const downloadRewrite = document.getElementById("downloadRewriteBrief");
   let lastPlan = "";
+  let lastRewriteBrief = "";
 
   function blockerLabel(weakestId, score) {
     if (weakestId === "auditProof" || weakestId === "auditObjection") return "Trust gap";
@@ -1285,6 +1288,62 @@ function initLandingAuditChecklist() {
     if (weakestId === "auditMobile" || weakestId === "auditSpeed") return "Friction gap";
     if (weakestId === "auditSeo") return score >= 65 ? "Intent mismatch" : "Positioning gap";
     return "Conversion gap";
+  }
+
+  function buildRewriteBrief({ pageType, goal, audience, offerName, outcome, proofAsset, notes, blocker, readiness, score, sorted }) {
+    const weakestLabels = sorted.slice(0, 3).map((item) => item.label.toLowerCase());
+    const hero = `For ${audience}, ${offerName} helps you get ${outcome} without guessing what to fix first.`;
+    const cta = goal.toLowerCase().includes("book")
+      ? `Book a focused ${offerName} review`
+      : goal.toLowerCase().includes("join") || goal.toLowerCase().includes("wait")
+        ? `Join the ${offerName} waitlist`
+        : `Start with ${offerName}`;
+    const proof = weakestLabels.includes("proof and trust")
+      ? `Add ${proofAsset} directly under the hero before asking for the click.`
+      : `Keep ${proofAsset} near the CTA so the promise feels verifiable.`;
+    const objection = weakestLabels.includes("objection handling")
+      ? `Add a short block: "Not sure if this fits? It is best for ${pageType.toLowerCase()} teams that need ${outcome}; it is not for broad, open-ended redesigns."`
+      : `Add one expectation line after the CTA: "After you click, you will see the next step, timeline, and what we need from you."`;
+    const plan = [
+      `Rewrite the H1 to name ${audience} and the outcome in one sentence.`,
+      `Replace the primary CTA with "${cta}" and explain the next step below it.`,
+      proof,
+      objection,
+      `Remove or move anything above the fold that does not support ${goal}.`
+    ];
+
+    return {
+      hero,
+      cta,
+      proof,
+      objection,
+      plan,
+      status: score >= 82 ? "Ready to test" : score >= 65 ? "Rewrite the weak fold" : "Fix before traffic",
+      text: [
+        `${pageType} above-the-fold rewrite brief`,
+        `Score: ${score}/100`,
+        `Readiness: ${readiness}`,
+        `Likely blocker: ${blocker}`,
+        `Audience: ${audience}`,
+        `Goal: ${goal}`,
+        notes ? `Current concern: ${notes}` : "",
+        "",
+        "Hero formula:",
+        hero,
+        "",
+        "CTA rewrite:",
+        cta,
+        "",
+        "Proof to add:",
+        proof,
+        "",
+        "Objection block:",
+        objection,
+        "",
+        "30-minute fix plan:",
+        ...plan.map((item, index) => `${index + 1}. ${item}`)
+      ].filter(Boolean).join("\n")
+    };
   }
 
   function render() {
@@ -1300,9 +1359,14 @@ function initLandingAuditChecklist() {
     const weakest = sorted[0];
     const pageType = document.getElementById("auditPageType")?.value || "Landing page";
     const goal = document.getElementById("auditGoal")?.value.trim() || "primary conversion";
+    const audience = document.getElementById("auditAudience")?.value.trim() || "your target visitor";
+    const offerName = document.getElementById("auditOfferName")?.value.trim() || "this offer";
+    const outcome = document.getElementById("auditOutcome")?.value.trim() || "the promised result";
+    const proofAsset = document.getElementById("auditProofAsset")?.value.trim() || "examples, screenshots, testimonials, or process proof";
     const notes = document.getElementById("auditNotes")?.value.trim();
     const readiness = score >= 82 ? "Ready to send" : score >= 65 ? "Tighten before traffic" : "Needs a focused pass";
     const blocker = blockerLabel(weakest.id, score);
+    const rewrite = buildRewriteBrief({ pageType, goal, audience, offerName, outcome, proofAsset, notes, blocker, readiness, score, sorted });
 
     setText("auditScore", `${score}/100`);
     setText("auditReadiness", readiness);
@@ -1328,9 +1392,28 @@ function initLandingAuditChecklist() {
     setText("auditPriorityOne", sorted[0]?.fix || "Score the page to generate the first fix.");
     setText("auditPriorityTwo", sorted[1]?.fix || "Score the page to generate the second fix.");
     setText("auditPriorityThree", sorted[2]?.fix || "Score the page to generate the third fix.");
+    setText("auditRewriteStatus", rewrite.status);
+    setText("auditHeroRewrite", rewrite.hero);
+    setText("auditCtaRewrite", rewrite.cta);
+    setText("auditProofRewrite", rewrite.proof);
+    setText("auditObjectionRewrite", rewrite.objection);
+    const fixPlan = document.getElementById("auditFixPlan");
+    if (fixPlan) {
+      fixPlan.replaceChildren(...rewrite.plan.map((item) => {
+        const li = document.createElement("li");
+        li.textContent = item;
+        return li;
+      }));
+    }
+    const rewriteStatus = document.getElementById("auditRewriteStatus");
+    if (rewriteStatus) {
+      rewriteStatus.className = `badge ${score >= 82 ? "good" : score >= 65 ? "warn" : "bad"}`;
+    }
     lastPlan = [
       `${pageType} landing page audit`,
       `Primary goal: ${goal}`,
+      `Audience: ${audience}`,
+      `Offer: ${offerName}`,
       `Score: ${score}/100`,
       `Readiness: ${readiness}`,
       `Likely blocker: ${blocker}`,
@@ -1340,6 +1423,7 @@ function initLandingAuditChecklist() {
       "Next fixes:",
       ...topFixes
     ].filter(Boolean).join("\n");
+    lastRewriteBrief = rewrite.text;
   }
 
   shell.querySelectorAll("input, select, textarea").forEach((input) => {
@@ -1352,6 +1436,12 @@ function initLandingAuditChecklist() {
     setTimeout(() => (copy.textContent = "Copy audit plan"), 1200);
   });
   download?.addEventListener("click", () => downloadTextFile("landing-page-audit-plan.txt", lastPlan));
+  copyRewrite?.addEventListener("click", async () => {
+    await navigator.clipboard.writeText(lastRewriteBrief);
+    copyRewrite.textContent = "Copied brief";
+    setTimeout(() => (copyRewrite.textContent = "Copy rewrite brief"), 1200);
+  });
+  downloadRewrite?.addEventListener("click", () => downloadTextFile("landing-page-rewrite-brief.txt", lastRewriteBrief));
   render();
 }
 

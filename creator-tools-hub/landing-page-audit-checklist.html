@@ -64,6 +64,22 @@
                 <input id="auditGoal" value="Book a call or send an inquiry">
               </div>
               <div class="field">
+                <label for="auditAudience">Primary audience</label>
+                <input id="auditAudience" value="Busy founders who need a clearer service page">
+              </div>
+              <div class="field">
+                <label for="auditOfferName">Offer or product name</label>
+                <input id="auditOfferName" value="48-hour landing page sprint">
+              </div>
+              <div class="field">
+                <label for="auditOutcome">Promised outcome</label>
+                <input id="auditOutcome" value="a launch-ready page with clearer copy and CTA">
+              </div>
+              <div class="field">
+                <label for="auditProofAsset">Best available proof</label>
+                <input id="auditProofAsset" value="before/after examples, screenshots, or client notes">
+              </div>
+              <div class="field">
                 <label for="auditHero">Hero clarity</label>
                 <input id="auditHero" type="range" min="1" max="5" value="3">
               </div>
@@ -119,6 +135,44 @@
             <div class="status-list" id="auditRows"></div>
             <p class="inline-note" id="auditSummary">Rate the page to generate a focused punch list.</p>
           </aside>
+        </div>
+      </section>
+
+      <section class="section">
+        <div class="tool-shell">
+          <div class="tool-head">
+            <div>
+              <h2>Above-the-fold rewrite brief</h2>
+              <p>Use the scorecard inputs to generate the concrete first-screen edits a visitor will actually notice.</p>
+            </div>
+            <span id="auditRewriteStatus" class="badge warn">Draft rewrite</span>
+          </div>
+          <div class="rewrite-grid">
+            <article class="rewrite-card hero-rewrite-card">
+              <span class="label">Hero formula</span>
+              <strong id="auditHeroRewrite">Score the page to generate a sharper hero.</strong>
+            </article>
+            <article class="rewrite-card">
+              <span class="label">CTA rewrite</span>
+              <strong id="auditCtaRewrite">Score the page to generate a CTA.</strong>
+            </article>
+            <article class="rewrite-card">
+              <span class="label">Proof to add</span>
+              <strong id="auditProofRewrite">Score the page to identify the missing proof.</strong>
+            </article>
+            <article class="rewrite-card">
+              <span class="label">Objection block</span>
+              <strong id="auditObjectionRewrite">Score the page to generate an objection block.</strong>
+            </article>
+          </div>
+          <div class="fix-plan">
+            <h3>30-minute fix plan</h3>
+            <ol id="auditFixPlan"></ol>
+          </div>
+          <div class="actions">
+            <button type="button" id="copyRewriteBrief">Copy rewrite brief</button>
+            <button type="button" id="downloadRewriteBrief">Download rewrite brief</button>
+          </div>
         </div>
       </section>
 

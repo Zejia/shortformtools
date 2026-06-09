@@ -732,6 +732,50 @@ textarea {
   color: var(--muted);
 }
 
+.rewrite-grid {
+  display: grid;
+  grid-template-columns: 1.2fr repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  padding: 18px;
+}
+
+.rewrite-card {
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: oklch(99% 0.004 88);
+  padding: 15px;
+  display: grid;
+  gap: 8px;
+}
+
+.hero-rewrite-card {
+  background:
+    radial-gradient(circle at top right, oklch(91% 0.045 190 / 0.48), transparent 45%),
+    oklch(99% 0.004 88);
+}
+
+.rewrite-card strong {
+  line-height: 1.28;
+}
+
+.fix-plan {
+  margin: 0 18px 18px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--panel);
+  padding: 15px;
+}
+
+.fix-plan ol {
+  margin: 10px 0 0;
+  padding-left: 22px;
+  color: var(--muted);
+}
+
+.fix-plan li + li {
+  margin-top: 8px;
+}
+
 .faq {
   display: grid;
   gap: 10px;
@@ -1047,6 +1091,10 @@ summary {
   }
 
   .tool-list {
+    grid-template-columns: 1fr;
+  }
+
+  .rewrite-grid {
     grid-template-columns: 1fr;
   }
 
