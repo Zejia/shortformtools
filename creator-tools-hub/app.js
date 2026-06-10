@@ -1278,8 +1278,21 @@ function initLandingAuditChecklist() {
   const download = document.getElementById("downloadAuditPlan");
   const copyRewrite = document.getElementById("copyRewriteBrief");
   const downloadRewrite = document.getElementById("downloadRewriteBrief");
+  const copyHandoff = document.getElementById("copySprintHandoff");
+  const downloadHandoff = document.getElementById("downloadSprintHandoff");
   let lastPlan = "";
   let lastRewriteBrief = "";
+  let lastSprintHandoff = "";
+
+  function renderTextList(id, items) {
+    const list = document.getElementById(id);
+    if (!list) return;
+    list.replaceChildren(...items.map((item) => {
+      const li = document.createElement("li");
+      li.textContent = item;
+      return li;
+    }));
+  }
 
   function blockerLabel(weakestId, score) {
     if (weakestId === "auditProof" || weakestId === "auditObjection") return "Trust gap";
@@ -1346,6 +1359,78 @@ function initLandingAuditChecklist() {
     };
   }
 
+  function buildSprintHandoff({ pageType, goal, audience, offerName, outcome, proofAsset, notes, blocker, readiness, score, sorted, rewrite }) {
+    const weakestIds = new Set(sorted.slice(0, 3).map((item) => item.id));
+    const needsProof = weakestIds.has("auditProof") || weakestIds.has("auditObjection");
+    const needsClarity = weakestIds.has("auditHero") || weakestIds.has("auditOffer");
+    const needsFunnel = weakestIds.has("auditCta") || weakestIds.has("auditMobile") || weakestIds.has("auditSpeed");
+    const needsSeo = weakestIds.has("auditSeo");
+    const weakCount = sorted.filter((item) => item.score <= 2).length;
+    const packageName = needsSeo
+      ? "Toolkit sprint"
+      : score >= 82 && weakCount <= 1
+        ? "Starter sprint"
+        : needsProof || needsClarity || needsFunnel
+          ? "Growth sprint"
+          : "Starter sprint";
+    const fit = score >= 82
+      ? "Good sprint fit"
+      : score >= 65
+        ? "Good fit with risk notes"
+        : "Clarify before booking";
+    const reason = packageName === "Toolkit sprint"
+      ? "Search-intent weakness means the page may need supporting sections or SEO pages, not just a hero rewrite."
+      : packageName === "Growth sprint"
+        ? "The audit shows enough signal for a focused sprint, but the first screen needs a stronger copy/proof/CTA pass."
+        : "The page looks close enough that a narrow static-page sprint can focus on polish, proof placement, and launch readiness.";
+    const missing = [];
+    if (needsProof) missing.push(`Proof asset to use near the hero: ${proofAsset}.`);
+    if (needsClarity) missing.push(`One sharper offer sentence for ${offerName}.`);
+    if (needsFunnel) missing.push(`Confirmation of the primary CTA path: ${goal}.`);
+    if (needsSeo) missing.push("One primary search query or audience problem the page should match.");
+    if (!notes) missing.push("Short note on what feels weak or confusing today.");
+    if (!missing.length) missing.push("No major missing item from the audit; send the current URL and proof assets.");
+    const attachments = [
+      "Current page URL or draft link.",
+      `Best proof: ${proofAsset}.`,
+      "Logo, brand colors, screenshots, and any existing copy doc.",
+      "Traffic source or launch channel for the first test.",
+      "One competitor or reference page if there is a clear style target."
+    ];
+    const subject = `Landing Page Sprint: ${offerName} (${score}/100 audit)`;
+    const body = [
+      "Hi Shortform Tools,",
+      "",
+      `I ran the landing page audit and want to check whether this fits a ${packageName.toLowerCase()}.`,
+      "",
+      `Page type: ${pageType}`,
+      `Offer: ${offerName}`,
+      `Audience: ${audience}`,
+      `Goal: ${goal}`,
+      `Promised outcome: ${outcome}`,
+      `Audit score: ${score}/100`,
+      `Readiness: ${readiness}`,
+      `Likely blocker: ${blocker}`,
+      notes ? `Current concern: ${notes}` : "",
+      "",
+      "Suggested hero:",
+      rewrite.hero,
+      "",
+      "Suggested CTA:",
+      rewrite.cta,
+      "",
+      "Top fixes:",
+      ...sorted.slice(0, 3).map((item) => `- ${item.fix}`),
+      "",
+      "Missing before kickoff:",
+      ...missing.map((item) => `- ${item}`),
+      "",
+      "I can share the current page URL and proof assets before kickoff."
+    ].filter(Boolean).join("\n");
+
+    return { packageName, fit, reason, missing, attachments, subject, body };
+  }
+
   function render() {
     const scores = fields.map(([id, label, fix]) => ({
       id,
@@ -1367,6 +1452,7 @@ function initLandingAuditChecklist() {
     const readiness = score >= 82 ? "Ready to send" : score >= 65 ? "Tighten before traffic" : "Needs a focused pass";
     const blocker = blockerLabel(weakest.id, score);
     const rewrite = buildRewriteBrief({ pageType, goal, audience, offerName, outcome, proofAsset, notes, blocker, readiness, score, sorted });
+    const handoff = buildSprintHandoff({ pageType, goal, audience, offerName, outcome, proofAsset, notes, blocker, readiness, score, sorted, rewrite });
 
     setText("auditScore", `${score}/100`);
     setText("auditReadiness", readiness);
@@ -1383,9 +1469,16 @@ function initLandingAuditChecklist() {
 
     const rows = document.getElementById("auditRows");
     if (rows) {
-      rows.innerHTML = scores
-        .map((item) => `<div class="status-item"><span>${item.label}</span><strong>${item.score}/5</strong></div>`)
-        .join("");
+      rows.replaceChildren(...scores.map((item) => {
+        const row = document.createElement("div");
+        const label = document.createElement("span");
+        const value = document.createElement("strong");
+        row.className = "status-item";
+        label.textContent = item.label;
+        value.textContent = `${item.score}/5`;
+        row.append(label, value);
+        return row;
+      }));
     }
 
     const topFixes = sorted.slice(0, 4).map((item) => `- ${item.fix}`);
@@ -1409,6 +1502,22 @@ function initLandingAuditChecklist() {
     if (rewriteStatus) {
       rewriteStatus.className = `badge ${score >= 82 ? "good" : score >= 65 ? "warn" : "bad"}`;
     }
+    setText("auditSprintFit", handoff.fit);
+    setText("auditSprintPackage", handoff.packageName);
+    setText("auditSprintReason", handoff.reason);
+    setText("auditSprintSubject", handoff.subject);
+    setText("auditSprintBody", handoff.body);
+    renderTextList("auditSprintMissing", handoff.missing);
+    renderTextList("auditSprintAttachments", handoff.attachments);
+    const sprintFit = document.getElementById("auditSprintFit");
+    if (sprintFit) {
+      sprintFit.className = `badge ${score >= 82 ? "good" : score >= 65 ? "warn" : "bad"}`;
+    }
+    const mailto = document.getElementById("auditSprintMailto");
+    if (mailto) {
+      const compactBody = handoff.body.length > 1600 ? `${handoff.body.slice(0, 1550)}\n\n[Full handoff copied from the audit tool.]` : handoff.body;
+      mailto.setAttribute("href", `mailto:hello@shortformtools.com?subject=${encodeURIComponent(handoff.subject)}&body=${encodeURIComponent(compactBody)}`);
+    }
     lastPlan = [
       `${pageType} landing page audit`,
       `Primary goal: ${goal}`,
@@ -1424,6 +1533,16 @@ function initLandingAuditChecklist() {
       ...topFixes
     ].filter(Boolean).join("\n");
     lastRewriteBrief = rewrite.text;
+    lastSprintHandoff = [
+      "Landing page sprint inquiry handoff",
+      `Recommended scope: ${handoff.packageName}`,
+      `Fit: ${handoff.fit}`,
+      handoff.reason,
+      "",
+      `Subject: ${handoff.subject}`,
+      "",
+      handoff.body
+    ].join("\n");
   }
 
   shell.querySelectorAll("input, select, textarea").forEach((input) => {
@@ -1442,6 +1561,12 @@ function initLandingAuditChecklist() {
     setTimeout(() => (copyRewrite.textContent = "Copy rewrite brief"), 1200);
   });
   downloadRewrite?.addEventListener("click", () => downloadTextFile("landing-page-rewrite-brief.txt", lastRewriteBrief));
+  copyHandoff?.addEventListener("click", async () => {
+    await navigator.clipboard.writeText(lastSprintHandoff);
+    copyHandoff.textContent = "Copied handoff";
+    setTimeout(() => (copyHandoff.textContent = "Copy sprint handoff"), 1200);
+  });
+  downloadHandoff?.addEventListener("click", () => downloadTextFile("landing-page-sprint-handoff.txt", lastSprintHandoff));
   render();
 }
 

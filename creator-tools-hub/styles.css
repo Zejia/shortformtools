@@ -758,6 +758,64 @@ textarea {
   line-height: 1.28;
 }
 
+.handoff-grid {
+  display: grid;
+  grid-template-columns: 1.2fr repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  padding: 18px;
+  border-top: 1px solid var(--line);
+}
+
+.handoff-card {
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: oklch(99% 0.004 88);
+  padding: 15px;
+  display: grid;
+  gap: 8px;
+}
+
+.primary-handoff-card {
+  background:
+    radial-gradient(circle at top right, oklch(91% 0.045 190 / 0.5), transparent 45%),
+    oklch(99% 0.004 88);
+}
+
+.handoff-card strong {
+  line-height: 1.2;
+}
+
+.handoff-card p {
+  margin: 0;
+  color: var(--muted);
+}
+
+.handoff-card ul {
+  margin: 0;
+  padding-left: 18px;
+  color: var(--muted);
+}
+
+.handoff-card li + li {
+  margin-top: 8px;
+}
+
+.handoff-preview {
+  margin: 0 18px 18px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--panel);
+  padding: 15px;
+}
+
+.handoff-preview pre {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  margin: 10px 0 0;
+  color: var(--ink);
+  font: 0.92rem/1.55 "Manrope", sans-serif;
+}
+
 .fix-plan {
   margin: 0 18px 18px;
   border: 1px solid var(--line);
@@ -1150,6 +1208,10 @@ summary {
   }
 
   .rewrite-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .handoff-grid {
     grid-template-columns: 1fr;
   }
 
