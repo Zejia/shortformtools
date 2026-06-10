@@ -1032,6 +1032,8 @@ function readBundleInputs(overrides = {}) {
       : (overridePrice > 0 ? overridePrice : retailSubtotal * (1 - discountRate)),
     discountRate,
     overridePrice,
+    expectedLift: clamp(val("bundleExpectedLift"), 0, 1000),
+    targetMargin: clamp(val("bundleTargetMargin"), 0, 95),
     shippingCharged: val("bundleShippingCharged"),
     shippingCost: val("bundleShippingCost"),
     packagingCost: val("bundlePackagingCost"),
@@ -1107,6 +1109,28 @@ function findMaxBundleDiscount(inputs) {
   return low * 100;
 }
 
+function findBundlePriceForTargetMargin(inputs, targetMargin) {
+  let low = 0;
+  let high = Math.max(10, inputs.retailSubtotal * 2, inputs.productCost * 5 + inputs.shippingCost + 50);
+  for (let i = 0; i < 60; i += 1) {
+    const mid = (low + high) / 2;
+    const result = calculateBundle({ ...inputs, itemRevenue: mid });
+    if (result.margin >= targetMargin && result.profit >= 0) high = mid;
+    else low = mid;
+  }
+  return Math.ceil(high * 100) / 100;
+}
+
+function renderTextList(id, items) {
+  const list = byId(id);
+  if (!list) return;
+  list.replaceChildren(...items.map((item) => {
+    const li = document.createElement("li");
+    li.textContent = item;
+    return li;
+  }));
+}
+
 function bundleScenarioData(inputs) {
   return [
     ["Current bundle", inputs.itemRevenue, calculateBundle(inputs)],
@@ -1176,8 +1200,73 @@ function renderBundleInsights(inputs, result, breakEven, maxDiscount, baseline, 
   }
   notes.push(`Maximum break-even discount is about ${pct(maxDiscount)} before the bundle turns unprofitable under these assumptions.`);
 
-  const list = byId("bundleInsights");
-  if (list) list.innerHTML = notes.map((item) => `<li>${item}</li>`).join("");
+  renderTextList("bundleInsights", notes);
+}
+
+function bundleDecisionPlan(inputs, result, baseline, targetPrice, fmt) {
+  const profitDelta = result.profit - baseline.profit;
+  const liftNeeded = result.profit > 0 && baseline.profit > 0
+    ? Math.max(0, (baseline.profit / result.profit - 1) * 100)
+    : Infinity;
+  const liftGap = Number.isFinite(liftNeeded) ? inputs.expectedLift - liftNeeded : -Infinity;
+  const marginGap = result.margin - inputs.targetMargin;
+  const priceMove = Math.max(0, targetPrice - result.itemRevenue);
+  let label = "Test carefully";
+  let tone = "warn";
+  let detail = "The bundle needs a measured conversion lift before becoming the default offer.";
+
+  if (result.profit <= 0) {
+    label = "Do not promote yet";
+    tone = "bad";
+    detail = "The bundle is not profitable under the current fee and cost assumptions.";
+  } else if (marginGap < 0 && liftGap < 0) {
+    label = "Raise price first";
+    tone = "bad";
+    detail = "The bundle misses target margin and the expected lift does not offset the retail-profit tradeoff.";
+  } else if (liftGap >= 0 && marginGap >= 0) {
+    label = "Safe to test";
+    tone = "good";
+    detail = "Expected order lift clears the full-retail tradeoff and the bundle protects the selected target margin.";
+  } else if (liftGap >= 0) {
+    label = "Test with guardrail";
+    tone = "warn";
+    detail = "Expected lift can justify the discount, but the margin target still needs monitoring.";
+  }
+
+  const reasons = [];
+  if (profitDelta < 0) {
+    reasons.push(`Each bundle earns ${fmt.format(Math.abs(profitDelta))} less than selling the same basket at full retail.`);
+  } else {
+    reasons.push(`Each bundle earns ${fmt.format(profitDelta)} more than the full-retail basket under current assumptions.`);
+  }
+  if (Number.isFinite(liftNeeded)) {
+    reasons.push(`The bundle needs about ${pct(liftNeeded)} more orders to match full-retail profit; expected lift is ${pct(inputs.expectedLift)}.`);
+  } else {
+    reasons.push("No realistic lift can fix this until bundle profit is positive.");
+  }
+  reasons.push(`Current margin is ${pct(result.margin)} vs a ${pct(inputs.targetMargin)} target.`);
+  if (priceMove > 0) {
+    reasons.push(`Estimated target-margin price is ${fmt.format(targetPrice)}, about ${fmt.format(priceMove)} above the current bundle price.`);
+  }
+
+  const tests = [];
+  if (result.profit <= 0) {
+    tests.push("Raise price, reduce item cost, or reduce shipping/packaging before buying traffic.");
+  } else if (priceMove > 0) {
+    tests.push(`Test a bundle price near ${fmt.format(targetPrice)} or reduce the discount until margin clears the target.`);
+  } else {
+    tests.push("Run the bundle as a measured listing test and compare conversion rate against the full-retail basket.");
+  }
+  if (profitDelta < 0) {
+    tests.push("Track whether the bundle increases orders enough to beat the full-retail profit baseline.");
+  }
+  if (inputs.offsiteRate > 0 || inputs.adSpend > 0) {
+    tests.push("Keep a separate ad-stress version because paid traffic changes the bundle threshold.");
+  } else {
+    tests.push("Before advertising, re-run with 12-15% Offsite Ads or Etsy Ads spend per order.");
+  }
+
+  return { label, tone, detail, profitDelta, liftNeeded, liftGap, marginGap, priceMove, targetPrice, reasons, tests };
 }
 
 function exportBundleCsv(inputs, result, breakEven, maxDiscount) {
@@ -1209,6 +1298,8 @@ function calculateBundleAndRender() {
   const baseline = calculateBundle({ ...inputs, itemRevenue: inputs.retailSubtotal });
   const breakEven = findBundleBreakEven(inputs);
   const maxDiscount = findMaxBundleDiscount(inputs);
+  const targetPrice = findBundlePriceForTargetMargin(inputs, inputs.targetMargin);
+  const decision = bundleDecisionPlan(inputs, result, baseline, targetPrice, fmt);
   const [status, tone] = health(result);
 
   text("currencyLabel", inputs.preset.currency);
@@ -1231,12 +1322,27 @@ function calculateBundleAndRender() {
   text("bundleFormulaLine", `Bundle profit = ${fmt.format(result.sellerRevenue)} seller revenue - ${fmt.format(result.platformFees)} Etsy/payment fees - ${fmt.format(result.operatingCost)} product, shipping, labor, packaging and ad cost = ${fmt.format(result.profit)}.`);
   renderBundleRows(inputs, fmt);
   renderBundleInsights(inputs, result, breakEven, maxDiscount, baseline, fmt);
+  text("bundleDecisionLabel", decision.label);
+  text("bundleDecisionDetail", decision.detail);
+  text("bundleLiftNeeded", Number.isFinite(decision.liftNeeded) ? pct(decision.liftNeeded) : "No lift fixes this");
+  text("bundleLiftVerdict", Number.isFinite(decision.liftNeeded)
+    ? `${pct(inputs.expectedLift)} expected lift is ${decision.liftGap >= 0 ? "above" : "below"} the needed lift.`
+    : "Profit must be positive before lift matters.");
+  text("bundleTargetGap", `${decision.marginGap >= 0 ? "+" : ""}${pct(decision.marginGap)}`);
+  text("bundlePriceMove", decision.priceMove > 0 ? `Raise bundle price about ${fmt.format(decision.priceMove)} to hit target.` : "Current price clears the target margin.");
+  text("bundleRetailTradeoff", `${decision.profitDelta >= 0 ? "+" : "-"}${fmt.format(Math.abs(decision.profitDelta))}`);
+  const decisionCard = byId("bundleDecisionCard");
+  if (decisionCard) decisionCard.dataset.tone = decision.tone;
+  renderTextList("bundleDecisionReasons", decision.reasons);
+  renderTextList("bundleNextTests", decision.tests);
 
   window.currentBundleReport = {
     inputs,
     result,
     breakEven,
     maxDiscount,
+    targetPrice,
+    decision,
     csv: exportBundleCsv(inputs, result, breakEven, maxDiscount),
     scenarios: bundleScenarioExports(inputs, fmt),
     fmtCurrency: inputs.preset.currency
@@ -1320,6 +1426,33 @@ Max break-even discount: ${pct(report.maxDiscount)}`;
     await navigator.clipboard.writeText(summary);
     text("copyBundleSummary", "Copied");
     setTimeout(() => text("copyBundleSummary", "Copy bundle plan"), 1200);
+  });
+
+  byId("copyBundleDecision")?.addEventListener("click", async () => {
+    const report = window.currentBundleReport;
+    if (!report) return;
+    const fmt = currencyFormatter(report.fmtCurrency);
+    const decision = report.decision;
+    const brief = [
+      "Etsy bundle lift decision",
+      `Decision: ${decision.label}`,
+      `Bundle price: ${fmt.format(report.result.itemRevenue)}`,
+      `Bundle profit: ${fmt.format(report.result.profit)}`,
+      `Margin: ${pct(report.result.margin)}`,
+      `Expected order lift: ${pct(report.inputs.expectedLift)}`,
+      `Lift needed to match full retail: ${Number.isFinite(decision.liftNeeded) ? pct(decision.liftNeeded) : "No lift fixes negative profit"}`,
+      `Target-margin price: ${fmt.format(report.targetPrice)}`,
+      `Retail profit tradeoff: ${decision.profitDelta >= 0 ? "+" : "-"}${fmt.format(Math.abs(decision.profitDelta))}`,
+      "",
+      "Reasons:",
+      ...decision.reasons.map((item) => `- ${item}`),
+      "",
+      "Next tests:",
+      ...decision.tests.map((item) => `- ${item}`)
+    ].join("\n");
+    await navigator.clipboard.writeText(brief);
+    text("copyBundleDecision", "Copied");
+    setTimeout(() => text("copyBundleDecision", "Copy decision brief"), 1200);
   });
 
   byId("downloadBundleCsv")?.addEventListener("click", () => {
