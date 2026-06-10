@@ -1635,6 +1635,92 @@ function initSprintBriefBuilder() {
         : recommendedTier === "Custom scope"
           ? "Use custom scoping before a fixed package."
           : "Use Starter when the offer is clear and the main need is a sharper one-page build.";
+    const pageShape = scope === "seo"
+      ? "Landing page + support cluster"
+      : scope === "tool"
+        ? "Interactive landing page"
+        : scope === "copy"
+          ? "Long-form proof page"
+          : scope === "custom"
+            ? "Scope-first product page"
+            : traffic === "Paid ads"
+              ? "Short paid-traffic page"
+              : "Focused landing page";
+    const sectionCount = pageShape === "Landing page + support cluster"
+      ? "1 page + 3 support pages"
+      : pageShape === "Interactive landing page"
+        ? "6-8 sections + tool"
+        : pageShape === "Short paid-traffic page"
+          ? "4-6 sections"
+          : pageShape === "Long-form proof page"
+            ? "7-9 sections"
+            : "5-7 sections";
+    const depthNeed = scope === "tool"
+      ? "Mini-tool required"
+      : traffic === "Paid ads" || proof === "none"
+        ? "Proof-critical"
+        : scope === "seo"
+          ? "Search-depth required"
+          : "Proof-light";
+    const pageShapeReason = pageShape === "Landing page + support cluster"
+      ? "Search traffic usually needs the main offer page plus supporting intent pages, not only a single sales page."
+      : pageShape === "Interactive landing page"
+        ? "The conversion hook depends on a calculator, quiz, checker, or brief builder that makes the page useful before the CTA."
+        : pageShape === "Short paid-traffic page"
+          ? "Paid traffic should reach the promise, proof, and action quickly without a long discovery path."
+          : pageShape === "Long-form proof page"
+            ? "Copy and structure are the bottleneck, so the page needs enough room for proof, objections, and comparison."
+            : pageShape === "Scope-first product page"
+              ? "The requested work may include app/CMS/backend scope that should be confirmed before a fixed 48-hour page."
+              : "A clear one-page structure is enough if the offer, audience, and action are already known.";
+    const sectionBlueprint = pageShape === "Landing page + support cluster"
+      ? [
+          "Main offer page: hero, proof, offer, CTA, FAQ, and next step.",
+          "Support page 1: problem/search-intent explainer for the highest-intent query.",
+          "Support page 2: checklist, calculator, or examples page that earns internal links.",
+          "Support page 3: comparison, methodology, or use-case page that handles objections."
+        ]
+      : pageShape === "Interactive landing page"
+        ? [
+            "Hero with the promised outcome and who the tool/page is for.",
+            "Interactive calculator, quiz, checker, or brief builder above the fold or immediately after it.",
+            "Result explanation that turns the output into a recommended next action.",
+            "Proof, examples, or process notes that make the recommendation believable.",
+            "Primary CTA with clear next-step expectations.",
+            "FAQ and scope boundaries."
+          ]
+        : pageShape === "Short paid-traffic page"
+          ? [
+              "Hero with one promise, one audience, and one CTA.",
+              "Fast proof block near the CTA.",
+              "Offer details and what happens after the click.",
+              "Objection block for price, trust, or timing.",
+              "Final CTA and lightweight FAQ."
+            ]
+          : pageShape === "Long-form proof page"
+            ? [
+                "Hero and outcome promise.",
+                "Problem framing and why the current option is not working.",
+                "Offer structure and deliverables.",
+                "Proof, examples, screenshots, or process detail.",
+                "Comparison or objection handling.",
+                "CTA with timeline and next steps.",
+                "FAQ and trust details."
+              ]
+            : [
+                "Hero with audience, promise, and CTA.",
+                "Offer details and deliverables.",
+                "Proof or credibility block.",
+                "Simple process or timeline.",
+                "Objection/FAQ block.",
+                "Final CTA."
+              ];
+    const scopeBoundary = [
+      isOutOfScope ? "Confirm CMS, account, payment, dashboard, or backend needs before pricing this as a sprint." : "Keep the first sprint to one primary page outcome.",
+      scope === "tool" ? "Define the mini-tool inputs, outputs, and edge cases before visual polish." : "Avoid adding app-like flows unless they directly support the page CTA.",
+      scope === "seo" ? "Pick the supporting page topics before build starts." : "Defer extra SEO pages unless search traffic is the first launch channel.",
+      proof === "none" ? "Use placeholders or process proof if testimonials/screenshots are not ready." : "Put the strongest proof close to the first CTA."
+    ];
     const actionPlan = [
       scope === "copy" ? "Rewrite hero, offer stack, CTA, and proof sequence before polishing visual layout." : "Lock the one-page structure around audience, promise, proof, and CTA.",
       scope === "tool" ? "Define the mini tool or quiz inputs, outputs, and edge cases before design polish." : "Build the first mobile-ready static draft around the primary action.",
@@ -1667,6 +1753,18 @@ function initSprintBriefBuilder() {
     setText("sprintRiskSummary", risks.length ? risks.join(" ") : "No major scope risk from the current brief.");
     setText("sprintPackageReason", recommendedTier);
     setText("sprintPackageNote", packageNote);
+    setText("sprintPageShape", pageShape);
+    setText("sprintPageShapeReason", pageShapeReason);
+    setText("sprintSectionCount", sectionCount);
+    setText("sprintSectionCountReason", `Recommended for ${decision.toLowerCase()} from ${traffic.toLowerCase()}.`);
+    setText("sprintDepthNeed", depthNeed);
+    setText("sprintDepthReason", scope === "tool"
+      ? "The page should include the interactive element as the value hook, not just describe it."
+      : scope === "seo"
+        ? "The sprint should include supporting search-intent pages if discovery is the bottleneck."
+        : proof === "none"
+          ? "The page needs a proof-light structure until real examples or screenshots exist."
+          : "A concise proof block should be enough for the current scope.");
     const actionPlanNode = document.getElementById("sprintActionPlan");
     if (actionPlanNode) {
       actionPlanNode.replaceChildren(...actionPlan.map((item) => {
@@ -1678,6 +1776,22 @@ function initSprintBriefBuilder() {
     const sendListNode = document.getElementById("sprintSendList");
     if (sendListNode) {
       sendListNode.replaceChildren(...sendList.map((item) => {
+        const li = document.createElement("li");
+        li.textContent = item;
+        return li;
+      }));
+    }
+    const sectionBlueprintNode = document.getElementById("sprintSectionBlueprint");
+    if (sectionBlueprintNode) {
+      sectionBlueprintNode.replaceChildren(...sectionBlueprint.map((item) => {
+        const li = document.createElement("li");
+        li.textContent = item;
+        return li;
+      }));
+    }
+    const scopeBoundaryNode = document.getElementById("sprintScopeBoundary");
+    if (scopeBoundaryNode) {
+      scopeBoundaryNode.replaceChildren(...scopeBoundary.map((item) => {
         const li = document.createElement("li");
         li.textContent = item;
         return li;
@@ -1697,6 +1811,9 @@ function initSprintBriefBuilder() {
       `Likely tier: ${recommendedTier}`,
       `Fit check: ${fitLabel}`,
       `Scope verdict: ${scopeVerdict}`,
+      `Recommended page shape: ${pageShape}`,
+      `Section count: ${sectionCount}`,
+      `Proof/tool depth: ${depthNeed}`,
       risks.length ? `Risk flags: ${risks.join(" | ")}` : "Risk flags: None from current brief",
       "",
       "Assets or links ready:",
@@ -1710,6 +1827,12 @@ function initSprintBriefBuilder() {
       "",
       "48-hour sprint plan:",
       ...actionPlan.map((item, index) => `${index + 1}. ${item}`),
+      "",
+      "Recommended section blueprint:",
+      ...sectionBlueprint.map((item, index) => `${index + 1}. ${item}`),
+      "",
+      "Scope boundary:",
+      ...scopeBoundary.map((item) => `- ${item}`),
       "",
       "Send before kickoff:",
       ...sendList.map((item) => `- ${item}`),
