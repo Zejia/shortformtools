@@ -3,16 +3,19 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Landed Cost Calculator: Per-Unit Import Cost Planner</title>
-    <meta name="description" content="Calculate total landed cost and per-unit import cost with duty, VAT, brokerage, freight, insurance, and low-value threshold modeling.">
+    <title>Landed Cost Calculator for Imports: Per-Unit Cost, Duty, VAT and Freight</title>
+    <meta name="description" content="Use this landed cost calculator for imports to estimate per-unit cost, duty, VAT, freight, brokerage, target resale price, and quote or reorder readiness before a PO.">
     <meta name="google-adsense-account" content="ca-pub-4259477754165351">
     <link rel="canonical" href="https://crossborderkit.com/landed-cost-calculator.html">
-    <meta property="og:title" content="Landed Cost Calculator">
-    <meta property="og:description" content="Model total landed cost and per-unit economics before you quote or replenish imported inventory.">
+    <meta property="og:title" content="Landed Cost Calculator for Imports">
+    <meta property="og:description" content="Estimate per-unit landed cost with duty, VAT, freight, brokerage, threshold logic, and quote readiness before you replenish imported inventory.">
     <meta property="og:type" content="article">
     <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
     <link rel="manifest" href="site.webmanifest">
     <link rel="stylesheet" href="styles.css">
+    <script type="application/ld+json">{"@context":"https://schema.org","@type":"WebPage","name":"Landed Cost Calculator for Imports","url":"https://crossborderkit.com/landed-cost-calculator.html","description":"Estimate total landed cost and per-unit import cost with duty, VAT, freight, insurance, brokerage, low-value threshold logic, and a quote or reorder decision packet.","dateModified":"2026-06-11","isPartOf":{"@type":"WebSite","name":"Import Duty Toolkit","url":"https://crossborderkit.com/"}}</script>
+    <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Import Duty Toolkit","item":"https://crossborderkit.com/"},{"@type":"ListItem","position":2,"name":"Landed Cost Calculator","item":"https://crossborderkit.com/landed-cost-calculator.html"}]}</script>
+    <script type="application/ld+json">{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[{"@type":"Question","name":"What is included in landed cost?","acceptedAnswer":{"@type":"Answer","text":"Landed cost usually includes product value, freight, insurance, duty, import tax or VAT, brokerage, and other shipment-level charges such as compliance or admin fees."}},{"@type":"Question","name":"Why is landed cost different from import duty?","acceptedAnswer":{"@type":"Answer","text":"Import duty is only one part of the total import bill. Landed cost adds the other costs that still affect the final per-unit economics, including freight, tax, brokerage, and buffers."}},{"@type":"Question","name":"When should I use a landed cost calculator instead of a duty calculator?","acceptedAnswer":{"@type":"Answer","text":"Use a duty calculator when the tariff treatment is the main question. Use a landed cost calculator when you need to quote a selling price, compare shipment scenarios, or understand the real per-unit cost after all import friction."}},{"@type":"Question","name":"How do I know whether a landed cost is quote-ready?","acceptedAnswer":{"@type":"Answer","text":"A landed cost is quote-ready when the resale price clears the target margin after landed and channel costs, and the HS code, duty basis, incoterm, tax base, and broker fee assumptions are confirmed enough for the decision."}},{"@type":"Question","name":"Can low-value threshold relief remove both duty and tax?","acceptedAnswer":{"@type":"Answer","text":"Sometimes, but not always. Some markets waive duty only while still collecting VAT or tax, so the calculator keeps threshold treatment visible instead of assuming one universal rule."}}]}</script>
   </head>
   <body>
     <header class="site-header">
@@ -122,6 +125,37 @@
                   <input id="thresholdLanded" data-field="threshold" type="number" min="0" step="0.01" value="150">
                 </div>
                 <label class="check-row span-2"><input data-field="useDeMinimis" type="checkbox" checked> <span>Apply low-value relief when eligible</span></label>
+                <p class="group-title">Quote and reorder decision</p>
+                <div class="field">
+                  <label for="quotedSalePriceLanded">Quoted resale price per unit</label>
+                  <input id="quotedSalePriceLanded" data-field="quotedSalePrice" type="number" min="0" step="0.01" value="14.99">
+                </div>
+                <div class="field">
+                  <label for="channelCostLanded">Channel / fulfillment cost per unit</label>
+                  <input id="channelCostLanded" data-field="channelCost" type="number" min="0" step="0.01" value="1.25">
+                </div>
+                <div class="field">
+                  <label for="targetMarginLanded">Target gross margin %</label>
+                  <input id="targetMarginLanded" data-field="targetMargin" type="number" min="0" max="80" step="0.1" value="30">
+                </div>
+                <div class="field">
+                  <label for="hsConfidenceLanded">HS classification confidence</label>
+                  <select id="hsConfidenceLanded" data-field="hsConfidence">
+                    <option value="confirmed">Confirmed by broker or ruling</option>
+                    <option value="likely" selected>Likely, not broker-confirmed</option>
+                    <option value="uncertain">Uncertain</option>
+                  </select>
+                </div>
+                <div class="field">
+                  <label for="incotermLanded">Commercial term</label>
+                  <select id="incotermLanded" data-field="incoterm">
+                    <option value="EXW">EXW / buyer controls freight</option>
+                    <option value="FOB" selected>FOB / freight separate</option>
+                    <option value="CIF">CIF / freight in quote</option>
+                    <option value="DDP">DDP / supplier quotes delivered</option>
+                  </select>
+                </div>
+                <label class="check-row"><input data-field="brokerReviewNeeded" type="checkbox"> <span>Broker review required before PO</span></label>
               </div>
 
               <details class="details-block">
@@ -169,10 +203,22 @@
                 <p class="list-copy">FX buffer modeled separately: <span data-output="bufferCost"></span></p>
               </div>
               <div class="formula-line" data-output="formulaLine"></div>
+              <div class="result-card">
+                <span class="label">Quote / reorder decision</span>
+                <strong data-output="landedDecision">-</strong>
+                <p class="list-copy" data-output="landedDecisionReason"></p>
+              </div>
+              <div class="kpi-grid compact">
+                <div class="kpi"><span>Profit per unit</span><strong data-output="decisionProfitPerUnit">-</strong></div>
+                <div class="kpi"><span>Margin at quote</span><strong data-output="decisionGrossMargin">-</strong></div>
+                <div class="kpi"><span>Target resale price</span><strong data-output="decisionTargetPrice">-</strong></div>
+                <div class="kpi"><span>Margin gap</span><strong data-output="decisionMarginGap">-</strong></div>
+              </div>
               <div class="hero-actions">
                 <button type="button" data-output="copySummary">Copy summary</button>
                 <button type="button" data-output="downloadCsv">Download CSV</button>
                 <button type="button" data-output="saveScenario">Save scenario</button>
+                <button type="button" data-output="copyDecisionPacket">Copy decision packet</button>
                 <a class="button ghost" href="hs-code-lookup-guide.html">HS brief</a>
               </div>
             </aside>
@@ -204,6 +250,16 @@
             <div class="content-panel">
               <h3>Operational readout</h3>
               <ul class="insights-list" data-output="insights"></ul>
+            </div>
+            <div class="content-panel">
+              <h3>Broker questions before quote or PO</h3>
+              <p>Use these prompts when the landed number is close enough to act on, but the filing assumptions still need a human check.</p>
+              <ul class="checklist" data-output="brokerQuestions"></ul>
+            </div>
+            <div class="content-panel">
+              <h3>PO / reorder checklist</h3>
+              <p>This turns the calculation into a short operating packet for a buyer, broker, or finance reviewer.</p>
+              <ul class="checklist" data-output="reorderChecklist"></ul>
             </div>
             <div class="content-panel">
               <h3>Saved scenarios</h3>
