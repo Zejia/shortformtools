@@ -130,6 +130,17 @@ function setText(scope, name, value) {
   if (node) node.textContent = value;
 }
 
+function renderTextList(list, items) {
+  if (!list) return;
+  list.replaceChildren(
+    ...items.map((item) => {
+      const li = document.createElement("li");
+      li.textContent = item;
+      return li;
+    })
+  );
+}
+
 function currentPreset(scope) {
   const key = byField(scope, "market")?.value || "US";
   return marketPresets[key] || marketPresets.US;
@@ -303,6 +314,174 @@ function buildInsights(inputs, result) {
   return items;
 }
 
+function readLandedDecisionInputs(scope) {
+  return {
+    ...readToolInputs(scope),
+    quotedSalePrice: safeNumber(byField(scope, "quotedSalePrice")?.value),
+    channelCost: safeNumber(byField(scope, "channelCost")?.value),
+    targetMargin: safeNumber(byField(scope, "targetMargin")?.value) / 100,
+    hsConfidence: byField(scope, "hsConfidence")?.value || "likely",
+    incoterm: byField(scope, "incoterm")?.value || "FOB",
+    brokerReviewNeeded: Boolean(byField(scope, "brokerReviewNeeded")?.checked)
+  };
+}
+
+function calculateLandedDecision(inputs, result) {
+  const salePrice = inputs.quotedSalePrice;
+  const loadedUnitCost = result.perUnit + inputs.channelCost;
+  const profitPerUnit = salePrice - loadedUnitCost;
+  const grossMargin = salePrice > 0 ? (profitPerUnit / salePrice) * 100 : 0;
+  const targetMarginPercent = inputs.targetMargin * 100;
+  const marginGap = grossMargin - targetMarginPercent;
+  const denominator = 1 - inputs.targetMargin;
+  const targetPrice = denominator > 0 ? loadedUnitCost / denominator : Infinity;
+  const needsBrokerReview =
+    inputs.brokerReviewNeeded ||
+    inputs.hsConfidence === "uncertain" ||
+    (inputs.hsConfidence === "likely" && (inputs.dutyRate >= 0.08 || result.upliftPercent >= 30));
+
+  if (salePrice <= 0) {
+    return {
+      status: "Set resale price",
+      tone: "warn",
+      reason: "Enter a quoted resale price to turn the landed-cost result into a quote or reorder decision.",
+      profitPerUnit,
+      grossMargin,
+      targetPrice,
+      marginGap
+    };
+  }
+
+  if (profitPerUnit < 0) {
+    return {
+      status: "Do not reorder yet",
+      tone: "bad",
+      reason: `The current quote loses ${formatCurrency(Math.abs(profitPerUnit), inputs.currency)} per unit after landed cost and channel cost.`,
+      profitPerUnit,
+      grossMargin,
+      targetPrice,
+      marginGap
+    };
+  }
+
+  if (needsBrokerReview) {
+    return {
+      status: "Broker review first",
+      tone: "warn",
+      reason: "The economics may work, but HS confidence, duty exposure, or an explicit review flag makes customs validation the next gate before quoting or signing a PO.",
+      profitPerUnit,
+      grossMargin,
+      targetPrice,
+      marginGap
+    };
+  }
+
+  if (grossMargin + 0.01 < targetMarginPercent) {
+    return {
+      status: "Raise price or renegotiate",
+      tone: "warn",
+      reason: `The quote is ${formatPercent(Math.abs(marginGap))} below the target margin. A target-margin resale price is about ${formatCurrency(targetPrice, inputs.currency)}.`,
+      profitPerUnit,
+      grossMargin,
+      targetPrice,
+      marginGap
+    };
+  }
+
+  if (result.upliftPercent >= 40) {
+    return {
+      status: "Quote-ready, freight-sensitive",
+      tone: "warn",
+      reason: "The quote clears target margin, but import overhead is high enough that freight or rate movement should be reconfirmed before PO approval.",
+      profitPerUnit,
+      grossMargin,
+      targetPrice,
+      marginGap
+    };
+  }
+
+  return {
+    status: "Quote-ready",
+    tone: "good",
+    reason: `The quote clears the ${formatPercent(targetMarginPercent)} target margin with ${formatCurrency(profitPerUnit, inputs.currency)} profit per unit after landed and channel costs.`,
+    profitPerUnit,
+    grossMargin,
+    targetPrice,
+    marginGap
+  };
+}
+
+function buildBrokerQuestions(inputs, result, decision) {
+  const questions = [];
+  if (inputs.hsConfidence !== "confirmed") {
+    questions.push("Confirm the HS code, duty rate, and any trade-remedy exposure before using this number in a customer quote.");
+  }
+  if (inputs.incoterm === "CIF" || inputs.incoterm === "DDP") {
+    questions.push(`Check whether the ${inputs.incoterm} quote already includes freight, insurance, duty, tax, or clearance charges so costs are not double-counted.`);
+  } else {
+    questions.push(`Confirm how ${inputs.incoterm} changes the duty base and which freight or insurance charges must be added to customs value.`);
+  }
+  if (inputs.taxRate > 0) {
+    questions.push("Ask whether VAT or import tax is calculated on customs value alone, customs value plus duty, or a broader landed base.");
+  }
+  if (result.thresholdEligible) {
+    questions.push("Verify the low-value relief treatment with a broker before relying on waived duty or tax in pricing.");
+  }
+  if (decision.marginGap < 5) {
+    questions.push("Ask the broker and forwarder for the fee lines most likely to move before shipment, because the margin cushion is narrow.");
+  }
+  if (!questions.length) {
+    questions.push("Save the current assumptions and ask the broker to confirm rate, basis, and fee treatment before the next reorder cycle.");
+  }
+  return questions;
+}
+
+function buildReorderChecklist(inputs, result, decision) {
+  const checklist = [
+    `Quote or reorder status: ${decision.status}.`,
+    `Use ${formatCurrency(result.perUnit, inputs.currency)} as the landed-cost floor before channel costs.`,
+    `Protect at least ${formatCurrency(Number.isFinite(decision.targetPrice) ? decision.targetPrice : 0, inputs.currency)} resale price to hit the target margin.`
+  ];
+
+  if (decision.tone === "bad") {
+    checklist.push("Do not approve the PO until resale price, supplier cost, freight, or channel cost changes.");
+  } else if (decision.tone === "warn") {
+    checklist.push("Route the packet to the owner of the blocking assumption before customer quote or PO signature.");
+  } else {
+    checklist.push("Attach the decision packet to the quote or reorder approval so Finance sees the same landed-cost basis.");
+  }
+
+  if (result.upliftPercent >= 30) {
+    checklist.push("Run one stress scenario for freight and duty movement because import overhead is materially shaping the decision.");
+  }
+
+  return checklist;
+}
+
+function landedDecisionBrief(inputs, result, decision) {
+  return [
+    "Landed cost quote/reorder decision packet",
+    `Market: ${inputs.preset.label}`,
+    `Commercial term: ${inputs.incoterm}`,
+    `HS confidence: ${inputs.hsConfidence}`,
+    `Total landed cost: ${formatCurrency(result.totalLanded, inputs.currency)}`,
+    `Per-unit landed cost: ${formatCurrency(result.perUnit, inputs.currency)}`,
+    `Quoted resale price: ${formatCurrency(inputs.quotedSalePrice, inputs.currency)}`,
+    `Channel / fulfillment cost per unit: ${formatCurrency(inputs.channelCost, inputs.currency)}`,
+    `Profit per unit: ${formatCurrency(decision.profitPerUnit, inputs.currency)}`,
+    `Gross margin at quote: ${formatPercent(decision.grossMargin)}`,
+    `Target resale price: ${Number.isFinite(decision.targetPrice) ? formatCurrency(decision.targetPrice, inputs.currency) : "No safe price"}`,
+    `Decision: ${decision.status}`,
+    `Reason: ${decision.reason}`,
+    "",
+    "Broker questions:",
+    ...buildBrokerQuestions(inputs, result, decision).map((item) => `- ${item}`),
+    "",
+    "PO / reorder checklist:",
+    ...buildReorderChecklist(inputs, result, decision).map((item) => `- ${item}`)
+  ].join("\n");
+}
+
 function scenarioRows(inputs) {
   const scenarios = [
     { label: "Current filing", patch: {} },
@@ -369,6 +548,7 @@ function landedScenarioSummary(inputs) {
 }
 
 function landedCsvRows(inputs, result) {
+  const decision = calculateLandedDecision(inputs, result);
   return [
     ["Metric", "Value"],
     ["Market", inputs.preset.label],
@@ -390,7 +570,17 @@ function landedCsvRows(inputs, result) {
     ["Per-unit landed cost", result.perUnit],
     ["Landed uplift percent", result.upliftPercent],
     ["Duty and tax share percent", result.rateBurden],
-    ["Threshold applied", result.thresholdEligible ? "yes" : "no"]
+    ["Threshold applied", result.thresholdEligible ? "yes" : "no"],
+    ["Quoted resale price", inputs.quotedSalePrice || 0],
+    ["Channel or fulfillment cost per unit", inputs.channelCost || 0],
+    ["Target margin percent", (inputs.targetMargin || 0) * 100],
+    ["Profit per unit after landed and channel costs", decision.profitPerUnit],
+    ["Gross margin at quote percent", decision.grossMargin],
+    ["Target resale price", Number.isFinite(decision.targetPrice) ? decision.targetPrice : "No safe price"],
+    ["Decision", decision.status],
+    ["Decision reason", decision.reason],
+    ["HS confidence", inputs.hsConfidence || "not captured"],
+    ["Commercial term", inputs.incoterm || "not captured"]
   ];
 }
 
@@ -461,9 +651,10 @@ function renderLandedHistory(scope) {
 }
 
 function renderTool(scope) {
-  const inputs = readToolInputs(scope);
+  const inputs = readLandedDecisionInputs(scope);
   const result = calculateLandedCost(inputs);
   const [status, tone] = planningStatus(inputs, result);
+  const decision = calculateLandedDecision(inputs, result);
 
   setText(scope, "totalLanded", formatCurrency(result.totalLanded, inputs.currency));
   setText(scope, "duty", formatCurrency(result.duty, inputs.currency));
@@ -483,6 +674,12 @@ function renderTool(scope) {
     "formulaLine",
     `Landed = product + freight + insurance + brokerage + misc + FX buffer + duty + tax = ${formatCurrency(result.totalLanded, inputs.currency)}`
   );
+  setText(scope, "landedDecision", decision.status);
+  setText(scope, "landedDecisionReason", decision.reason);
+  setText(scope, "decisionProfitPerUnit", formatCurrency(decision.profitPerUnit, inputs.currency));
+  setText(scope, "decisionGrossMargin", formatPercent(decision.grossMargin));
+  setText(scope, "decisionTargetPrice", Number.isFinite(decision.targetPrice) ? formatCurrency(decision.targetPrice, inputs.currency) : "No safe price");
+  setText(scope, "decisionMarginGap", formatPercent(decision.marginGap));
 
   const statusNode = byOutput(scope, "statusTone");
   if (statusNode) statusNode.className = `status-pill ${tone}`;
@@ -494,6 +691,9 @@ function renderTool(scope) {
   if (insightList) {
     insightList.innerHTML = insights.map((item) => `<li>${item}</li>`).join("");
   }
+
+  renderTextList(byOutput(scope, "brokerQuestions"), buildBrokerQuestions(inputs, result, decision));
+  renderTextList(byOutput(scope, "reorderChecklist"), buildReorderChecklist(inputs, result, decision));
 
   renderScenarioTable(scope, inputs);
   renderLandedHistory(scope);
@@ -513,7 +713,7 @@ function attachCsvAndHistory(scope) {
   const clearHistoryButton = byOutput(scope, "clearHistory");
 
   downloadButton?.addEventListener("click", () => {
-    const inputs = readToolInputs(scope);
+    const inputs = readLandedDecisionInputs(scope);
     const result = calculateLandedCost(inputs);
     downloadCsvFile("landed-cost-scenario.csv", landedCsvRows(inputs, result));
   });
@@ -596,8 +796,9 @@ function attachCopySummary(scope) {
   const button = byOutput(scope, "copySummary");
   if (!button) return;
   button.addEventListener("click", async () => {
-    const inputs = readToolInputs(scope);
+    const inputs = readLandedDecisionInputs(scope);
     const result = calculateLandedCost(inputs);
+    const decision = calculateLandedDecision(inputs, result);
     const summary = [
       `${inputs.preset.label} landed-cost summary`,
       `Product value: ${formatCurrency(inputs.productValue, inputs.currency)}`,
@@ -605,6 +806,9 @@ function attachCopySummary(scope) {
       `Tax: ${formatCurrency(result.tax, inputs.currency)}`,
       `Total landed: ${formatCurrency(result.totalLanded, inputs.currency)}`,
       `Per-unit landed: ${formatCurrency(result.perUnit, inputs.currency)}`,
+      `Quote/reorder decision: ${decision.status}`,
+      `Profit per unit: ${formatCurrency(decision.profitPerUnit, inputs.currency)}`,
+      `Target resale price: ${Number.isFinite(decision.targetPrice) ? formatCurrency(decision.targetPrice, inputs.currency) : "No safe price"}`,
       `Threshold: ${result.thresholdEligible ? "applied" : "not applied"}`
     ].join("\n");
     try {
@@ -617,6 +821,27 @@ function attachCopySummary(scope) {
       button.textContent = "Copy failed";
       window.setTimeout(() => {
         button.textContent = "Copy summary";
+      }, 1200);
+    }
+  });
+}
+
+function attachLandedDecisionPacket(scope) {
+  const copyButton = byOutput(scope, "copyDecisionPacket");
+  copyButton?.addEventListener("click", async () => {
+    const inputs = readLandedDecisionInputs(scope);
+    const result = calculateLandedCost(inputs);
+    const decision = calculateLandedDecision(inputs, result);
+    try {
+      await navigator.clipboard.writeText(landedDecisionBrief(inputs, result, decision));
+      copyButton.textContent = "Copied";
+      window.setTimeout(() => {
+        copyButton.textContent = "Copy decision packet";
+      }, 1200);
+    } catch (_error) {
+      copyButton.textContent = "Copy failed";
+      window.setTimeout(() => {
+        copyButton.textContent = "Copy decision packet";
       }, 1200);
     }
   });
@@ -1314,6 +1539,7 @@ function initLandedCostTools() {
 
     attachCopySummary(scope);
     attachCsvAndHistory(scope);
+    attachLandedDecisionPacket(scope);
     renderTool(scope);
   });
 }
