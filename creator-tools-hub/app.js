@@ -1,4 +1,5 @@
 const numberFormat = new Intl.NumberFormat("en-US", { maximumFractionDigits: 2 });
+const LANDING_SPRINT_HANDOFF_KEY = "shortformtools-landing-sprint-handoff-v1";
 
 function num(id) {
   const value = document.getElementById(id)?.value ?? 0;
@@ -24,6 +25,32 @@ function downloadTextFile(filename, text) {
   link.download = filename;
   link.click();
   URL.revokeObjectURL(url);
+}
+
+function readStoredJson(key) {
+  try {
+    return JSON.parse(localStorage.getItem(key) || "null");
+  } catch (_error) {
+    return null;
+  }
+}
+
+function writeStoredJson(key, value) {
+  try {
+    localStorage.setItem(key, JSON.stringify(value));
+    return true;
+  } catch (_error) {
+    return false;
+  }
+}
+
+function removeStoredJson(key) {
+  try {
+    localStorage.removeItem(key);
+    return true;
+  } catch (_error) {
+    return false;
+  }
 }
 
 function rateBadge(rate) {
@@ -1279,10 +1306,14 @@ function initLandingAuditChecklist() {
   const copyRewrite = document.getElementById("copyRewriteBrief");
   const downloadRewrite = document.getElementById("downloadRewriteBrief");
   const copyHandoff = document.getElementById("copySprintHandoff");
+  const saveHandoff = document.getElementById("saveSprintHandoff");
   const downloadHandoff = document.getElementById("downloadSprintHandoff");
+  const saveStatus = document.getElementById("auditSprintSaveStatus");
+  const openPrefill = document.getElementById("openSprintPrefill");
   let lastPlan = "";
   let lastRewriteBrief = "";
   let lastSprintHandoff = "";
+  let lastHandoffPayload = null;
 
   function renderTextList(id, items) {
     const list = document.getElementById(id);
@@ -1453,6 +1484,7 @@ function initLandingAuditChecklist() {
     const blocker = blockerLabel(weakest.id, score);
     const rewrite = buildRewriteBrief({ pageType, goal, audience, offerName, outcome, proofAsset, notes, blocker, readiness, score, sorted });
     const handoff = buildSprintHandoff({ pageType, goal, audience, offerName, outcome, proofAsset, notes, blocker, readiness, score, sorted, rewrite });
+    const weakestLabels = sorted.slice(0, 3).map((item) => item.label);
 
     setText("auditScore", `${score}/100`);
     setText("auditReadiness", readiness);
@@ -1543,6 +1575,28 @@ function initLandingAuditChecklist() {
       "",
       handoff.body
     ].join("\n");
+    lastHandoffPayload = {
+      savedAt: new Date().toISOString(),
+      pageType,
+      goal,
+      audience,
+      offerName,
+      outcome,
+      proofAsset,
+      notes,
+      readiness,
+      blocker,
+      score,
+      weakestLabels,
+      packageName: handoff.packageName,
+      fit: handoff.fit,
+      subject: handoff.subject,
+      body: handoff.body,
+      rewriteHero: rewrite.hero,
+      rewriteCta: rewrite.cta,
+      missing: handoff.missing,
+      attachments: handoff.attachments
+    };
   }
 
   shell.querySelectorAll("input, select, textarea").forEach((input) => {
@@ -1566,6 +1620,20 @@ function initLandingAuditChecklist() {
     copyHandoff.textContent = "Copied handoff";
     setTimeout(() => (copyHandoff.textContent = "Copy sprint handoff"), 1200);
   });
+  saveHandoff?.addEventListener("click", () => {
+    if (!lastHandoffPayload) return;
+    const didSave = writeStoredJson(LANDING_SPRINT_HANDOFF_KEY, lastHandoffPayload);
+    if (saveStatus) {
+      saveStatus.textContent = didSave
+        ? "Saved in this browser. Open the sprint page to import the audit into the brief builder."
+        : "Could not save in this browser. Copy or download the handoff instead.";
+    }
+    if (openPrefill && didSave) {
+      openPrefill.setAttribute("href", `landing-page-sprint.html#import-saved-audit`);
+    }
+    saveHandoff.textContent = didSave ? "Saved for sprint brief" : "Save failed";
+    setTimeout(() => (saveHandoff.textContent = "Save for sprint brief"), 1600);
+  });
   downloadHandoff?.addEventListener("click", () => downloadTextFile("landing-page-sprint-handoff.txt", lastSprintHandoff));
   render();
 }
@@ -1576,10 +1644,129 @@ function initSprintBriefBuilder() {
 
   const copy = document.getElementById("copySprintBrief");
   const download = document.getElementById("downloadSprintBrief");
+  const importCard = document.getElementById("sprintSavedAuditCard");
+  const importButton = document.getElementById("importSavedAudit");
+  const clearButton = document.getElementById("clearSavedAudit");
+  const importStatus = document.getElementById("sprintImportStatus");
   let lastBrief = "";
 
   function fieldValue(id) {
     return document.getElementById(id)?.value.trim() || "";
+  }
+
+  function setFieldValue(id, value) {
+    const field = document.getElementById(id);
+    if (!field || value == null) return;
+    field.value = value;
+    field.dispatchEvent(new Event("input", { bubbles: true }));
+    field.dispatchEvent(new Event("change", { bubbles: true }));
+  }
+
+  function setSelectValue(id, value) {
+    const field = document.getElementById(id);
+    if (!field) return;
+    const option = [...field.options].find((item) => item.value === value || item.textContent === value);
+    if (!option) return;
+    field.value = option.value;
+    field.dispatchEvent(new Event("change", { bubbles: true }));
+  }
+
+  function mapAuditToSprint(payload) {
+    const weakText = `${payload.blocker || ""} ${(payload.weakestLabels || []).join(" ")} ${payload.notes || ""}`.toLowerCase();
+    const packageName = String(payload.packageName || "").toLowerCase();
+    const goal = String(payload.goal || "book a call");
+    const scope = packageName.includes("toolkit") || weakText.includes("search")
+      ? "seo"
+      : weakText.includes("proof") || weakText.includes("clarity") || weakText.includes("cta")
+        ? "copy"
+        : "simple";
+    const tier = packageName.includes("toolkit")
+      ? "Toolkit"
+      : packageName.includes("growth")
+        ? "Growth"
+        : "Starter";
+    const proof = /no proof|proof assets? yet|placeholder/i.test(`${payload.proofAsset || ""} ${payload.notes || ""}`)
+      ? "none"
+      : /some|rough|draft/i.test(`${payload.proofAsset || ""} ${payload.notes || ""}`)
+        ? "some"
+        : "ready";
+    const traffic = weakText.includes("search") || packageName.includes("toolkit")
+      ? "Search traffic"
+      : "Warm outreach";
+    const decision = scope === "seo"
+      ? "Build a small SEO cluster"
+      : weakText.includes("cta") || weakText.includes("wait")
+        ? "Validate a waitlist or lead magnet"
+        : "Fix an existing weak page";
+    const cta = goal.toLowerCase().includes("book")
+      ? "book a call"
+      : goal.toLowerCase().includes("join") || goal.toLowerCase().includes("wait")
+        ? "join the waitlist"
+        : goal;
+    const assets = [
+      payload.proofAsset ? `Proof to use: ${payload.proofAsset}.` : "",
+      payload.attachments?.length ? `Attach/link: ${payload.attachments.join(" ")}` : "",
+      payload.subject ? `Audit handoff subject: ${payload.subject}.` : ""
+    ].filter(Boolean).join("\n");
+    const notes = [
+      payload.notes ? `Audit concern: ${payload.notes}` : "",
+      payload.blocker ? `Likely blocker: ${payload.blocker}.` : "",
+      payload.score ? `Audit score: ${payload.score}/100 (${payload.readiness || "readiness captured"}).` : "",
+      payload.rewriteHero ? `Suggested hero: ${payload.rewriteHero}` : "",
+      payload.rewriteCta ? `Suggested CTA: ${payload.rewriteCta}` : ""
+    ].filter(Boolean).join("\n");
+
+    return {
+      offer: payload.offerName || "",
+      audience: payload.audience || "",
+      cta,
+      tier,
+      scope,
+      deadline: payload.score >= 65 ? "this-week" : "two-weeks",
+      proof,
+      traffic,
+      decision,
+      assets,
+      notes
+    };
+  }
+
+  function showSavedAuditCard() {
+    const payload = readStoredJson(LANDING_SPRINT_HANDOFF_KEY);
+    if (!payload || !importCard) return;
+    importCard.hidden = false;
+    setText("sprintSavedAuditTitle", `${payload.offerName || "Saved audit"} (${payload.score || "?"}/100)`);
+    setText(
+      "sprintSavedAuditSummary",
+      `${payload.packageName || "Sprint scope"} from the audit checklist. Importing will prefill the brief; it will not send an email.`
+    );
+    if (window.location.hash === "#import-saved-audit") {
+      importStatus?.scrollIntoView({ block: "center" });
+    }
+  }
+
+  function importSavedAudit() {
+    const payload = readStoredJson(LANDING_SPRINT_HANDOFF_KEY);
+    if (!payload) {
+      if (importStatus) importStatus.textContent = "No saved audit handoff found in this browser.";
+      return;
+    }
+    const mapped = mapAuditToSprint(payload);
+    setFieldValue("sprintOffer", mapped.offer);
+    setFieldValue("sprintAudience", mapped.audience);
+    setFieldValue("sprintCta", mapped.cta);
+    setSelectValue("sprintTier", mapped.tier);
+    setSelectValue("sprintScope", mapped.scope);
+    setSelectValue("sprintDeadline", mapped.deadline);
+    setSelectValue("sprintProof", mapped.proof);
+    setSelectValue("sprintTraffic", mapped.traffic);
+    setSelectValue("sprintDecision", mapped.decision);
+    setFieldValue("sprintAssets", mapped.assets);
+    setFieldValue("sprintNotes", mapped.notes);
+    render();
+    if (importStatus) {
+      importStatus.textContent = `Imported ${payload.offerName || "the saved audit"} into the sprint brief. Review before copying or emailing.`;
+    }
   }
 
   function render() {
@@ -1851,6 +2038,13 @@ function initSprintBriefBuilder() {
     setTimeout(() => (copy.textContent = "Copy sprint brief"), 1200);
   });
   download?.addEventListener("click", () => downloadTextFile("landing-page-sprint-brief.txt", lastBrief));
+  importButton?.addEventListener("click", importSavedAudit);
+  clearButton?.addEventListener("click", () => {
+    removeStoredJson(LANDING_SPRINT_HANDOFF_KEY);
+    if (importCard) importCard.hidden = true;
+    if (importStatus) importStatus.textContent = "Saved audit handoff cleared from this browser.";
+  });
+  showSavedAuditCard();
   render();
 }
 

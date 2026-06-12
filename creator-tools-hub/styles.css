@@ -628,6 +628,37 @@ textarea {
   margin-top: 16px;
 }
 
+.compact-actions {
+  margin-top: 0;
+  justify-content: flex-end;
+}
+
+.handoff-import-card {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  align-items: center;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  background: linear-gradient(135deg, var(--teal-soft), var(--paper));
+  padding: 16px;
+  margin-bottom: 16px;
+  box-shadow: 0 1px 3px oklch(22% 0.012 206 / 0.1);
+}
+
+.handoff-import-card[hidden] {
+  display: none;
+}
+
+.handoff-import-card strong {
+  display: block;
+  margin-top: 4px;
+}
+
+.handoff-import-card p {
+  margin-top: 6px;
+}
+
 .inline-note {
   margin-top: 12px;
   border-radius: var(--radius);
