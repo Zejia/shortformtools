@@ -82,6 +82,9 @@
               <div class="field"><label for="adsConversionRate">Conversion rate</label><input id="adsConversionRate" type="number" min="0.1" step="0.1" value="3"><span class="hint">Percent of ad clicks that become orders.</span></div>
               <div class="field"><label for="adsAverageCpc">Average CPC</label><input id="adsAverageCpc" type="number" min="0" step="0.01" value="0.35"></div>
               <div class="field"><label for="adsMonthlyBudget">Monthly Etsy Ads budget</label><input id="adsMonthlyBudget" type="number" min="0" step="1" value="150"></div>
+              <div class="field"><label for="adsDailyBudget">Daily test budget</label><input id="adsDailyBudget" type="number" min="0" step="0.50" value="5"><span class="hint">Used for the test-window plan.</span></div>
+              <div class="field"><label for="adsMinTestClicks">Minimum test clicks</label><input id="adsMinTestClicks" type="number" min="10" step="5" value="100"><span class="hint">How much click data before making a budget decision.</span></div>
+              <div class="field"><label for="adsMaxTestLoss">Max test loss allowed</label><input id="adsMaxTestLoss" type="number" min="0" step="1" value="40"><span class="hint">Stop-loss for the listing test window.</span></div>
               <div class="field"><label for="adsTargetMargin">Target profit margin after ads</label><input id="adsTargetMargin" type="number" min="0" max="80" step="0.1" value="20"></div>
               <div class="field"><label for="adsSampleClicks">Recent ad clicks reviewed</label><input id="adsSampleClicks" type="number" min="0" step="1" value="100"><span class="hint">Use listing-level Etsy Ads clicks from a recent test window.</span></div>
               <div class="field"><label for="adsSampleOrders">Recent ad-attributed orders</label><input id="adsSampleOrders" type="number" min="0" step="1" value="3"><span class="hint">Used only for confidence, not fee math.</span></div>
@@ -203,6 +206,53 @@
           </div>
           <div class="hero-actions">
             <button type="button" id="copyAdsActionPlan">Copy action plan</button>
+          </div>
+        </div>
+      </section>
+
+      <section class="content-band wrap">
+        <div class="plain-panel">
+          <div class="section-head">
+            <div>
+              <h2>Etsy Ads test-window planner</h2>
+              <p>Decide how long to run the test, what result is enough to scale, and when the loss limit says to pause.</p>
+            </div>
+            <span class="status ok" id="adsTestWindowStatus">Planning</span>
+          </div>
+          <div class="action-grid">
+            <div class="action-card primary-card">
+              <span>Test window</span>
+              <strong id="adsTestWindowDays">-</strong>
+              <small id="adsTestWindowDetail">Set a daily budget and minimum clicks.</small>
+            </div>
+            <div class="action-card">
+              <span>Spend to decision</span>
+              <strong id="adsTestSpend">$0.00</strong>
+              <small id="adsTestLossRisk">-</small>
+            </div>
+            <div class="action-card">
+              <span>Orders needed</span>
+              <strong id="adsOrdersNeeded">0</strong>
+              <small id="adsOrdersNeededDetail">-</small>
+            </div>
+            <div class="action-card">
+              <span>Stop-loss check</span>
+              <strong id="adsStopLoss">-</strong>
+              <small id="adsStopLossDetail">-</small>
+            </div>
+          </div>
+          <div class="decision-grid">
+            <div>
+              <h3>Scale rule</h3>
+              <ul class="insights" id="adsScaleRules"></ul>
+            </div>
+            <div>
+              <h3>Pause or fix rule</h3>
+              <ul class="insights" id="adsPauseRules"></ul>
+            </div>
+          </div>
+          <div class="hero-actions">
+            <button type="button" id="copyAdsTestPlan">Copy test plan</button>
           </div>
         </div>
       </section>

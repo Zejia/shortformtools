@@ -1517,6 +1517,9 @@ function readAdsInputs() {
     conversionRate: Math.max(0.1, val("adsConversionRate")) / 100,
     averageCpc: Math.max(0, val("adsAverageCpc")),
     monthlyBudget: Math.max(0, val("adsMonthlyBudget")),
+    dailyBudget: Math.max(0, val("adsDailyBudget")),
+    minTestClicks: Math.max(10, val("adsMinTestClicks") || 10),
+    maxTestLoss: Math.max(0, val("adsMaxTestLoss")),
     targetMargin: clamp(val("adsTargetMargin"), 0, 80),
     sampleClicks: Math.max(0, val("adsSampleClicks")),
     sampleOrders: Math.max(0, val("adsSampleOrders"))
@@ -1651,6 +1654,9 @@ function exportAdsCsv(inputs, plan) {
     ["Profit before Etsy Ads", plan.baseResult.profit],
     ["Conversion rate percent", inputs.conversionRate * 100],
     ["Average CPC", inputs.averageCpc],
+    ["Daily test budget", inputs.dailyBudget],
+    ["Minimum test clicks", inputs.minTestClicks],
+    ["Max test loss allowed", inputs.maxTestLoss],
     ["Ad spend per order", plan.currentAdSpendPerOrder],
     ["Profit after ads per order", plan.profitAfterAds],
     ["Break-even ad spend per order", plan.breakEvenSpend],
@@ -1806,6 +1812,97 @@ function buildAdsActionPlan(inputs, plan, fmt) {
   };
 }
 
+function buildAdsTestWindow(inputs, plan, action, fmt) {
+  const spendToDecision = inputs.minTestClicks * inputs.averageCpc;
+  const dailyBudget = inputs.dailyBudget > 0 ? inputs.dailyBudget : inputs.monthlyBudget / 30;
+  const daysToDecision = dailyBudget > 0 ? Math.ceil(spendToDecision / dailyBudget) : Infinity;
+  const expectedOrders = inputs.minTestClicks * inputs.conversionRate;
+  const ordersForTarget = Math.ceil(inputs.minTestClicks * plan.conversionNeededForTarget);
+  const ordersForBreakEven = Math.ceil(inputs.minTestClicks * plan.conversionNeededForBreakEven);
+  const expectedProfit = expectedOrders * plan.baseResult.profit - spendToDecision;
+  const observedTestProfit = inputs.sampleOrders * plan.baseResult.profit - inputs.sampleClicks * inputs.averageCpc;
+  const lossAtDecision = Math.max(0, -expectedProfit);
+  const stopLossTriggered = inputs.maxTestLoss > 0 && Math.max(0, -observedTestProfit) >= inputs.maxTestLoss;
+  const stopLossProjected = inputs.maxTestLoss > 0 && lossAtDecision >= inputs.maxTestLoss;
+  const enoughClicks = inputs.sampleClicks >= inputs.minTestClicks;
+  const enoughTargetOrders = inputs.sampleOrders >= ordersForTarget && ordersForTarget > 0;
+  const enoughBreakEvenOrders = inputs.sampleOrders >= ordersForBreakEven && ordersForBreakEven > 0;
+  const clicksRemaining = Math.max(0, inputs.minTestClicks - inputs.sampleClicks);
+  const spendRemaining = clicksRemaining * inputs.averageCpc;
+  const daysRemaining = dailyBudget > 0 ? Math.ceil(spendRemaining / dailyBudget) : Infinity;
+
+  let status = "Run test";
+  let tone = "ok";
+  let stopLoss = "Not triggered";
+  let stopLossDetail = `Projected test loss is ${fmt.format(lossAtDecision)} against a ${fmt.format(inputs.maxTestLoss)} stop-loss.`;
+  const scaleRules = [];
+  const pauseRules = [];
+
+  if (plan.baseResult.profit <= 0) {
+    status = "Fix economics first";
+    tone = "bad";
+    stopLoss = "Do not test yet";
+    stopLossDetail = "The listing has no pre-ad profit cushion, so the test window cannot produce a healthy paid result.";
+    pauseRules.push("Pause Etsy Ads until price, cost, shipping, discount, or fees create positive pre-ad profit.");
+  } else if (stopLossTriggered) {
+    status = "Stop-loss hit";
+    tone = "bad";
+    stopLoss = "Triggered";
+    stopLossDetail = `The reviewed sample is down ${fmt.format(Math.max(0, -observedTestProfit))}, which meets or exceeds the stop-loss.`;
+    pauseRules.push("Pause or cut bids now; do not wait for more clicks before fixing the listing or search terms.");
+  } else if (enoughClicks && enoughTargetOrders && action.tone === "good") {
+    status = "Scale test";
+    tone = "good";
+    scaleRules.push(`Scale only in a small step because ${compact.format(inputs.sampleClicks)} clicks and ${compact.format(inputs.sampleOrders)} orders clear the target-order rule.`);
+  } else if (enoughClicks && !enoughBreakEvenOrders) {
+    status = "Pause or fix";
+    tone = "bad";
+    pauseRules.push(`The sample reached ${compact.format(inputs.sampleClicks)} clicks but missed the ${compact.format(ordersForBreakEven)} break-even order threshold.`);
+  } else if (enoughClicks && !enoughTargetOrders) {
+    status = "Fix before scaling";
+    tone = "warn";
+    pauseRules.push(`The sample reached the click threshold but missed the ${compact.format(ordersForTarget)} target-margin order threshold.`);
+  } else if (stopLossProjected) {
+    status = "Lower-risk test";
+    tone = "warn";
+    stopLoss = "Projected risk";
+    stopLossDetail = `The planned test could lose ${fmt.format(lossAtDecision)}, above the selected stop-loss. Reduce CPC, daily budget, or minimum clicks.`;
+  }
+
+  if (!scaleRules.length) {
+    scaleRules.push(`Wait for at least ${compact.format(inputs.minTestClicks)} clicks and ${compact.format(Math.max(1, ordersForTarget))} orders before raising budget.`);
+  }
+  scaleRules.push(`If CPC stays at or below ${fmt.format(plan.targetCpc)} and profit after ads clears ${fmt.format(plan.targetProfit)} per order, raise budget in one small step.`);
+  scaleRules.push("Keep the same listing variable during the test window so photo/title/price changes do not blur the result.");
+
+  if (!pauseRules.length) {
+    pauseRules.push(`Pause or fix if ${compact.format(inputs.minTestClicks)} clicks produce fewer than ${compact.format(Math.max(1, ordersForBreakEven))} orders.`);
+  }
+  pauseRules.push(`Pause early if reviewed test loss reaches ${fmt.format(inputs.maxTestLoss)}.`);
+  pauseRules.push("Before restarting, fix one likely bottleneck: thumbnail, price/shipping, title relevance, or review/proof placement.");
+
+  return {
+    status,
+    tone,
+    spendToDecision,
+    dailyBudget,
+    daysToDecision,
+    expectedOrders,
+    ordersForTarget,
+    ordersForBreakEven,
+    expectedProfit,
+    observedTestProfit,
+    lossAtDecision,
+    stopLoss,
+    stopLossDetail,
+    clicksRemaining,
+    spendRemaining,
+    daysRemaining,
+    scaleRules: [...new Set(scaleRules)].slice(0, 4),
+    pauseRules: [...new Set(pauseRules)].slice(0, 4)
+  };
+}
+
 function adsActionSummary(inputs, plan, action) {
   const fmt = currencyFormatter(inputs.preset.currency);
   return [
@@ -1828,12 +1925,35 @@ function adsActionSummary(inputs, plan, action) {
   ].join("\n");
 }
 
+function adsTestWindowSummary(inputs, plan, testWindow) {
+  const fmt = currencyFormatter(inputs.preset.currency);
+  return [
+    "Etsy Ads test-window plan",
+    `Status: ${testWindow.status}`,
+    `Minimum clicks: ${compact.format(inputs.minTestClicks)}`,
+    `Daily budget: ${fmt.format(testWindow.dailyBudget)}`,
+    `Estimated days to decision: ${Number.isFinite(testWindow.daysToDecision) ? `${testWindow.daysToDecision} day${testWindow.daysToDecision === 1 ? "" : "s"}` : "No daily budget set"}`,
+    `Spend to decision: ${fmt.format(testWindow.spendToDecision)}`,
+    `Orders needed for target margin: ${compact.format(testWindow.ordersForTarget)}`,
+    `Orders needed to break even: ${compact.format(testWindow.ordersForBreakEven)}`,
+    `Expected profit at modeled conversion: ${fmt.format(testWindow.expectedProfit)}`,
+    `Stop-loss: ${testWindow.stopLoss} (${testWindow.stopLossDetail})`,
+    "",
+    "Scale rule:",
+    ...testWindow.scaleRules.map((item) => `- ${item}`),
+    "",
+    "Pause or fix rule:",
+    ...testWindow.pauseRules.map((item) => `- ${item}`)
+  ].join("\n");
+}
+
 function calculateAdsAndRender() {
   const inputs = readAdsInputs();
   const fmt = currencyFormatter(inputs.preset.currency);
   const plan = calculateAdsPlan(inputs);
   const [status, tone] = adsStatus(plan.profitAfterAds, plan.targetProfit);
   const action = buildAdsActionPlan(inputs, plan, fmt);
+  const testWindow = buildAdsTestWindow(inputs, plan, action, fmt);
 
   text("currencyLabel", inputs.preset.currency);
   text("paymentPresetText", `${inputs.preset.label}: ${pct(inputs.paymentRate * 100)} + ${fmt.format(inputs.paymentFlat)}`);
@@ -1874,12 +1994,33 @@ function calculateAdsAndRender() {
   if (reasonList) reasonList.innerHTML = action.reasons.map((item) => `<li>${item}</li>`).join("");
   const testList = byId("adsNextTests");
   if (testList) testList.innerHTML = action.tests.map((item) => `<li>${item}</li>`).join("");
+  text("adsTestWindowStatus", testWindow.status);
+  text("adsTestWindowDays", Number.isFinite(testWindow.daysToDecision) ? `${testWindow.daysToDecision} day${testWindow.daysToDecision === 1 ? "" : "s"}` : "Set budget");
+  text("adsTestWindowDetail", testWindow.clicksRemaining > 0 ? `${compact.format(testWindow.clicksRemaining)} clicks left; about ${Number.isFinite(testWindow.daysRemaining) ? `${testWindow.daysRemaining} day${testWindow.daysRemaining === 1 ? "" : "s"}` : "unknown time"} remaining.` : "Minimum click window reached. Use the order rule.");
+  text("adsTestSpend", fmt.format(testWindow.spendToDecision));
+  text("adsTestLossRisk", `Modeled test profit: ${fmt.format(testWindow.expectedProfit)}`);
+  text("adsOrdersNeeded", compact.format(testWindow.ordersForTarget));
+  text("adsOrdersNeededDetail", `${compact.format(testWindow.ordersForBreakEven)} orders to break even; ${compact.format(testWindow.expectedOrders)} expected at modeled conversion.`);
+  text("adsStopLoss", testWindow.stopLoss);
+  text("adsStopLossDetail", testWindow.stopLossDetail);
+  const testStatus = byId("adsTestWindowStatus");
+  if (testStatus) testStatus.className = `status ${testWindow.tone}`;
+  const testCard = byId("adsTestWindowDays")?.closest(".action-card");
+  if (testCard) testCard.dataset.tone = testWindow.tone;
+  const stopLossCard = byId("adsStopLoss")?.closest(".action-card");
+  if (stopLossCard) stopLossCard.dataset.tone = testWindow.tone === "bad" ? "bad" : testWindow.stopLoss === "Projected risk" ? "warn" : "good";
+  const scaleList = byId("adsScaleRules");
+  if (scaleList) scaleList.innerHTML = testWindow.scaleRules.map((item) => `<li>${item}</li>`).join("");
+  const pauseList = byId("adsPauseRules");
+  if (pauseList) pauseList.innerHTML = testWindow.pauseRules.map((item) => `<li>${item}</li>`).join("");
 
   window.currentAdsReport = {
     inputs,
     plan,
     action,
+    testWindow,
     actionSummary: adsActionSummary(inputs, plan, action),
+    testWindowSummary: adsTestWindowSummary(inputs, plan, testWindow),
     csv: exportAdsCsv(inputs, plan),
     scenarios: adsScenarioExports(inputs, plan),
     fmtCurrency: inputs.preset.currency
@@ -1916,6 +2057,9 @@ function bindAdsRoas() {
         byId("adsLaborCost").value = 3;
         byId("adsConversionRate").value = 3;
         byId("adsAverageCpc").value = 0.35;
+        byId("adsDailyBudget").value = 5;
+        byId("adsMinTestClicks").value = 100;
+        byId("adsMaxTestLoss").value = 40;
         byId("adsSampleClicks").value = 100;
         byId("adsSampleOrders").value = 3;
       }
@@ -1928,6 +2072,9 @@ function bindAdsRoas() {
         byId("adsLaborCost").value = 1.5;
         byId("adsConversionRate").value = 4;
         byId("adsAverageCpc").value = 0.22;
+        byId("adsDailyBudget").value = 4;
+        byId("adsMinTestClicks").value = 120;
+        byId("adsMaxTestLoss").value = 30;
         byId("adsSampleClicks").value = 120;
         byId("adsSampleOrders").value = 5;
       }
@@ -1940,6 +2087,9 @@ function bindAdsRoas() {
         byId("adsLaborCost").value = 2.5;
         byId("adsConversionRate").value = 2;
         byId("adsAverageCpc").value = 0.4;
+        byId("adsDailyBudget").value = 3;
+        byId("adsMinTestClicks").value = 90;
+        byId("adsMaxTestLoss").value = 25;
         byId("adsSampleClicks").value = 90;
         byId("adsSampleOrders").value = 1;
       }
@@ -2002,6 +2152,14 @@ Profit after ads/order: ${fmt.format(report.plan.profitAfterAds)}`;
     await navigator.clipboard.writeText(report.actionSummary);
     text("copyAdsActionPlan", "Copied");
     setTimeout(() => text("copyAdsActionPlan", "Copy action plan"), 1200);
+  });
+
+  byId("copyAdsTestPlan")?.addEventListener("click", async () => {
+    const report = window.currentAdsReport;
+    if (!report) return;
+    await navigator.clipboard.writeText(report.testWindowSummary);
+    text("copyAdsTestPlan", "Copied");
+    setTimeout(() => text("copyAdsTestPlan", "Copy test plan"), 1200);
   });
 
   calculateAdsAndRender();
